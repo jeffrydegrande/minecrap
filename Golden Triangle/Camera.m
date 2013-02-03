@@ -13,11 +13,11 @@
 #define STRAFE_DISTANCE 0.4
 
 // camera positions
-float xpos = 0;
-float ypos = 0;
-float zpos = 0;
-float xrot = 0;
-float yrot = 0;
+float xpos = 40; // -10.0;
+float ypos = 52; // 0.0;
+float zpos = 29; // 42.0;
+float xrot = 29; // -21;
+float yrot = 7; // 36;
 
 float lastx = 0;
 float lasty = 0;
@@ -133,6 +133,14 @@ float lasty = 0;
     glRotatef(xrot,1.0,0.0,0.0);  //rotate our camera on the x-axis (left and right)
     glRotatef(yrot,0.0,1.0,0.0);  //rotate our camera on they-axis (up and down)
     glTranslated(-xpos,-ypos,-zpos); //translate the screen to the position of our camera
+    
+    GLfloat pos[3];
+    pos[0] = -xpos;
+    pos[1] = -ypos;
+    pos[2] = -zpos;
+    
+    // glLightfv (GL_LIGHT1, GL_POSITION, pos);
+
 }
 
 

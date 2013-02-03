@@ -8,16 +8,14 @@
 
 #import <Cocoa/Cocoa.h>
 #import "Camera.h"
+#import "World.h"
 
 @interface MyOpenGLView : NSOpenGLView
 {
     Camera *camera;
+    World *world;
+    
     long lastTicks;
- 
-    float cubeRotationAngle;
 }
-
-- (void) buildWorld;
-- (void) renderBlocks;
 
 @end

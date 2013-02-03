@@ -161,11 +161,13 @@ GLubyte world[WORLDX][WORLDY][WORLDZ];
 
 bool exposedToAir(int x, int y, int z)
 {
+    /*
     if (x == 0 || x == 0 || z == 0)
         return false;
     if (x == WORLDX-1 || y == WORLDY - 1 || z == WORLDZ - 1)
         return false;
-    
+    */
+     
     if (world[x+1][y][z] == AIR || world[x-1][y][z] == AIR
         || world[x][y+1][z] == AIR || world[x][y-1][z] == AIR
         || world[x][y][z+1] == AIR || world[x][y][z-1] == AIR
@@ -233,6 +235,10 @@ static void renderBlock(int x, int y, int z) {
     } else if (block == WATER) {
         glMaterialfv(GL_FRONT, GL_AMBIENT, dblue);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, blue);
+    } else if (block == RED) {
+        
+        glMaterialfv(GL_FRONT, GL_AMBIENT, red);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, red);
     } else {
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, white);
     }

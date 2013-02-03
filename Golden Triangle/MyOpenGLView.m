@@ -201,7 +201,16 @@ int optionLighting = 1;        // toggled by pressing '3'
                 glDisable(GL_LIGHT0);
     
             [self setNeedsDisplay:YES];
+            return;
         }
+        
+        if (keyChar == 110) { // 'n'
+            [ camera cycle];
+            [self setNeedsDisplay:YES];
+            return;
+        }
+        
+        /// NSLog(@"%d", keyChar);
     }
 
     [super keyDown:theEvent];

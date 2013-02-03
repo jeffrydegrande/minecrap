@@ -22,6 +22,7 @@ float yrot = 51;
 float lastx = 0;
 float lasty = 0;
 
+int camera_position = 0;
 
 - (int) bound:(int) value {
     if (value < -360) {
@@ -133,14 +134,28 @@ float lasty = 0;
     glRotatef(xrot,1.0,0.0,0.0);  //rotate our camera on the x-axis (left and right)
     glRotatef(yrot,0.0,1.0,0.0);  //rotate our camera on they-axis (up and down)
     glTranslated(-xpos,-ypos,-zpos); //translate the screen to the position of our camera
-    
-    GLfloat pos[3];
-    pos[0] = -xpos;
-    pos[1] = -ypos;
-    pos[2] = -zpos;
-    
-    // glLightfv (GL_LIGHT1, GL_POSITION, pos);
+}
 
+
+- (void) cycle {
+    int camera_positions[8][3] = {
+        {0, 0, 0},
+        {0, 0, 60},
+        {60, 0, 0},
+        {60, 0, 60},
+        {0, 60, 0},
+        {0, 60, 60},
+        {60, 60, 0},
+        {60, 60, 60},
+    };
+    
+    camera_position++;
+    if (camera_position >= 8)
+        camera_position = 0;
+    
+    xpos = camera_positions[camera_position][0];
+    ypos = camera_positions[camera_position][1];
+    zpos = camera_positions[camera_position][2];
 }
 
 

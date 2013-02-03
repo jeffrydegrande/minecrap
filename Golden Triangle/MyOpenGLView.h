@@ -18,6 +18,6 @@
 }
 
 - (void) buildWorld;
-- (void) renderCubes;
+- (void) renderBlocks;
 
 @end

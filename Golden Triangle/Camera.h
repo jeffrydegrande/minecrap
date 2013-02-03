@@ -26,4 +26,7 @@
 
 - (void) lookUp;
 - (void) lookDown;
+
+- (NSString *) stringFromPosition;
+
 @end

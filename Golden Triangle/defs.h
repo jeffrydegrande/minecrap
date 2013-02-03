@@ -9,7 +9,6 @@
 #ifndef Golden_Triangle_defs_h
 #define Golden_Triangle_defs_h
 
-
 // COLORS
 
 GLfloat blue[]     = {0.0, 0.0, 1.0, 1.0};
@@ -33,7 +32,6 @@ GLfloat dgreen[]   = {0.0, 0.5, 0.0, 1.0};
 GLfloat dyellow[]  = {0.5, 0.5, 0.0, 1.0};
 GLfloat dpurple[]  = {0.5, 0.0, 0.5, 1.0};
 GLfloat dorange[]  = {0.5, 0.32, 0.0, 1.0};
-
 GLfloat skyblue[]  = {0.52, 0.74, 0.84, 1.0};
 
 

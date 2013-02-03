@@ -7,7 +7,7 @@
 //
 
 #import "World.h"
-#include "defs.h"
+#import "defs.h"
 #include "perlin.h"
 #include "simplex.h"
 
@@ -215,9 +215,11 @@ static void renderBlock(int x, int y, int z) {
     
     if (block == AIR)
         return;
-    
     /* select colour based on value in the world array */
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
+    
+
     if (block == ROCK)
     {
         glMaterialfv(GL_FRONT, GL_AMBIENT, dstone);

@@ -22,20 +22,6 @@ int optionSmoothShading  = 1;  // toggled by pressing '2'
 int optionLighting = 1;        // toggled by pressing '3'
 
 
-/* location for the light source (the sun), the first three
- values are the x,y,z coordinates */
-GLfloat lightPosition[] = {0.0, 80.0, 0.0, 0.0};
-/* location for light source that is kept at viewpoint location */
-GLfloat viewpointLight[] = {-50.0, -50.0, -50.0, 1.0};
-
-
-
-GLfloat light_ambient[]  = { 0.0, 0.0, 0.0, 1.0 };
-GLfloat light_diffuse[]  = { 0.8, 0.8, 0.8, 1.0 };
-GLfloat light_specular[] = { 0.5, 0.5, 0.5, 1.0 };
-GLfloat light_full_off[] = {0.0, 0.0, 0.0, 1.0};
-GLfloat light_full_on[]  = {1.0, 1.0, 1.0, 1.0};
-
 
 @implementation MyOpenGLView
 
@@ -56,27 +42,10 @@ GLfloat light_full_on[]  = {1.0, 1.0, 1.0, 1.0};
     [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
     [[self window] setAcceptsMouseMovedEvents:YES];
     
-    
-//    glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    /* no specular reflection from sun, it is too distracting */
-    glLightfv (GL_LIGHT0, GL_SPECULAR, light_full_on);
-    glLightfv (GL_LIGHT0, GL_POSITION, lightPosition);
-    glLightfv (GL_LIGHT0, GL_EMISSION, light_specular);
-
-    
-    /* viewpoint light */
-    glLightfv (GL_LIGHT1, GL_POSITION, viewpointLight);
-    glLightfv (GL_LIGHT1, GL_AMBIENT, light_ambient);
-    glLightfv (GL_LIGHT1, GL_DIFFUSE, light_diffuse);
-    glLightfv (GL_LIGHT1, GL_SPECULAR, light_specular);
-    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.5);
-    
     glEnable (GL_LIGHTING);
     glEnable (GL_LIGHT0);
-    glEnable (GL_LIGHT1);
-    
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 }
 
 
@@ -95,19 +64,71 @@ GLfloat light_full_on[]  = {1.0, 1.0, 1.0, 1.0};
     gluPerspective(fovy, view_aspect, NEAR_CLIP, RENDER_DISTANCE);    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
-    
-    glLightfv(GL_LIGHT0,GL_POSITION, lightPosition);
-
 }
 
+
+
+
+- (void)drawRect:(NSRect)dirtyRect
+{
+    long ticks = clock();
+    // delta_t in millis;
+    int delta_t = (int)((ticks - lastTicks)/(CLOCKS_PER_SEC/1000));
+    int fps = delta_t > 0 ? (int) 1000 / delta_t : 1000;
+    
+    
+    
+    lastTicks = ticks;
+    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+    
+    if (optionDrawWireframes == 1)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    
+    if (optionSmoothShading == 1)
+        glShadeModel(GL_SMOOTH);
+    else
+        glShadeModel(GL_FLAT);
+    
+    
+    GLfloat lightPosition[] = {0.0, 100.0, 0.0, 0.0};
+    GLfloat light_diffuse[]  = { 0.8, 0.8, 0.8, 1.0 };
+    GLfloat light_specular[] = { 0.5, 0.5, 0.5, 1.0 };
+    GLfloat light_full_on[]  = {1.0, 1.0, 1.0, 1.0};
+    GLfloat white[]    = {1.0, 1.0, 1.0, 1.0};
+
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, white);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_full_on);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+    glLightfv(GL_LIGHT0, GL_EMISSION, light_specular);
+    
+    [camera update];
+
+    
+    glPushMatrix();
+    int blocksRendered = [world render];
+    
+    [[self window] setTitle:[NSString stringWithFormat:@"FPS: %d/%@ (%d blocks)",
+                             fps,
+                             [camera stringFromPosition],
+                             blocksRendered]];
+    
+    glPopMatrix();
+  
+    
+    
+    glSwapAPPLE();
+}
 
 - (BOOL)acceptsFirstResponder
 {
     return YES;
 }
-
-
 
 - (void)keyDown:(NSEvent *)theEvent{
     
@@ -170,6 +191,17 @@ GLfloat light_full_on[]  = {1.0, 1.0, 1.0, 1.0};
             [self setNeedsDisplay:YES];
             return;
         }
+        
+        if (keyChar == 51) { // '3'
+            optionLighting = !optionLighting;
+         
+            if (optionLighting)
+                glEnable(GL_LIGHT0);
+            else
+                glDisable(GL_LIGHT0);
+    
+            [self setNeedsDisplay:YES];
+        }
     }
 
     [super keyDown:theEvent];
@@ -190,52 +222,5 @@ GLfloat light_full_on[]  = {1.0, 1.0, 1.0, 1.0};
     [camera updateWithPoint:point];
     [self setNeedsDisplay:YES];
 }
-
-
-- (void)drawRect:(NSRect)dirtyRect
-{
-    long ticks = clock();
-    // delta_t in millis;
-    int delta_t = (int)((ticks - lastTicks)/(CLOCKS_PER_SEC/1000));
-    int fps = delta_t > 0 ? (int) 1000 / delta_t : 1000;
-    
-    
-
-    lastTicks = ticks;
-    
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-
-    if (optionDrawWireframes == 1)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    else
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    
-    if (optionSmoothShading == 1)
-        glShadeModel(GL_SMOOTH);
-    else
-        glShadeModel(GL_FLAT);
-    
-    [camera update];
-    
-    
-    
-    /* give all objects the same shininess value and specular colour */
-    glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
-
-
-    glPushMatrix();
-    int blocksRendered = [world render];
-
-    [[self window] setTitle:[NSString stringWithFormat:@"FPS: %d/%@ (%d blocks)",
-                             fps,
-                             [camera stringFromPosition],
-                             blocksRendered]];
-    
-    glPopMatrix();
-    glSwapAPPLE();
-}
-
-
 
 @end

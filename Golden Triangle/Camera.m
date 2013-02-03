@@ -10,14 +10,14 @@
 
 @implementation Camera
 
-#define STRAFE_DISTANCE 0.4
+#define STRAFE_DISTANCE 1.0
 
 // camera positions
-float xpos = 40; // -10.0;
-float ypos = 52; // 0.0;
-float zpos = 29; // 42.0;
-float xrot = 29; // -21;
-float yrot = 7; // 36;
+float xpos = 7;
+float ypos = 71;
+float zpos = 50;
+float xrot = 25;
+float yrot = 51;
 
 float lastx = 0;
 float lasty = 0;

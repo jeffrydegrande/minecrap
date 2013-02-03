@@ -193,10 +193,10 @@ GLfloat skyblue[]  = {0.52, 0.74, 0.84, 1.0};
     
     NSRect rect = [self bounds];
 
-    if (point.x > rect.size.width || point.x)
+    if (point.x > rect.size.width || point.x < 0)
         return;
     
-    if (point.y > rect.size.height || point.y)
+    if (point.y > rect.size.height || point.y < 0)
         return;
 
     

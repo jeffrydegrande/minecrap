@@ -33,7 +33,6 @@ int optionLighting = 1;        // toggled by pressing '3'
     lastTicks = clock();
     camera = [Camera alloc];
     world = [World alloc];
-    
     [world build];
 }
 
@@ -221,11 +220,17 @@ int optionLighting = 1;        // toggled by pressing '3'
     
     NSRect rect = [self bounds];
 
-    if (point.x > rect.size.width || point.x < 0)
+    if (point.x > rect.size.width || point.x < 0) {
+        [NSCursor unhide];
         return;
+    }
     
-    if (point.y > rect.size.height || point.y < 0)
+    if (point.y > rect.size.height || point.y < 0) {
+        [NSCursor unhide];
         return;
+    }
+    
+    [NSCursor hide];
     
     [camera updateWithPoint:point];
     [self setNeedsDisplay:YES];

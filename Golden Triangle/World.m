@@ -16,14 +16,14 @@
 #include <GLUT/gutil.h>
 
 
-#define AIR 0
-#define ROCK 1
-#define GEMS 2
-#define DIRT 3
+#define AIR   0
+#define ROCK  1
+#define GEMS  2
+#define DIRT  3
 #define GRASS 4
-#define LAVA 5
+#define LAVA  5
 #define WATER 6
-#define RED 7
+#define RED  7
 
 #define WORLDX 64
 #define WORLDY 64
@@ -41,7 +41,7 @@ GLubyte world[WORLDX][WORLDY][WORLDZ];
 @implementation World
 
 
-# pragma mark World Building
+# pragma mark - TerrainBuilding
 
 - (void) build {
     [self buildWithSimplexNoise];
@@ -53,48 +53,6 @@ GLubyte world[WORLDX][WORLDY][WORLDZ];
     foreach_xyz
         world[x][y][z] = rand() % 6 + 1;
     endforeach
-}
-
-
-- (void) summarizeTerrain {
-    int rock =0, dirt=0, empty=0;
-    int blockCount = 0;
-    
-    foreach_xyz {
-        switch(world[x][y][z]) {
-            case ROCK: rock++; break;
-            case DIRT: dirt++; break;
-            default: empty++;
-        }
-        blockCount++;
-    } endforeach
-
-    NSLog(@"%d blocks in this world. %d stone, %d dirt, %d empty", blockCount, rock, dirt, empty);
-}
-
-
-- (void) addMarkersAtTerrainBoundaries {
-    world[0][0][0] = RED;
-    world[0][0][WORLDZ-1] = RED;
-    world[WORLDX-1][0][0] = RED;
-    world[WORLDX-1][0][WORLDZ-1] = RED;
-    
-    world[0][WORLDY-1][0] = RED;
-    world[0][WORLDY-1][WORLDZ-1] = RED;
-    world[WORLDX-1][WORLDY-1][0] = RED;
-    world[WORLDX-1][WORLDY-1][WORLDZ-1] = RED;
-    
-}
-
-- (int) addDirt {
-    foreach_xyz {
-        int block = world[x][y][z];
-        int ontop = world[x][y+1][z];
-        if (block == ROCK && ontop == AIR) {
-            world[x][y][z] = DIRT;
-        }
-    } endforeach
-    return 0;
 }
 
 - (int) buildWithSimplexNoise {
@@ -140,7 +98,91 @@ GLubyte world[WORLDX][WORLDY][WORLDZ];
     return blockCount;
 }
 
+- (void) summarizeTerrain {
+    int rock =0, dirt=0, empty=0;
+    int blockCount = 0;
+    
+    foreach_xyz {
+        switch(world[x][y][z]) {
+            case ROCK: rock++; break;
+            case DIRT: dirt++; break;
+            default: empty++;
+        }
+        blockCount++;
+    } endforeach
+
+    NSLog(@"%d blocks in this world. %d stone, %d dirt, %d empty", blockCount, rock, dirt, empty);
+}
+
+
+
+- (void) addMarkersAtTerrainBoundaries {
+    world[0][0][0] = RED;
+    world[0][0][WORLDZ-1] = RED;
+    world[WORLDX-1][0][0] = RED;
+    world[WORLDX-1][0][WORLDZ-1] = RED;
+    
+    world[0][WORLDY-1][0] = RED;
+    world[0][WORLDY-1][WORLDZ-1] = RED;
+    world[WORLDX-1][WORLDY-1][0] = RED;
+    world[WORLDX-1][WORLDY-1][WORLDZ-1] = RED;
+    
+}
+
+- (int) addDirt {
+    foreach_xyz {
+        int block = world[x][y][z];
+        int ontop = world[x][y+1][z];
+        if (block == ROCK && ontop == AIR) {
+            world[x][y][z] = DIRT;
+        }
+    } endforeach
+    return 0;
+}
+
+
+
 # pragma mark Rendering
+
+- (int) render {
+    int blocksRendered = 0;
+    blocksRendered += [self renderBlocks];
+    blocksRendered += [self renderSun];
+    blocksRendered += [self renderSky];
+    
+    return blocksRendered;
+}
+
+
+- (int) renderSun {
+    glMaterialfv(GL_FRONT, GL_AMBIENT, dyellow);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
+    
+    glPushMatrix();
+    glTranslatef(0, 80, 0);
+    glutSolidCube(8.0);
+    glPopMatrix();
+    
+    return 1; // only one block rendered
+}
+
+
+- (int) renderSky {
+    glShadeModel(GL_SMOOTH);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, black);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, black);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, skyblue);
+    glPushMatrix();
+    glTranslatef(50, 25, 50);
+    glutSolidCube(150.0);
+    glPopMatrix();
+    glShadeModel(GL_SMOOTH);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
+    
+    return 1; // only one block rendered
+}
+
+
 
 bool exposedToAir(int x, int y, int z)
 {
@@ -160,39 +202,6 @@ bool exposedToAir(int x, int y, int z)
     } endforeach
     return renderedBlocksCount;
 }
-
-
-- (void) renderSun {
-    glMaterialfv(GL_FRONT, GL_AMBIENT, dyellow);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
-    
-    glPushMatrix();
-    glTranslatef(0, 80, 0);
-    glutSolidCube(8.0);
-    glPopMatrix();
-}
-
-
-
-- (int) render {
-    [self renderSky];
-    [self renderSun];
-    return [self renderBlocks];
-}
-
-- (void) renderSky {
-    glShadeModel(GL_SMOOTH);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, black);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, black);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, skyblue);
-    glPushMatrix();
-    glTranslatef(50, 25, 50);
-    glutSolidCube(150.0);
-    glPopMatrix();
-    glShadeModel(GL_SMOOTH);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
-}
-
 
 - (void) renderBlock:(int) x :(int)y :(int)z {
     GLubyte block = world[x][y][z];

@@ -10,7 +10,6 @@
 
 @interface World : NSObject
 
-
 - (void) build;
 - (int) render;
 @end

@@ -23,6 +23,7 @@
 #define GRASS 4
 #define LAVA 5
 #define WATER 6
+#define RED 7
 
 #define WORLDX 64
 #define WORLDY 64
@@ -30,50 +31,136 @@
 
 GLubyte world[WORLDX][WORLDY][WORLDZ];
 
+#define foreach_xyz \
+  for (int x=0; x<WORLDX; x++) { \
+    for (int y=0; y< WORLDY; y++) { \
+      for (int z=0; z < WORLDZ; z++)
+
+#define endforeach }}
+
 @implementation World
 
+
+# pragma mark World Building
+
 - (void) build {
-    
-    int blockCount = [self buildSimplex];
-    [self addDirt];
-    
-    int x, y, z;
-    int stone = 0;
-    int dirt = 0;
-    int empty = 0;
-    
-    for(x=0; x<WORLDX-1; x++) {
-        for (y=0; y<WORLDY-1; y++) {
-            for (z=0; z < WORLDZ-1; z++) {
-                if (world[x][y][z] == ROCK)
-                    stone++;
-                else if (world[x][y][z] == DIRT)
-                    dirt++;
-                else
-                    empty++;
-            }
-        }
-    }
-    
-    NSLog(@"%d blocks in this world. %d stone, %d dirt, %d empty", blockCount, stone,dirt, empty);
+    [self buildWithSimplexNoise];
+    [self addMarkersAtTerrainBoundaries];
+    [self summarizeTerrain];
 }
 
-- (void) buildTest {
-    int blockCount = 0;
-    for (int x=0; x<WORLDX; x++) {
-        for (int y=0; y< WORLDY; y++) {
-            for (int z=0; z < WORLDZ; z++) {
-                world[x][y][z] = rand() % 6 + 1;
-                
-                if (world[x][y][z] < 1 || world[x][y][z] > 6)
-                    NSLog(@"UNKNOWN BLOCK TYPE PICKED");
-                
-                blockCount++;
-            }
-        }
-    }
-    NSLog(@"World consists of %d blocks", blockCount);
+- (void) buildWithRandomValues {
+    foreach_xyz
+        world[x][y][z] = rand() % 6 + 1;
+    endforeach
 }
+
+
+- (void) summarizeTerrain {
+    int rock =0, dirt=0, empty=0;
+    int blockCount = 0;
+    
+    foreach_xyz {
+        switch(world[x][y][z]) {
+            case ROCK: rock++; break;
+            case DIRT: dirt++; break;
+            default: empty++;
+        }
+        blockCount++;
+    } endforeach
+
+    NSLog(@"%d blocks in this world. %d stone, %d dirt, %d empty", blockCount, rock, dirt, empty);
+}
+
+
+- (void) addMarkersAtTerrainBoundaries {
+    world[0][0][0] = RED;
+    world[0][0][WORLDZ-1] = RED;
+    world[WORLDX-1][0][0] = RED;
+    world[WORLDX-1][0][WORLDZ-1] = RED;
+    
+    world[0][WORLDY-1][0] = RED;
+    world[0][WORLDY-1][WORLDZ-1] = RED;
+    world[WORLDX-1][WORLDY-1][0] = RED;
+    world[WORLDX-1][WORLDY-1][WORLDZ-1] = RED;
+    
+}
+
+- (int) addDirt {
+    foreach_xyz {
+        int block = world[x][y][z];
+        int ontop = world[x][y+1][z];
+        if (block == ROCK && ontop == AIR) {
+            world[x][y][z] = DIRT;
+        }
+    } endforeach
+    return 0;
+}
+
+- (int) buildWithSimplexNoise {
+    int blockCount = 0;
+    float caves, center_falloff, plateau_falloff, density;
+    
+    foreach_xyz {
+        float xf = (float)x/(float)WORLDX;
+        float yf = (float)y/(float)WORLDY;
+        float zf = (float)z/(float)WORLDZ;
+        
+        if(yf <= 0.8){
+            plateau_falloff = 1.0;
+        }
+        else if(0.8 < yf && yf < 0.9){
+            plateau_falloff = 1.0-(yf-0.8)*10.0;
+        }
+        else{
+            plateau_falloff = 0.0;
+        }
+        
+        center_falloff = 0.1/(
+                              pow((xf-0.5)*1.5, 2) +
+                              pow((yf-1.0)*0.8, 2) +
+                              pow((zf-0.5)*1.5, 2)
+                              );
+        caves = pow(simplex_noise(1, xf*5, yf*5, zf*5), 3);
+        density = simplex_noise(5, xf, yf*0.5, zf) * center_falloff * plateau_falloff;
+        
+        density *= pow(
+                       noise((xf+1)*3.0, (yf+1)*3.0, (zf+1)*3.0)+0.4, 1.8
+                       );
+        if(caves<0.5){
+            density = 0;
+        }
+        world[x][y][z] = (density > 3.1 ? ROCK : AIR);
+        blockCount++;
+    }
+    endforeach
+    
+    [self addDirt];
+    
+    return blockCount;
+}
+
+# pragma mark Rendering
+
+bool exposedToAir(int x, int y, int z)
+{
+    return (world[x+1][y][z] == AIR || world[x-1][y][z] == AIR
+            || world[x][y+1][z] == AIR || world[x][y-1][z] == AIR
+            || world[x][y][z+1] == AIR || world[x][y][z-1] == AIR);
+}
+
+
+- (int) renderBlocks {
+    int renderedBlocksCount=0;
+    foreach_xyz {
+        if (world[x][y][z] != AIR && exposedToAir(x, y, z)) {
+            [self renderBlock:x :y :z];
+            renderedBlocksCount++;
+        }
+    } endforeach
+    return renderedBlocksCount;
+}
+
 
 - (void) renderSun {
     glMaterialfv(GL_FRONT, GL_AMBIENT, dyellow);
@@ -85,116 +172,12 @@ GLubyte world[WORLDX][WORLDY][WORLDZ];
     glPopMatrix();
 }
 
-- (int) addDirt {
-    int x, y, z;
-    for(x=0; x<WORLDX; x++) {
-        for (y=0; y<WORLDY; y++) {
-            for (z=0; z < WORLDZ; z++) {
-                int block = world[x][y][z];
-                int ontop = world[x][y+1][z];
-                if (block == ROCK && ontop == AIR) {
-                    world[x][y][z] = DIRT;
-                }
-            }
-        }
-    }
- 
-    return 0;
-}
-
-- (int) buildSimplex {
-    int blockCount = 0;
-    int x, y, z;
-    float caves, center_falloff, plateau_falloff, density;
-    
-    for(x=0; x<WORLDX; x++) {
-        for (y=0; y<WORLDY; y++) {
-            for (z=0; z < WORLDZ; z++) {
-                float xf = (float)x/(float)WORLDX;
-                float yf = (float)y/(float)WORLDY;
-                float zf = (float)z/(float)WORLDZ;
-                
-                if(yf <= 0.8){
-                    plateau_falloff = 1.0;
-                }
-                else if(0.8 < yf && yf < 0.9){
-                    plateau_falloff = 1.0-(yf-0.8)*10.0;
-                }
-                else{
-                    plateau_falloff = 0.0;
-                }
-                
-                center_falloff = 0.1/(
-                                      pow((xf-0.5)*1.5, 2) +
-                                      pow((yf-1.0)*0.8, 2) +
-                                      pow((zf-0.5)*1.5, 2)
-                                      );
-                caves = pow(simplex_noise(1, xf*5, yf*5, zf*5), 3);
-                density = (
-                           simplex_noise(5, xf, yf*0.5, zf) *
-                           center_falloff *
-                           plateau_falloff
-                           );
-                density *= pow(
-                               noise((xf+1)*3.0, (yf+1)*3.0, (zf+1)*3.0)+0.4, 1.8
-                               );
-                if(caves<0.5){
-                    density = 0;
-                }
-                world[x][y][z] = (density > 3.1 ? ROCK : AIR);
-                blockCount++;
-            }
-        }
-    }
-    return blockCount;
-}
-
 
 
 - (int) render {
     [self renderSky];
     [self renderSun];
     return [self renderBlocks];
-}
-
-
-
-bool exposedToAir(int x, int y, int z)
-{
-    /*
-    if (x == 0 || x == 0 || z == 0)
-        return false;
-    if (x == WORLDX-1 || y == WORLDY - 1 || z == WORLDZ - 1)
-        return false;
-    */
-     
-    if (world[x+1][y][z] == AIR || world[x-1][y][z] == AIR
-        || world[x][y+1][z] == AIR || world[x][y-1][z] == AIR
-        || world[x][y][z+1] == AIR || world[x][y][z-1] == AIR
-        )
-        return true;
-    else
-        return false;
-}
-
-
-- (int) renderBlocks
-{
-    int x=0, y=0, z=0;
-    int c=0;
-    
-    // render blocks with fixed x
-    for (x= 0; x < WORLDX; x++) {
-        for (y=0; y<WORLDY; y++) {
-            for (z=0; z<WORLDZ; z++) {
-                if (world[x][y][z] != AIR && exposedToAir(x, y, z)) {
-                    renderBlock(x, y, z);
-                    c++;
-                }
-            }
-        }
-    }
-    return c;
 }
 
 - (void) renderSky {
@@ -211,8 +194,7 @@ bool exposedToAir(int x, int y, int z)
 }
 
 
-
-static void renderBlock(int x, int y, int z) {
+- (void) renderBlock:(int) x :(int)y :(int)z {
     GLubyte block = world[x][y][z];
     
     if (block == AIR)
@@ -236,7 +218,6 @@ static void renderBlock(int x, int y, int z) {
         glMaterialfv(GL_FRONT, GL_AMBIENT, dblue);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, blue);
     } else if (block == RED) {
-        
         glMaterialfv(GL_FRONT, GL_AMBIENT, red);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, red);
     } else {

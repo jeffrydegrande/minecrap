@@ -12,9 +12,9 @@
 #include <GLUT/gutil.h>
 #include <time.h>
 
-#define RENDER_DISTANCE 2000  // was 1536
-#define NEAR_CLIP       0.1f  // was 0.2f
-#define FOV             65
+#define RENDER_DISTANCE 1000  // was 1536
+#define NEAR_CLIP       0.2f  // was 0.2f
+#define FOV             60
 
 
 int optionDrawWireframes = 0;  // toggled by pressing '1'
@@ -22,9 +22,7 @@ int optionSmoothShading  = 1;  // toggled by pressing '2'
 int optionLighting = 1;        // toggled by pressing '3'
 
 
-
 @implementation MyOpenGLView
-
 
 // The init function since we're loading from a NIB so regular
 // init messages arent' being sent.
@@ -32,8 +30,7 @@ int optionLighting = 1;        // toggled by pressing '3'
 - (void) awakeFromNib {
     lastTicks = clock();
     camera = [Camera alloc];
-    world = [World alloc];
-    [world build];
+    world = [[World alloc] init];
 }
 
 - (void)prepareOpenGL {
@@ -41,6 +38,8 @@ int optionLighting = 1;        // toggled by pressing '3'
     [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
     [[self window] setAcceptsMouseMovedEvents:YES];
     
+    glClearColor(0.52, 0.74, 0.84, 1.0);
+
     glEnable (GL_LIGHTING);
     glEnable (GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
@@ -63,6 +62,8 @@ int optionLighting = 1;        // toggled by pressing '3'
     gluPerspective(fovy, view_aspect, NEAR_CLIP, RENDER_DISTANCE);    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    
+    
 }
 
 
@@ -75,12 +76,7 @@ int optionLighting = 1;        // toggled by pressing '3'
     int delta_t = (int)((ticks - lastTicks)/(CLOCKS_PER_SEC/1000));
     int fps = delta_t > 0 ? (int) 1000 / delta_t : 1000;
     
-    
-    
     lastTicks = ticks;
-    
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
     
     if (optionDrawWireframes == 1)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -92,6 +88,10 @@ int optionLighting = 1;        // toggled by pressing '3'
     else
         glShadeModel(GL_FLAT);
     
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+    
+
     
     GLfloat lightPosition[] = {0.0, 100.0, 0.0, 0.0};
     GLfloat light_diffuse[]  = { 0.8, 0.8, 0.8, 1.0 };
@@ -192,7 +192,6 @@ int optionLighting = 1;        // toggled by pressing '3'
         
         if (keyChar == 51) { // '3'
             optionLighting = !optionLighting;
-         
             if (optionLighting)
                 glEnable(GL_LIGHT0);
             else
@@ -213,7 +212,6 @@ int optionLighting = 1;        // toggled by pressing '3'
 
     [super keyDown:theEvent];
 }
-
 
 - (void)mouseMoved:(NSEvent *)theEvent {
     NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];

@@ -7,9 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Chunk.h"
 
 @interface World : NSObject
+{
+    Chunk *chunk;
+}
 
-- (void) build;
 - (int) render;
 @end

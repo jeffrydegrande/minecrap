@@ -9,9 +9,9 @@
 /* Begin PBXBuildFile section */
 		3E1CC22816BD96A60023B0DB /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E1CC22716BD96A60023B0DB /* GLUT.framework */; };
 		3E1CC22C16BDBDBE0023B0DB /* Camera.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E1CC22B16BDBDBE0023B0DB /* Camera.m */; };
-		3E2B268316BDF66000B894A2 /* perlin.c in Sources */ = {isa = PBXBuildFile; fileRef = 3E2B268216BDF66000B894A2 /* perlin.c */; };
 		3E2B268816BDF70900B894A2 /* World.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E2B268716BDF70900B894A2 /* World.m */; };
 		3E2B268F16BE286900B894A2 /* simplex.c in Sources */ = {isa = PBXBuildFile; fileRef = 3E2B268E16BE286900B894A2 /* simplex.c */; };
+		3E40473016BF5CCE00342750 /* Minecrap-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3EE7391716B74B020039752E /* Minecrap-Info.plist */; };
 		3EE7391016B74B020039752E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EE7390F16B74B020039752E /* Cocoa.framework */; };
 		3EE7391A16B74B020039752E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3EE7391816B74B020039752E /* InfoPlist.strings */; };
 		3EE7391C16B74B020039752E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EE7391B16B74B020039752E /* main.m */; };
@@ -21,7 +21,7 @@
 		3EE7392E16B74B020039752E /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EE7392D16B74B020039752E /* SenTestingKit.framework */; };
 		3EE7392F16B74B020039752E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EE7390F16B74B020039752E /* Cocoa.framework */; };
 		3EE7393716B74B020039752E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3EE7393516B74B020039752E /* InfoPlist.strings */; };
-		3EE7393A16B74B020039752E /* Golden_TriangleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EE7393916B74B020039752E /* Golden_TriangleTests.m */; };
+		3EE7393A16B74B020039752E /* MinecrapTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EE7393916B74B020039752E /* MinecrapTests.m */; };
 		3EE7394416B74B2B0039752E /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EE7394316B74B2B0039752E /* OpenGL.framework */; };
 		3EE7394716B74B710039752E /* MyOpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EE7394616B74B710039752E /* MyOpenGLView.m */; };
 /* End PBXBuildFile section */
@@ -32,7 +32,7 @@
 			containerPortal = 3EE7390216B74B020039752E /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 3EE7390A16B74B020039752E;
-			remoteInfo = "Golden Triangle";
+			remoteInfo = "Minecrap";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -40,32 +40,30 @@
 		3E1CC22716BD96A60023B0DB /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		3E1CC22A16BDBDBE0023B0DB /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
 		3E1CC22B16BDBDBE0023B0DB /* Camera.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Camera.m; sourceTree = "<group>"; };
-		3E2B268216BDF66000B894A2 /* perlin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = perlin.c; sourceTree = "<group>"; };
-		3E2B268516BDF69700B894A2 /* perlin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = perlin.h; sourceTree = "<group>"; };
 		3E2B268616BDF70900B894A2 /* World.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = World.h; sourceTree = "<group>"; };
 		3E2B268716BDF70900B894A2 /* World.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = World.m; sourceTree = "<group>"; };
 		3E2B268916BDF79100B894A2 /* defs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = defs.h; sourceTree = "<group>"; };
 		3E2B268E16BE286900B894A2 /* simplex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simplex.c; sourceTree = "<group>"; };
 		3E2B269116BE289200B894A2 /* simplex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = simplex.h; sourceTree = "<group>"; };
-		3EE7390B16B74B020039752E /* Golden Triangle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Golden Triangle.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3EE7390B16B74B020039752E /* Minecrap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Minecrap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3EE7390F16B74B020039752E /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		3EE7391216B74B020039752E /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		3EE7391316B74B020039752E /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3EE7391416B74B020039752E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		3EE7391716B74B020039752E /* Golden Triangle-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Golden Triangle-Info.plist"; sourceTree = "<group>"; };
+		3EE7391716B74B020039752E /* Minecrap-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Minecrap-Info.plist"; sourceTree = "<group>"; };
 		3EE7391916B74B020039752E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3EE7391B16B74B020039752E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		3EE7391D16B74B020039752E /* Golden Triangle-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Golden Triangle-Prefix.pch"; sourceTree = "<group>"; };
+		3EE7391D16B74B020039752E /* Minecrap-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Minecrap-Prefix.pch"; sourceTree = "<group>"; };
 		3EE7391F16B74B020039752E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		3EE7392116B74B020039752E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3EE7392216B74B020039752E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		3EE7392516B74B020039752E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		3EE7392C16B74B020039752E /* Golden TriangleTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Golden TriangleTests.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3EE7392C16B74B020039752E /* MinecrapTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MinecrapTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3EE7392D16B74B020039752E /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		3EE7393416B74B020039752E /* Golden TriangleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Golden TriangleTests-Info.plist"; sourceTree = "<group>"; };
+		3EE7393416B74B020039752E /* MinecrapTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MinecrapTests-Info.plist"; sourceTree = "<group>"; };
 		3EE7393616B74B020039752E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		3EE7393816B74B020039752E /* Golden_TriangleTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Golden_TriangleTests.h; sourceTree = "<group>"; };
-		3EE7393916B74B020039752E /* Golden_TriangleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Golden_TriangleTests.m; sourceTree = "<group>"; };
+		3EE7393816B74B020039752E /* MinecrapTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MinecrapTests.h; sourceTree = "<group>"; };
+		3EE7393916B74B020039752E /* MinecrapTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MinecrapTests.m; sourceTree = "<group>"; };
 		3EE7394316B74B2B0039752E /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		3EE7394516B74B710039752E /* MyOpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyOpenGLView.h; sourceTree = "<group>"; };
 		3EE7394616B74B710039752E /* MyOpenGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyOpenGLView.m; sourceTree = "<group>"; };
@@ -99,8 +97,8 @@
 			children = (
 				3E1CC22716BD96A60023B0DB /* GLUT.framework */,
 				3EE7394316B74B2B0039752E /* OpenGL.framework */,
-				3EE7391516B74B020039752E /* Golden Triangle */,
-				3EE7393216B74B020039752E /* Golden TriangleTests */,
+				3EE7391516B74B020039752E /* Minecrap */,
+				3EE7393216B74B020039752E /* Minecrap Tests */,
 				3EE7390E16B74B020039752E /* Frameworks */,
 				3EE7390C16B74B020039752E /* Products */,
 			);
@@ -109,8 +107,8 @@
 		3EE7390C16B74B020039752E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3EE7390B16B74B020039752E /* Golden Triangle.app */,
-				3EE7392C16B74B020039752E /* Golden TriangleTests.octest */,
+				3EE7390B16B74B020039752E /* Minecrap.app */,
+				3EE7392C16B74B020039752E /* MinecrapTests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -135,18 +133,16 @@
 			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
-		3EE7391516B74B020039752E /* Golden Triangle */ = {
+		3EE7391516B74B020039752E /* Minecrap */ = {
 			isa = PBXGroup;
 			children = (
 				3EE7394516B74B710039752E /* MyOpenGLView.h */,
 				3EE7394616B74B710039752E /* MyOpenGLView.m */,
-				3E2B268216BDF66000B894A2 /* perlin.c */,
 				3E2B268616BDF70900B894A2 /* World.h */,
 				3E2B268716BDF70900B894A2 /* World.m */,
 				3E2B268E16BE286900B894A2 /* simplex.c */,
 				3E2B269116BE289200B894A2 /* simplex.h */,
 				3E2B268916BDF79100B894A2 /* defs.h */,
-				3E2B268516BDF69700B894A2 /* perlin.h */,
 				3E1CC22A16BDBDBE0023B0DB /* Camera.h */,
 				3E1CC22B16BDBDBE0023B0DB /* Camera.m */,
 				3EE7392116B74B020039752E /* AppDelegate.h */,
@@ -154,35 +150,36 @@
 				3EE7392416B74B020039752E /* MainMenu.xib */,
 				3EE7391616B74B020039752E /* Supporting Files */,
 			);
-			path = "Golden Triangle";
+			path = Minecrap;
 			sourceTree = "<group>";
 		};
 		3EE7391616B74B020039752E /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				3EE7391716B74B020039752E /* Golden Triangle-Info.plist */,
+				3EE7391716B74B020039752E /* Minecrap-Info.plist */,
 				3EE7391816B74B020039752E /* InfoPlist.strings */,
 				3EE7391B16B74B020039752E /* main.m */,
-				3EE7391D16B74B020039752E /* Golden Triangle-Prefix.pch */,
+				3EE7391D16B74B020039752E /* Minecrap-Prefix.pch */,
 				3EE7391E16B74B020039752E /* Credits.rtf */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		3EE7393216B74B020039752E /* Golden TriangleTests */ = {
+		3EE7393216B74B020039752E /* Minecrap Tests */ = {
 			isa = PBXGroup;
 			children = (
-				3EE7393816B74B020039752E /* Golden_TriangleTests.h */,
-				3EE7393916B74B020039752E /* Golden_TriangleTests.m */,
+				3EE7393816B74B020039752E /* MinecrapTests.h */,
+				3EE7393916B74B020039752E /* MinecrapTests.m */,
 				3EE7393316B74B020039752E /* Supporting Files */,
 			);
-			path = "Golden TriangleTests";
+			name = "Minecrap Tests";
+			path = MinecrapTests;
 			sourceTree = "<group>";
 		};
 		3EE7393316B74B020039752E /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				3EE7393416B74B020039752E /* Golden TriangleTests-Info.plist */,
+				3EE7393416B74B020039752E /* MinecrapTests-Info.plist */,
 				3EE7393516B74B020039752E /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
@@ -191,9 +188,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3EE7390A16B74B020039752E /* Golden Triangle */ = {
+		3EE7390A16B74B020039752E /* Minecrap */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3EE7393D16B74B020039752E /* Build configuration list for PBXNativeTarget "Golden Triangle" */;
+			buildConfigurationList = 3EE7393D16B74B020039752E /* Build configuration list for PBXNativeTarget "Minecrap" */;
 			buildPhases = (
 				3EE7390716B74B020039752E /* Sources */,
 				3EE7390816B74B020039752E /* Frameworks */,
@@ -203,14 +200,14 @@
 			);
 			dependencies = (
 			);
-			name = "Golden Triangle";
-			productName = "Golden Triangle";
-			productReference = 3EE7390B16B74B020039752E /* Golden Triangle.app */;
+			name = Minecrap;
+			productName = "Minecrap";
+			productReference = 3EE7390B16B74B020039752E /* Minecrap.app */;
 			productType = "com.apple.product-type.application";
 		};
-		3EE7392B16B74B020039752E /* Golden TriangleTests */ = {
+		3EE7392B16B74B020039752E /* MinecrapTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3EE7394016B74B020039752E /* Build configuration list for PBXNativeTarget "Golden TriangleTests" */;
+			buildConfigurationList = 3EE7394016B74B020039752E /* Build configuration list for PBXNativeTarget "MinecrapTests" */;
 			buildPhases = (
 				3EE7392716B74B020039752E /* Sources */,
 				3EE7392816B74B020039752E /* Frameworks */,
@@ -222,9 +219,9 @@
 			dependencies = (
 				3EE7393116B74B020039752E /* PBXTargetDependency */,
 			);
-			name = "Golden TriangleTests";
-			productName = "Golden TriangleTests";
-			productReference = 3EE7392C16B74B020039752E /* Golden TriangleTests.octest */;
+			name = MinecrapTests;
+			productName = "MinecrapTests";
+			productReference = 3EE7392C16B74B020039752E /* MinecrapTests.octest */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -236,7 +233,7 @@
 				LastUpgradeCheck = 0450;
 				ORGANIZATIONNAME = "Jeffry Degrande";
 			};
-			buildConfigurationList = 3EE7390516B74B020039752E /* Build configuration list for PBXProject "Golden Triangle" */;
+			buildConfigurationList = 3EE7390516B74B020039752E /* Build configuration list for PBXProject "Minecrap" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -248,8 +245,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3EE7390A16B74B020039752E /* Golden Triangle */,
-				3EE7392B16B74B020039752E /* Golden TriangleTests */,
+				3EE7390A16B74B020039752E /* Minecrap */,
+				3EE7392B16B74B020039752E /* MinecrapTests */,
 			);
 		};
 /* End PBXProject section */
@@ -262,6 +259,7 @@
 				3EE7391A16B74B020039752E /* InfoPlist.strings in Resources */,
 				3EE7392016B74B020039752E /* Credits.rtf in Resources */,
 				3EE7392616B74B020039752E /* MainMenu.xib in Resources */,
+				3E40473016BF5CCE00342750 /* Minecrap-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,7 +298,6 @@
 				3EE7392316B74B020039752E /* AppDelegate.m in Sources */,
 				3EE7394716B74B710039752E /* MyOpenGLView.m in Sources */,
 				3E1CC22C16BDBDBE0023B0DB /* Camera.m in Sources */,
-				3E2B268316BDF66000B894A2 /* perlin.c in Sources */,
 				3E2B268816BDF70900B894A2 /* World.m in Sources */,
 				3E2B268F16BE286900B894A2 /* simplex.c in Sources */,
 			);
@@ -310,7 +307,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3EE7393A16B74B020039752E /* Golden_TriangleTests.m in Sources */,
+				3EE7393A16B74B020039752E /* MinecrapTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -319,7 +316,7 @@
 /* Begin PBXTargetDependency section */
 		3EE7393116B74B020039752E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3EE7390A16B74B020039752E /* Golden Triangle */;
+			target = 3EE7390A16B74B020039752E /* Minecrap */;
 			targetProxy = 3EE7393016B74B020039752E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -418,8 +415,8 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Golden Triangle/Golden Triangle-Prefix.pch";
-				INFOPLIST_FILE = "Golden Triangle/Golden Triangle-Info.plist";
+				GCC_PREFIX_HEADER = "Minecrap/Minecrap-Prefix.pch";
+				INFOPLIST_FILE = "Minecrap/Minecrap-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -430,8 +427,8 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Golden Triangle/Golden Triangle-Prefix.pch";
-				INFOPLIST_FILE = "Golden Triangle/Golden Triangle-Info.plist";
+				GCC_PREFIX_HEADER = "Minecrap/Minecrap-Prefix.pch";
+				INFOPLIST_FILE = "Minecrap/Minecrap-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -440,12 +437,12 @@
 		3EE7394116B74B020039752E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Golden Triangle.app/Contents/MacOS/Golden Triangle";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Minecrap.app/Contents/MacOS/Minecrap";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Golden Triangle/Golden Triangle-Prefix.pch";
-				INFOPLIST_FILE = "Golden TriangleTests/Golden TriangleTests-Info.plist";
+				GCC_PREFIX_HEADER = "Minecrap/Minecrap-Prefix.pch";
+				INFOPLIST_FILE = "Minecrap/MinecrapTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
@@ -455,12 +452,12 @@
 		3EE7394216B74B020039752E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Golden Triangle.app/Contents/MacOS/Golden Triangle";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Minecrap.app/Contents/MacOS/Minecrap";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Golden Triangle/Golden Triangle-Prefix.pch";
-				INFOPLIST_FILE = "Golden TriangleTests/Golden TriangleTests-Info.plist";
+				GCC_PREFIX_HEADER = "Minecrap/Minecrap-Prefix.pch";
+				INFOPLIST_FILE = "MinecrapTests/MinecrapTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
@@ -470,7 +467,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3EE7390516B74B020039752E /* Build configuration list for PBXProject "Golden Triangle" */ = {
+		3EE7390516B74B020039752E /* Build configuration list for PBXProject "Minecrap" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3EE7393B16B74B020039752E /* Debug */,
@@ -479,7 +476,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3EE7393D16B74B020039752E /* Build configuration list for PBXNativeTarget "Golden Triangle" */ = {
+		3EE7393D16B74B020039752E /* Build configuration list for PBXNativeTarget "Minecrap" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3EE7393E16B74B020039752E /* Debug */,
@@ -488,7 +485,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3EE7394016B74B020039752E /* Build configuration list for PBXNativeTarget "Golden TriangleTests" */ = {
+		3EE7394016B74B020039752E /* Build configuration list for PBXNativeTarget "MinecrapTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3EE7394116B74B020039752E /* Debug */,

@@ -1,13 +1,13 @@
 //
 //  defs.h
-//  Golden Triangle
+//  Minecrap
 //
 //  Created by Jeffry Degrande on 2/2/13.
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
 //
 
-#ifndef Golden_Triangle_defs_h
-#define Golden_Triangle_defs_h
+#ifndef Minecrap_defs_h
+#define Minecrap_defs_h
 
 // COLORS
 

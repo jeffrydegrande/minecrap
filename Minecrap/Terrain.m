@@ -1,13 +1,13 @@
 //
-//  Terrain.h
-//  Golden Triangle
+//  Terrain.m
+//  Minecrap
 //
 //  Created by Jeffry Degrande on 2/3/13.
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import "Terrain.h"
 
-@interface Terrain : NSObject
+@implementation Terrain
 
 @end

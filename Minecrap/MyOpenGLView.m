@@ -1,6 +1,6 @@
 //
 //  MyOpenGLView.m
-//  Golden Triangle
+//  Minecrap
 //
 //  Created by Jeffry Degrande on 1/28/13.
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.

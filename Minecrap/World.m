@@ -1,6 +1,6 @@
 //
 //  World.m
-//  Golden Triangle
+//  Minecrap
 //
 //  Created by Jeffry Degrande on 2/2/13.
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
@@ -8,7 +8,6 @@
 
 #import "World.h"
 #import "defs.h"
-#include "perlin.h"
 #include "simplex.h"
 
 #include <OpenGl/gl.h>

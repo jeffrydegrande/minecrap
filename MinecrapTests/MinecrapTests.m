@@ -1,14 +1,14 @@
 //
-//  Golden_TriangleTests.m
-//  Golden TriangleTests
+//  MinecrapTests.m
+//  MinecrapTests
 //
 //  Created by Jeffry Degrande on 1/28/13.
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
 //
 
-#import "Golden_TriangleTests.h"
+#import "MinecrapTests.h"
 
-@implementation Golden_TriangleTests
+@implementation MinecrapTests
 
 - (void)setUp
 {
@@ -26,7 +26,7 @@
 
 - (void)testExample
 {
-    STFail(@"Unit tests are not implemented yet in Golden TriangleTests");
+    STFail(@"Unit tests are not implemented yet in MinecrapTests");
 }
 
 @end

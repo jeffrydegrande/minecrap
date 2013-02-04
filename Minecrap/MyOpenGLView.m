@@ -109,21 +109,20 @@ int optionLighting = 1;        // toggled by pressing '3'
     
     [camera update];
 
-    
-    glPushMatrix();
+
     int blocksRendered = [world render];
+    glSwapAPPLE();
     
+    [self updateMenuBar:fps :blocksRendered];
+}
+
+- (void) updateMenuBar:(int)fps :(int)blocksRendered {
     [[self window] setTitle:[NSString stringWithFormat:@"FPS: %d/%@ (%d blocks)",
                              fps,
                              [camera stringFromPosition],
                              blocksRendered]];
-    
-    glPopMatrix();
-  
-    
-    
-    glSwapAPPLE();
 }
+
 
 - (BOOL)acceptsFirstResponder
 {

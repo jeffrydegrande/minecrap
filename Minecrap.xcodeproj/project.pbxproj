@@ -11,6 +11,7 @@
 		3E1CC22C16BDBDBE0023B0DB /* Camera.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E1CC22B16BDBDBE0023B0DB /* Camera.m */; };
 		3E2B268816BDF70900B894A2 /* World.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E2B268716BDF70900B894A2 /* World.m */; };
 		3E2B268F16BE286900B894A2 /* simplex.c in Sources */ = {isa = PBXBuildFile; fileRef = 3E2B268E16BE286900B894A2 /* simplex.c */; };
+		3E2C3D7816C49CD80030155A /* Color.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E2C3D7716C49CD80030155A /* Color.m */; };
 		3E39C02716BF69A3004F9A96 /* Chunk.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E39C02616BF69A3004F9A96 /* Chunk.m */; };
 		3E40473016BF5CCE00342750 /* Minecrap-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3EE7391716B74B020039752E /* Minecrap-Info.plist */; };
 		3EE7391016B74B020039752E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EE7390F16B74B020039752E /* Cocoa.framework */; };
@@ -43,9 +44,10 @@
 		3E1CC22B16BDBDBE0023B0DB /* Camera.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Camera.m; sourceTree = "<group>"; };
 		3E2B268616BDF70900B894A2 /* World.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = World.h; sourceTree = "<group>"; };
 		3E2B268716BDF70900B894A2 /* World.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = World.m; sourceTree = "<group>"; };
-		3E2B268916BDF79100B894A2 /* defs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = defs.h; sourceTree = "<group>"; };
+		3E2B268916BDF79100B894A2 /* Color.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Color.h; sourceTree = "<group>"; };
 		3E2B268E16BE286900B894A2 /* simplex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simplex.c; sourceTree = "<group>"; };
 		3E2B269116BE289200B894A2 /* simplex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = simplex.h; sourceTree = "<group>"; };
+		3E2C3D7716C49CD80030155A /* Color.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Color.m; sourceTree = "<group>"; };
 		3E39C02516BF69A3004F9A96 /* Chunk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chunk.h; sourceTree = "<group>"; };
 		3E39C02616BF69A3004F9A96 /* Chunk.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chunk.m; sourceTree = "<group>"; };
 		3E39C02A16BF6B58004F9A96 /* minecrap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = minecrap.h; sourceTree = "<group>"; };
@@ -148,7 +150,8 @@
 				3E39C02616BF69A3004F9A96 /* Chunk.m */,
 				3E2B268E16BE286900B894A2 /* simplex.c */,
 				3E2B269116BE289200B894A2 /* simplex.h */,
-				3E2B268916BDF79100B894A2 /* defs.h */,
+				3E2B268916BDF79100B894A2 /* Color.h */,
+				3E2C3D7716C49CD80030155A /* Color.m */,
 				3E39C02A16BF6B58004F9A96 /* minecrap.h */,
 				3E1CC22A16BDBDBE0023B0DB /* Camera.h */,
 				3E1CC22B16BDBDBE0023B0DB /* Camera.m */,
@@ -308,6 +311,7 @@
 				3E2B268816BDF70900B894A2 /* World.m in Sources */,
 				3E2B268F16BE286900B894A2 /* simplex.c in Sources */,
 				3E39C02716BF69A3004F9A96 /* Chunk.m in Sources */,
+				3E2C3D7816C49CD80030155A /* Color.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

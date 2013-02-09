@@ -14,18 +14,40 @@
 #include <GLUT/gutil.h>
 
 #include "minecrap.h"
+#include <time.h>
+#include <stdlib.h>
 
 
 @implementation World
 
+@synthesize seed;
+
 # pragma mark - TerrainBuilding
+
+
+- (id) initWithSeed:(int) worldSeed
+{
+    self = [super init];
+    if (self) {
+        srand((unsigned int)worldSeed);
+        self.seed = rand() % 65536;
+        int count = 3;
+        rowOfChunks = [[NSMutableArray alloc] initWithCapacity:count];
+        for (int i =0; i < count; i++) {
+            [self makeRow:count :i];
+            
+        }
+    }
+    return self;
+}
 
 - (id)init
 {
     self = [super init];
     if (self) {
-        
-        int count = 4;
+        srand((unsigned int)time(NULL));
+        self.seed = rand() % 65536;
+        int count = 3;
         rowOfChunks = [[NSMutableArray alloc] initWithCapacity:count];
         for (int i =0; i < count; i++) {
             [self makeRow:count :i];
@@ -39,7 +61,7 @@
 {
     NSMutableArray *row = [[NSMutableArray alloc] initWithCapacity:size];
     for (int i=0; i < size; i++) {
-        Chunk *chunk = [[Chunk alloc] initWithWorldPosition:i :rowNumber];
+        Chunk *chunk = [[Chunk alloc] initWithWorldPosition:i :rowNumber :self.seed];
         [row addObject:chunk];
     }
     
@@ -97,7 +119,6 @@
             } endforeach
         }
     }
-
     return renderedBlocksCount;
 }
 

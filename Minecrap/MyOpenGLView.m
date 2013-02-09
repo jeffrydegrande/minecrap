@@ -31,7 +31,7 @@ int optionLighting = 1;        // toggled by pressing '3'
 - (void) awakeFromNib {
     lastTicks = clock();
     camera = [Camera alloc];
-    world = [[World alloc] init];
+    world = [[World alloc] initWithSeed:300];
 }
 
 - (void)prepareOpenGL {

@@ -8,10 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-#include "minecrap.h"
 #include <OpenGl/gl.h>
 #include <GLUT/glut.h>
 #include <GLUT/gutil.h>
+
+
+#include "minecrap.h"
 
 @interface Chunk : NSObject
 {
@@ -20,9 +22,10 @@
 
 @property (assign) NSInteger worldX;
 @property (assign) NSInteger worldY;
+@property (assign) NSInteger seed;
 
 
-- (id) initWithWorldPosition:(int)x :(int)y;
+- (id) initWithWorldPosition:(int)x :(int)y :(int) worldSeed;
 - (int) renderBlock:(int)x :(int)y :(int)z;
 - (bool) isExposedToAir:(int)x :(int)y :(int)z;
 @end

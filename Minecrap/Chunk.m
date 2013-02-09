@@ -20,12 +20,14 @@
 
 @implementation Chunk
 
-@synthesize worldX, worldY;
+@synthesize worldX, worldY, seed;
 
-- (id)initWithWorldPosition:(int)x :(int)y
+- (id)initWithWorldPosition:(int)x :(int)y :(int)worldSeed
 {
     self = [super init];
     if (self) {
+        self.seed = worldSeed;
+        NSLog (@"Setting seed to %d", worldSeed);
         self.worldX = x;
         self.worldY = y;
         [self build];
@@ -36,22 +38,11 @@
 
 - (void) build {
     [self generateTerrain];
-    [self addDirt];
-    [self addWaterLevel];
-    [self addBedrock];
-    [self addMarkersAtTerrainBoundaries];
-    [self summarizeTerrain];
-}
-
-- (int) buildSimple {
-    int blockCount = 0;
-    
-    foreach_xyz {
-        blocks[x][y][z] = ROCK;
-        blockCount++;
-    } endforeach
-    
-    return blockCount;
+    //[self addDirt];
+    //[self addWaterLevel];
+    //[self addBedrock];
+    //    [self addMarkersAtTerrainBoundaries];
+    //[self summarizeTerrain];
 }
 
 float terrainNoise(float x, float y, float frequency, float amplitude) {
@@ -77,16 +68,17 @@ float terrainNoise(float x, float y, float frequency, float amplitude) {
 
 - (int) generateTerrain {
     int blockCount = 0;
-
+        
     for(int x=0; x<CHUNKX; x++) {
-        for(int z=0; z<CHUNKZ; z++) {            
-            float maxHeight = terrainNoise(x + (worldX << 4), z + (worldY << 4), 0.5, 0.05) * WATER_LEVEL + WATER_LEVEL;
-            assert(maxHeight <= CHUNKY && maxHeight >= 0);
-            // NSLog(@"%ld,%ld, height: %f (%d)", realX, realZ, maxheight, (int)maxheight);
-            blocks[x][(int)maxHeight][z] = ROCK;
+            for(int z=0; z<CHUNKZ; z++) {
+                 float maxHeight = terrainNoise(x + self.seed + (worldX << 4), z + self.seed + (worldY << 4), 0.5, 0.5) * 32 + WATER_LEVEL;
+                 
+                 assert(maxHeight <= CHUNKY && maxHeight >= 0);
+                 // NSLog(@"%ld,%ld, height: %f (%d)", realX, realZ, maxheight, (int)maxheight);
+                 blocks[x][(int)maxHeight][z] = ROCK;
+            }
         }
-    }
-    return blockCount;
+        return blockCount;
 }
 
 - (void) summarizeTerrain {

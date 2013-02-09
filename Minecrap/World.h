@@ -11,9 +11,11 @@
 
 @interface World : NSObject
 {
-    
     NSMutableArray *rowOfChunks;
 }
 
+@property int seed;
+
+- (id)initWithSeed:(int)worldSeed;
 - (int) render;
 @end

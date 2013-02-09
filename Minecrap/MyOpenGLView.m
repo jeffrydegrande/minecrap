@@ -219,16 +219,16 @@ int optionLighting = 1;        // toggled by pressing '3'
     NSRect rect = [self bounds];
 
     if (point.x > rect.size.width || point.x < 0) {
-        [NSCursor unhide];
+        //  [NSCursor unhide];
         return;
     }
     
     if (point.y > rect.size.height || point.y < 0) {
-        [NSCursor unhide];
+        //        [NSCursor unhide];
         return;
     }
     
-    [NSCursor hide];
+    //    [NSCursor hide];
     
     [camera updateWithPoint:point];
     [self setNeedsDisplay:YES];

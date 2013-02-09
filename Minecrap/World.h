@@ -14,8 +14,10 @@
     NSMutableArray *rowOfChunks;
 }
 
+@property Point3D playerSpawnPoint;
 @property int seed;
 
 - (id)initWithSeed:(int)worldSeed;
 - (int) render;
+- (NSUInteger) size;
 @end

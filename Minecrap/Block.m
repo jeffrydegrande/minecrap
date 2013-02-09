@@ -10,6 +10,12 @@
 #import "Color.h"
 #import "minecrap.h"
 
+
+
+#include <OpenGl/gl.h>
+#include <GLUT/glut.h>
+#include <GLUT/gutil.h>
+
 @implementation Block
 
 static GLfloat n[6][3] =
@@ -35,6 +41,8 @@ static GLint faces[6][4] =
 
 static GLuint theRockBlock;
 static GLuint theWaterBlock;
+static GLuint theTestBlock;
+static GLuint theDirtBlock;
 
 + (void) setup {
     theRockBlock = glGenLists(1);
@@ -48,29 +56,36 @@ static GLuint theWaterBlock;
     glNewList(theWaterBlock, GL_COMPILE);
     [Block drawWater];
     glEndList();
+    
+    theTestBlock = glGenLists(1);
+    assert(theTestBlock != 0);
+    glNewList(theTestBlock, GL_COMPILE);
+    [Block drawTestBlock];
+    glEndList();
+    
+    theDirtBlock = glGenLists(1);
+    assert(theDirtBlock != 0);
+    glNewList(theDirtBlock, GL_COMPILE);
+    [Block drawDirtBlock];
+    glEndList();
 }
 
 + (void) render:(GLubyte)blockType
 {
     switch (blockType) {
         case ROCK:
-            [Block renderRock];
+             glCallList(theRockBlock);
+            break;
+        case DIRT:
+            glCallList(theDirtBlock);
             break;
         case WATER:
-            [Block renderWater];
+            glCallList(theWaterBlock);
             break;
+        case RED:
+            glCallList(theTestBlock);
     }
 }
-
-+ (void) renderRock {
-    glCallList(theRockBlock);
-}
-
-+ (void) renderWater {
-    glCallList(theWaterBlock);
-    
-}
-
 
 
 #if 0
@@ -108,6 +123,14 @@ if (block == ROCK)
 
 }
 
++ (void) drawDirtBlock {
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, dbrown);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, brown);
+    [Block drawBlock];
+}
+
 + (void) drawWater {
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);
     glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
@@ -116,7 +139,20 @@ if (block == ROCK)
     [Block drawBlock];
 }
 
++ (void) drawTestBlock {
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, dred);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, red);
+    [Block drawBlock];
+}
+
 + (void) drawBlock {
+    
+    glutSolidCube(1);
+    
+    
+    return;
     
     GLfloat v[8][3];
     GLint i;

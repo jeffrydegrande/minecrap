@@ -9,6 +9,9 @@
 #ifndef Minecrap_minecrap_h
 #define Minecrap_minecrap_h
 
+#define PI 3.141592654f
+
+
 #define CHUNKX 16
 #define CHUNKY 128
 #define CHUNKZ 16
@@ -25,7 +28,9 @@
 
 #define RED   7
 
-
+typedef struct Point3D_ {
+    GLfloat x, y, z;
+} Point3D;
 
 
 #define foreach_xyz \

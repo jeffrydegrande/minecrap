@@ -30,8 +30,11 @@ int optionLighting = 1;        // toggled by pressing '3'
 
 - (void) awakeFromNib {
     lastTicks = clock();
-    camera = [Camera alloc];
+
     world = [[World alloc] initWithSeed:300];
+    camera = [Camera alloc];
+    
+    [camera setPosition:[world playerSpawnPoint]];
 }
 
 - (void)prepareOpenGL {
@@ -65,8 +68,6 @@ int optionLighting = 1;        // toggled by pressing '3'
     gluPerspective(fovy, view_aspect, NEAR_CLIP, RENDER_DISTANCE);    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
-    
 }
 
 

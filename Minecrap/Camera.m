@@ -7,6 +7,7 @@
 //
 
 #import "Camera.h"
+#import "minecrap.h"
 
 @implementation Camera
 
@@ -17,12 +18,19 @@ float xpos = 0;
 float ypos = 140;
 float zpos = 0;
 float xrot = 11;
-float yrot = 118;
+float yrot = 0; // face North
 
 float lastx = 0;
 float lasty = 0;
 
 int camera_position = 0;
+
+- (void) setPosition:(Point3D)point {
+    xpos = point.x;
+    ypos = point.y;
+    zpos = point.z;
+}
+
 
 - (int) bound:(int) value {
     if (value < -360) {

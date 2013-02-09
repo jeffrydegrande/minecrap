@@ -7,15 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "minecrap.h"
 
 
-#define PI 3.141592654f
 
 
 @interface Camera : NSObject
 
 - (void) update;
 - (void) updateWithPoint: (NSPoint)point;
+- (void) setPosition:(Point3D)point;
+
 
 - (void) moveLeft;
 - (void) moveRight;

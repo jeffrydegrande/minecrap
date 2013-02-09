@@ -17,7 +17,6 @@
 #include "simplex.h"
 #include "Block.h"
 
-
 @implementation Chunk
 
 @synthesize worldX, worldY, seed;
@@ -27,7 +26,6 @@
     self = [super init];
     if (self) {
         self.seed = worldSeed;
-        NSLog (@"Setting seed to %d", worldSeed);
         self.worldX = x;
         self.worldY = y;
         [self build];
@@ -35,14 +33,28 @@
     return self;
 }
 
+- (int) heightAtPosition:(int)x :(int)z {
+    for (int y=CHUNKY; y >= 0; y--) {
+        if (blocks[x][y][z] != AIR) {
+            return y;
+        }
+    }
+    return 0;
+}
+
+- (void) setBlock:(int)x :(int)y :(int)z :(GLubyte)blockType
+{    
+    blocks[x][y][z] = blockType;
+}
 
 - (void) build {
     [self generateTerrain];
-    //[self addDirt];
-    //[self addWaterLevel];
-    //[self addBedrock];
-    //    [self addMarkersAtTerrainBoundaries];
-    //[self summarizeTerrain];
+    [self addDirt];
+    
+    // [self addWaterLevel];
+    // [self addBedrock];
+    // [self addMarkersAtTerrainBoundaries];
+    // [self summarizeTerrain];
 }
 
 float terrainNoise(float x, float y, float frequency, float amplitude) {
@@ -76,6 +88,7 @@ float terrainNoise(float x, float y, float frequency, float amplitude) {
                  assert(maxHeight <= CHUNKY && maxHeight >= 0);
                  // NSLog(@"%ld,%ld, height: %f (%d)", realX, realZ, maxheight, (int)maxheight);
                  blocks[x][(int)maxHeight][z] = ROCK;
+                blocks[x][(int)maxHeight - 1][z] = ROCK;
             }
         }
         return blockCount;
@@ -155,9 +168,16 @@ float terrainNoise(float x, float y, float frequency, float amplitude) {
 }
 
 - (int) renderBlock:(int) x :(int)y :(int)z {
+    
+    if (blocks[x][y][z] == AIR)
+        return 0;
+    
+    
+    /*
     if (blocks [x][y][z] == AIR || ![self isExposedToAir:x :y :z]) {
         return 0;
     }
+     */
 
     
     GLubyte block = blocks[x][y][z];

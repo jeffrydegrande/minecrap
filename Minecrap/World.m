@@ -6,24 +6,25 @@
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
 //
 
-#import "World.h"
-#import "Color.h"
+#include <time.h>
+#include <stdlib.h>
 
 #include <OpenGl/gl.h>
 #include <GLUT/glut.h>
 #include <GLUT/gutil.h>
 
-#include "minecrap.h"
-#include <time.h>
-#include <stdlib.h>
+#import "minecrap.h"
+#import "World.h"
+#import "Color.h"
 
 
 @implementation World
 
-@synthesize seed;
+@synthesize seed, playerSpawnPoint;
 
 # pragma mark - TerrainBuilding
 
+#define INITIAL_WORLD_SIZE 8
 
 - (id) initWithSeed:(int) worldSeed
 {
@@ -31,15 +32,13 @@
     if (self) {
         srand((unsigned int)worldSeed);
         self.seed = rand() % 65536;
-        int count = 3;
-        rowOfChunks = [[NSMutableArray alloc] initWithCapacity:count];
-        for (int i =0; i < count; i++) {
-            [self makeRow:count :i];
-            
-        }
+        [self buildChunks:INITIAL_WORLD_SIZE];
+        NSLog(@"World of size %ld by %ld created", (unsigned long)[self size], (unsigned long)[self size]);
+        [self calculatePlayerSpawnPoint];
     }
     return self;
 }
+
 
 - (id)init
 {
@@ -47,26 +46,67 @@
     if (self) {
         srand((unsigned int)time(NULL));
         self.seed = rand() % 65536;
-        int count = 3;
-        rowOfChunks = [[NSMutableArray alloc] initWithCapacity:count];
-        for (int i =0; i < count; i++) {
-            [self makeRow:count :i];
-            
-        }
+        [self buildChunks:INITIAL_WORLD_SIZE];
+        [self calculatePlayerSpawnPoint];
     }
     return self;
 }
 
-- (void) makeRow:(int)size :(int)rowNumber
-{
-    NSMutableArray *row = [[NSMutableArray alloc] initWithCapacity:size];
-    for (int i=0; i < size; i++) {
-        Chunk *chunk = [[Chunk alloc] initWithWorldPosition:i :rowNumber :self.seed];
-        [row addObject:chunk];
+- (void) buildChunks:(int) count {
+    if (rowOfChunks == NULL) {
+        rowOfChunks = [[NSMutableArray alloc] initWithCapacity:count];
     }
     
-    [rowOfChunks addObject:row];
+    for (int x=0; x<count; x++) {
+        NSMutableArray *row = [[NSMutableArray alloc] initWithCapacity:count];
+        for (int y=0; y < count; y++) {
+            Chunk *chunk = [[Chunk alloc] initWithWorldPosition:x :y :seed];
+            [row addObject: chunk];
+        }
+        
+        [rowOfChunks addObject:row];
+    }
 }
+
+
+- (NSUInteger) size {
+    return [rowOfChunks count] << 4;
+}
+
+- (void) calculatePlayerSpawnPoint {
+    
+    NSUInteger size = [self size];
+    
+    // we need an x and a z that are randoms within the world size
+    
+    int x = rand() % size;
+    int z = rand() % size;
+    
+    // find the chunk where x,z can be found
+    int xrow = x / 16;
+    int zrow = z / 16;
+
+    Chunk *chunk = [self findChunkAtPosition:xrow :zrow];
+    
+    int xChunk = x % 16;
+    int zChunk = z % 16;
+    
+    int y = [chunk heightAtPosition:xChunk :zChunk];
+
+    [chunk setBlock:xChunk :(y+1) :zChunk :RED];
+    
+    playerSpawnPoint.x = x;
+    playerSpawnPoint.y = y+1;
+    playerSpawnPoint.z = z;
+    
+    NSLog(@"spawning at %d,%d,%d (found in chunk %d, %d / %d, %d)", x, y, z, xrow, zrow, xChunk, zChunk);
+}
+
+- (Chunk *) findChunkAtPosition:(int)x :(int)y {
+    NSMutableArray *chunks = [rowOfChunks objectAtIndex:x];
+    return [chunks objectAtIndex:y];
+}
+
 
 # pragma mark Rendering
 

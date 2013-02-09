@@ -18,6 +18,7 @@
 @interface Chunk : NSObject
 {
     GLubyte blocks[CHUNKX][CHUNKY][CHUNKZ];
+    
 }
 
 @property (assign) NSInteger worldX;
@@ -28,4 +29,6 @@
 - (id) initWithWorldPosition:(int)x :(int)y :(int) worldSeed;
 - (int) renderBlock:(int)x :(int)y :(int)z;
 - (bool) isExposedToAir:(int)x :(int)y :(int)z;
+- (int) heightAtPosition:(int)x :(int)z;
+- (void) setBlock:(int)x :(int)y :(int)z :(GLubyte)blockType;
 @end

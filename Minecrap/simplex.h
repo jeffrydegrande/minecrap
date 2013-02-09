@@ -9,7 +9,9 @@
 #ifndef Minecrap_simplex_h
 #define Minecrap_simplex_h
 
+
 float noise(float xin, float yin, float zin);
+float noise2D(float xin, float zin);
 float simplex_noise(int octaves, float x, float y, float z);
 
 #endif

@@ -18,6 +18,11 @@
     GLubyte blocks[CHUNKX][CHUNKY][CHUNKZ];
 }
 
-- (GLubyte) blockAt:(int)x :(int)y :(int)z;
+@property (assign) NSInteger worldX;
+@property (assign) NSInteger worldY;
+
+
+- (id) initWithWorldPosition:(int)x :(int)y;
+- (int) renderBlock:(int)x :(int)y :(int)z;
 - (bool) isExposedToAir:(int)x :(int)y :(int)z;
 @end

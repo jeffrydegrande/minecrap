@@ -7,99 +7,95 @@
 //
 
 #import "Chunk.h"
+#include "Color.h"
 
 #include "minecrap.h"
 #include "simplex.h"
 
+#include <OpenGl/gl.h>
+#include <GLUT/glut.h>
+#include <GLUT/gutil.h>
+
+
 @implementation Chunk
 
-- (id)init
+@synthesize worldX, worldY;
+
+- (id)initWithWorldPosition:(int)x :(int)y
 {
     self = [super init];
     if (self) {
+        self.worldX = x;
+        self.worldY = y;
         [self build];
     }
     return self;
 }
 
-- (GLubyte) blockAt:(int)x :(int)y :(int)z {
-    return blocks[x][y][z];
-}
-
-- (bool) isExposedToAir:(int)x :(int)y :(int)z {
-    return (blocks[x+1][y][z] == AIR || blocks[x-1][y][z] == AIR
-            || blocks[x][y+1][z] == AIR || blocks[x][y-1][z] == AIR
-            || blocks[x][y][z+1] == AIR || blocks[x][y][z-1] == AIR);
-}
-
 
 - (void) build {
-    [self buildWithSimplexNoise];
+    [self generateTerrain];
     [self addDirt];
     [self addWaterLevel];
     [self addBedrock];
     [self addMarkersAtTerrainBoundaries];
+    [self summarizeTerrain];
 }
 
-- (int) buildWithSimplexNoise {
+- (int) buildSimple {
     int blockCount = 0;
-    float caves, center_falloff, plateau_falloff, density;
-    
-    int caveBlocks = 0;
     
     foreach_xyz {
-        float xf = (float)x/(float)CHUNKX;
-        float yf = (float)y/(float)CHUNKY;
-        float zf = (float)z/(float)CHUNKZ;
-        
-        if(yf <= 0.8){
-            plateau_falloff = 1.0;
-        }
-        else if(0.8 < yf && yf < 0.9){
-            plateau_falloff = 1.0-(yf-0.8)*10.0;
-        }
-        else{
-            plateau_falloff = 0.0;
-        }
-        
-        center_falloff = 0.2/(
-                              pow((xf-0.5)*1.5, 2) +
-                              pow((yf-1.5)*0.2, 2) +
-                              pow((zf-0.5)*1.5, 2)
-                              );
-        
-        caves = pow(simplex_noise(1, xf*5, yf*5, zf*5), 3);
-        density = simplex_noise(5, xf, yf*0.5, zf) * center_falloff * plateau_falloff;
-        
-        density *= pow(
-                       noise((xf+1)*3.0, (yf+1)*3.0, (zf+1)*3.0)+0.4, 1.8
-                       );
-        
-        if(caves < 0.5){
-            density = 0;
-            blocks[x][y][z] = RED;
-            caveBlocks++;
-            blockCount++;
-            continue;
-        }
-        
-        blocks[x][y][z] = (density > 3.1 ? ROCK : AIR);
+        blocks[x][y][z] = ROCK;
         blockCount++;
-    }
-    endforeach
-    
-    NSLog(@"%d of %d are cave blocks", caveBlocks, blockCount);
-    
+    } endforeach
     
     return blockCount;
 }
 
+float terrainNoise(float x, float y, float frequency, float amplitude) {
+    float result = 0;
+    float amp = 1;
+    float freq = 1;
+    float max = 0;
+    
+    x*= 1/64.0f;
+    y*= 1/64.0f;
+    
+    for (int i = 0; i < 8; i++) {
+        result += noise2D(x * freq, y*freq) * amp;
+        max += amp;
+        freq *= frequency;
+        amp *= amplitude;
+    }
+    
+    result /= max;
+    
+    return result;
+}
+
+- (int) generateTerrain {
+    int blockCount = 0;
+
+    for(int x=0; x<CHUNKX; x++) {
+        for(int z=0; z<CHUNKZ; z++) {            
+            float maxHeight = terrainNoise(x + (worldX << 4), z + (worldY << 4), 0.5, 0.05) * WATER_LEVEL + WATER_LEVEL;
+            assert(maxHeight <= CHUNKY && maxHeight >= 0);
+            // NSLog(@"%ld,%ld, height: %f (%d)", realX, realZ, maxheight, (int)maxheight);
+            blocks[x][(int)maxHeight][z] = ROCK;
+        }
+    }
+    return blockCount;
+}
+
 - (void) summarizeTerrain {
-    int rock =0, dirt=0, empty=0;
+    int rock =0, dirt=0, air=0, test=0, empty=0;
     int blockCount = 0;
     
     foreach_xyz {
         switch(blocks[x][y][z]) {
+            case AIR: air++; break;
+            case RED: test++; break;
             case ROCK: rock++; break;
             case DIRT: dirt++; break;
             default: empty++;
@@ -107,7 +103,7 @@
         blockCount++;
     } endforeach
     
-    NSLog(@"%d blocks in this world. %d stone, %d dirt, %d empty", blockCount, rock, dirt, empty);
+    NSLog(@"chunk at %ld/%ld: %d blocks.\n%d stone,\n%d dirt,\n%d empty,\n%d test,\n%d air\n", self.worldX, self.worldY, blockCount, rock, dirt, empty, test, air);
 }
 
 
@@ -153,6 +149,98 @@
         }
     }
     return blockCount;
+}
+
+- (bool) isBorderBlock:(int)x :(int)y :(int)z {
+    return (x == 0 || z == 0 || x == CHUNKX || z == CHUNKZ);
+}
+
+- (bool) isExposedToAir:(int)x :(int)y :(int)z {
+    return (blocks[x+1][y][z] == AIR || blocks[x-1][y][z] == AIR
+            || blocks[x][y+1][z] == AIR || blocks[x][y-1][z] == AIR
+            || blocks[x][y][z+1] == AIR || blocks[x][y][z-1] == AIR);
+}
+
+- (int) renderBlock:(int) x :(int)y :(int)z {
+    /*
+    
+    if (blocks [x][y][z] == AIR || ![self isExposedToAir:x :y :z]) {
+        return 0;
+    }
+     */
+    if (blocks[x][y][z] != ROCK && blocks[x][y][z] != WATER)
+        return 0;
+     
+    GLubyte block = blocks[x][y][z];
+    
+    /* select colour based on value in the world array */
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
+    
+    if (block == ROCK)
+    {
+        glMaterialfv(GL_FRONT, GL_AMBIENT, dstone);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, stone);
+    } else if (block == GRASS) {
+        glMaterialfv(GL_FRONT, GL_AMBIENT, dgreen);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
+    } else if (block == DIRT) {
+        glMaterialfv(GL_FRONT, GL_AMBIENT, dbrown);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, brown);
+    } else if (block == WATER) {
+        glMaterialfv(GL_FRONT, GL_AMBIENT, dblue);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, blue);
+    } else if (block == RED) {
+        glMaterialfv(GL_FRONT, GL_AMBIENT, red);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, red);
+    } else {
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, white);
+    }
+    
+    glPushMatrix();
+    glTranslatef((self.worldX << 4) + x,  y, (self.worldY << 4) + z);
+    
+    static GLfloat n[6][3] =
+    {
+        {-1.0, 0.0, 0.0},
+        {0.0, 1.0, 0.0},
+        {1.0, 0.0, 0.0},
+        {0.0, -1.0, 0.0},
+        {0.0, 0.0, 1.0},
+        {0.0, 0.0, -1.0}
+    };
+    static GLint faces[6][4] =
+    {
+        {0, 1, 2, 3},
+        {3, 2, 6, 7},
+        {7, 6, 5, 4},
+        {4, 5, 1, 0},
+        {5, 6, 2, 1},
+        {7, 4, 0, 3}
+    };
+    GLfloat v[8][3];
+    GLint i;
+    
+    v[0][0] = v[1][0] = v[2][0] = v[3][0] = -1.0f;
+    v[4][0] = v[5][0] = v[6][0] = v[7][0] = 1.0f;
+    v[0][1] = v[1][1] = v[4][1] = v[5][1] = -1.0f;
+    v[2][1] = v[3][1] = v[6][1] = v[7][1] = 1.0f;
+    v[0][2] = v[3][2] = v[4][2] = v[7][2] = -1.0f;
+    v[1][2] = v[2][2] = v[5][2] = v[6][2] = 1.0f;
+    
+    for (i = 5; i >= 0; i--) {
+        glBegin(GL_QUADS);
+        glNormal3fv(&n[i][0]);
+        glVertex3fv(&v[faces[i][0]][0]);
+        glVertex3fv(&v[faces[i][1]][0]);
+        glVertex3fv(&v[faces[i][2]][0]);
+        glVertex3fv(&v[faces[i][3]][0]);
+        glEnd();
+    }
+    
+    glPopMatrix();
+ 
+    return 1;
 }
 
 @end

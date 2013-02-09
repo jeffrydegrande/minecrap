@@ -12,7 +12,7 @@
 #include <GLUT/gutil.h>
 #include <time.h>
 
-#define RENDER_DISTANCE 1000  // was 1536
+#define RENDER_DISTANCE 300  // was 1536
 #define NEAR_CLIP       0.2f  // was 0.2f
 #define FOV             60
 

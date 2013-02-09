@@ -11,7 +11,8 @@
 
 @interface World : NSObject
 {
-    Chunk *chunk;
+    
+    NSMutableArray *rowOfChunks;
 }
 
 - (int) render;

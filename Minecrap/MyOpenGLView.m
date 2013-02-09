@@ -12,10 +12,11 @@
 #include <GLUT/gutil.h>
 #include <time.h>
 
+#include "Block.h"
+
 #define RENDER_DISTANCE 300  // was 1536
 #define NEAR_CLIP       0.2f  // was 0.2f
 #define FOV             60
-
 
 int optionDrawWireframes = 0;  // toggled by pressing '1'
 int optionSmoothShading  = 1;  // toggled by pressing '2'
@@ -39,6 +40,8 @@ int optionLighting = 1;        // toggled by pressing '3'
     [[self window] setAcceptsMouseMovedEvents:YES];
     
     glClearColor(0.52, 0.74, 0.84, 1.0);
+    
+    [Block setup];
 
     glEnable (GL_LIGHTING);
     glEnable (GL_LIGHT0);

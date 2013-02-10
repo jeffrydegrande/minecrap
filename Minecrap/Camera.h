@@ -31,5 +31,4 @@
 
 - (NSString *) stringFromPosition;
 
-- (void) cycle;
 @end

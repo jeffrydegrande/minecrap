@@ -63,8 +63,6 @@ int camera_position = 0;
     yrotrad = (yrot / 180 * PI);
     xpos -= (float) cos(yrotrad) * STRAFE_DISTANCE;
     zpos -= (float) sin(yrotrad) * STRAFE_DISTANCE;
-    
-    
 }
 
 - (void) moveForward {
@@ -86,17 +84,6 @@ int camera_position = 0;
     ypos += (float)sin(xrotrad);
     zpos += (float)cos(yrotrad);
 }
-
-
-- (void) lookDown {
-    xrot = [self bound: xrot + 1];
-}
-
-- (void) lookUp {
-    xrot -= 1;
-    xrot = [self bound: xrot - 1];
-}
-
 
 - (NSString *) stringFromDirection {
     
@@ -139,31 +126,9 @@ int camera_position = 0;
 }
 
 - (void) update {
-    glRotatef(xrot,1.0,0.0,0.0);  //rotate our camera on the x-axis (left and right)
-    glRotatef(yrot,0.0,1.0,0.0);  //rotate our camera on they-axis (up and down)
+    glRotatef(xrot, 1.0, 0.0, 0.0);  //rotate our camera on the x-axis (left and right)
+    glRotatef(yrot, 0.0, 1.0, 0.0);  //rotate our camera on they-axis (up and down)
     glTranslated(-xpos,-ypos,-zpos); //translate the screen to the position of our camera
-}
-
-
-- (void) cycle {
-    int camera_positions[8][3] = {
-        {0, 0, 0},
-        {0, 0, 60},
-        {60, 0, 0},
-        {60, 0, 60},
-        {0, 60, 0},
-        {0, 60, 60},
-        {60, 60, 0},
-        {60, 60, 60},
-    };
-    
-    camera_position++;
-    if (camera_position >= 8)
-        camera_position = 0;
-    
-    xpos = camera_positions[camera_position][0];
-    ypos = camera_positions[camera_position][1];
-    zpos = camera_positions[camera_position][2];
 }
 
 
@@ -172,17 +137,18 @@ int camera_position = 0;
     if (lastx == 0 && lasty == 0) {
         lastx = point.x;
         lasty = point.y;
-        
     } else {
         int diffx = point.x - lastx; // check the difference between the current x and the last x position
         int diffy = point.y - lasty; // check the difference between the current y and the last y position
         lastx = point.x;             // set lastx to the current x position
         lasty = point.y;             // set lasty to the current y position
         
-        // set the xrot to xrot with the additionof the difference in the y position
-        xrot = [self bound: xrot - (float) diffy];
+        // look up or down by the distance the mouse has travelled
+        float up = [self bound: xrot - (float) diffy];
+        if ( up < 90 && up > -90)
+            xrot = up;
         
-        // set the yrot to yrot with the addition of the difference in the position
+        // look left or right by the distance the mouse has travelled
         yrot = [self bound: yrot + (float) diffx];
     }
 }

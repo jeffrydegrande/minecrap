@@ -13,6 +13,7 @@
 #include <time.h>
 
 #include "Block.h"
+#import "Crosshair.h"
 
 #define RENDER_DISTANCE 300  // was 1536
 #define NEAR_CLIP       0.2f  // was 0.2f
@@ -30,6 +31,8 @@ int optionLighting = 1;        // toggled by pressing '3'
 
 - (void) awakeFromNib {
     lastTicks = clock();
+    
+    [NSCursor hide];
 
     world = [[World alloc] initWithSeed:300];
     camera = [Camera alloc];
@@ -45,9 +48,9 @@ int optionLighting = 1;        // toggled by pressing '3'
     glClearColor(0.52, 0.74, 0.84, 1.0);
     
     [Block setup];
-
-    glEnable (GL_LIGHTING);
-    glEnable (GL_LIGHT0);
+    
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 }
@@ -56,7 +59,10 @@ int optionLighting = 1;        // toggled by pressing '3'
 - (void)reshape {
     NSRect rect = [self bounds];
     glViewport(0, 0, rect.size.width, rect.size.height);
-        
+    
+    [Crosshair setup:rect.size.width :rect.size.height];
+
+    
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     CGFloat view_aspect = rect.size.width / rect.size.height;
@@ -65,6 +71,7 @@ int optionLighting = 1;        // toggled by pressing '3'
     if (view_aspect > 1.0f) {
         fovy /= view_aspect;
     }
+    
     gluPerspective(fovy, view_aspect, NEAR_CLIP, RENDER_DISTANCE);    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -75,12 +82,14 @@ int optionLighting = 1;        // toggled by pressing '3'
 
 - (void)drawRect:(NSRect)dirtyRect
 {
+    // calculate framerate
     long ticks = clock();
-    // delta_t in millis;
     int delta_t = (int)((ticks - lastTicks)/(CLOCKS_PER_SEC/1000));
     int fps = delta_t > 0 ? (int) 1000 / delta_t : 1000;
     
     lastTicks = ticks;
+    
+    // switch options
     
     if (optionDrawWireframes == 1)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -92,10 +101,11 @@ int optionLighting = 1;        // toggled by pressing '3'
     else
         glShadeModel(GL_FLAT);
     
+    
+    // clear and start rendering
+    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    
-
     
     GLfloat lightPosition[] = {0.0, 100.0, 0.0, 0.0};
     GLfloat light_diffuse[]  = { 0.8, 0.8, 0.8, 1.0 };
@@ -103,21 +113,47 @@ int optionLighting = 1;        // toggled by pressing '3'
     GLfloat light_full_on[]  = {1.0, 1.0, 1.0, 1.0};
     GLfloat white[]    = {1.0, 1.0, 1.0, 1.0};
 
-
     glLightfv(GL_LIGHT0, GL_AMBIENT, white);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_full_on);
     glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
     glLightfv(GL_LIGHT0, GL_EMISSION, light_specular);
+
     
+    // render 3D stuff
     [camera update];
-
-
     int blocksRendered = [world render];
-    glSwapAPPLE();
+
+
+    // render 2D stuff
+    NSRect rect = [self bounds];
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0, rect.size.width, rect.size.height, 0, -1, 1);
     
+    glMatrixMode(GL_MODELVIEW);
+    glDisable(GL_CULL_FACE);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glPushMatrix();
+    
+    glLoadIdentity();
+    
+    [Crosshair render];
+       
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+   
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_CULL_FACE);
+    
+    glSwapAPPLE();
     [self updateMenuBar:fps :blocksRendered];
 }
+
+
 
 - (void) updateMenuBar:(int)fps :(int)blocksRendered {
     [[self window] setTitle:[NSString stringWithFormat:@"FPS: %d/%@ (%d blocks)",
@@ -205,13 +241,15 @@ int optionLighting = 1;        // toggled by pressing '3'
             return;
         }
         
-        if (keyChar == 110) { // 'n'
-            [ camera cycle];
-            [self setNeedsDisplay:YES];
-            return;
+        if (keyChar == 32) { // spacebar
+            // jump
         }
         
-        /// NSLog(@"%d", keyChar);
+        if (keyChar == 27) {
+            [NSCursor unhide];
+        }
+      
+        NSLog(@"%d", keyChar);
     }
 
     [super keyDown:theEvent];
@@ -219,20 +257,6 @@ int optionLighting = 1;        // toggled by pressing '3'
 
 - (void)mouseMoved:(NSEvent *)theEvent {
     NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-    
-    NSRect rect = [self bounds];
-
-    if (point.x > rect.size.width || point.x < 0) {
-        //  [NSCursor unhide];
-        return;
-    }
-    
-    if (point.y > rect.size.height || point.y < 0) {
-        //        [NSCursor unhide];
-        return;
-    }
-    
-    //    [NSCursor hide];
     
     [camera updateWithPoint:point];
     [self setNeedsDisplay:YES];

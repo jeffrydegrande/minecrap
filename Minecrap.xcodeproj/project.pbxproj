@@ -14,6 +14,7 @@
 		3E2C3D7816C49CD80030155A /* Color.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E2C3D7716C49CD80030155A /* Color.m */; };
 		3E37FAE316C607A600E76042 /* Block.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E37FAE216C607A600E76042 /* Block.m */; };
 		3E39C02716BF69A3004F9A96 /* Chunk.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E39C02616BF69A3004F9A96 /* Chunk.m */; };
+		3E7C698116C7263B006A9376 /* Crosshair.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E7C698016C7263B006A9376 /* Crosshair.m */; };
 		3EE7391016B74B020039752E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EE7390F16B74B020039752E /* Cocoa.framework */; };
 		3EE7391A16B74B020039752E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3EE7391816B74B020039752E /* InfoPlist.strings */; };
 		3EE7391C16B74B020039752E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EE7391B16B74B020039752E /* main.m */; };
@@ -53,6 +54,8 @@
 		3E39C02516BF69A3004F9A96 /* Chunk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chunk.h; sourceTree = "<group>"; };
 		3E39C02616BF69A3004F9A96 /* Chunk.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chunk.m; sourceTree = "<group>"; };
 		3E39C02A16BF6B58004F9A96 /* minecrap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = minecrap.h; sourceTree = "<group>"; };
+		3E7C697F16C7263B006A9376 /* Crosshair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crosshair.h; sourceTree = "<group>"; };
+		3E7C698016C7263B006A9376 /* Crosshair.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Crosshair.m; sourceTree = "<group>"; };
 		3EE7390B16B74B020039752E /* Minecrap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Minecrap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3EE7390F16B74B020039752E /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		3EE7391216B74B020039752E /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -144,6 +147,8 @@
 		3EE7391516B74B020039752E /* Minecrap */ = {
 			isa = PBXGroup;
 			children = (
+				3E7C697F16C7263B006A9376 /* Crosshair.h */,
+				3E7C698016C7263B006A9376 /* Crosshair.m */,
 				3EE7394516B74B710039752E /* MyOpenGLView.h */,
 				3EE7394616B74B710039752E /* MyOpenGLView.m */,
 				3E2B268616BDF70900B894A2 /* World.h */,
@@ -316,6 +321,7 @@
 				3E39C02716BF69A3004F9A96 /* Chunk.m in Sources */,
 				3E2C3D7816C49CD80030155A /* Color.m in Sources */,
 				3E37FAE316C607A600E76042 /* Block.m in Sources */,
+				3E7C698116C7263B006A9376 /* Crosshair.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

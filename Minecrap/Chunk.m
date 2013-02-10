@@ -80,7 +80,7 @@ float terrainNoise(float x, float y, float frequency, float amplitude) {
 
 - (int) generateTerrain {
     int blockCount = 0;
-        
+            
     for(int x=0; x<CHUNKX; x++) {
             for(int z=0; z<CHUNKZ; z++) {
                  float maxHeight = terrainNoise(x + self.seed + (worldX << 4), z + self.seed + (worldY << 4), 0.5, 0.5) * 32 + WATER_LEVEL;

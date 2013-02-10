@@ -135,7 +135,7 @@ int optionLighting = 1;        // toggled by pressing '3'
     
     glMatrixMode(GL_MODELVIEW);
     glDisable(GL_CULL_FACE);
-    glClear(GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_DEPTH_TEST);
     glPushMatrix();
     
     glLoadIdentity();
@@ -148,6 +148,7 @@ int optionLighting = 1;        // toggled by pressing '3'
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
     
     glSwapAPPLE();
     [self updateMenuBar:fps :blocksRendered];

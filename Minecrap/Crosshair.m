@@ -40,8 +40,10 @@ static int centery;
     theCrosshair = glGenLists(1);
     assert(theCrosshair != 0);
     glNewList(theCrosshair, GL_COMPILE);
-    glLineWidth(3.0f);
-    glColor3fv(white);
+    glLineWidth(3.0f);    
+    glMaterialfv(GL_FRONT, GL_AMBIENT, white);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, white);
+    
     glBegin(GL_LINES);
     glVertex2f(centerx - 16.0f, centery);
     glVertex2f(centerx - 2.0f, centery);

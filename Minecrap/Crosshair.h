@@ -6,11 +6,20 @@
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#include "minecrap.h"
 
-@interface Crosshair : NSObject
+class Crosshair {
+	float centerX;
+	float centerY;
 
-+ (void) setup:(int) screenWidth :(int)screenHeight;
-+ (void) render;
+	GLuint crosshair;
 
-@end
+public:
+	Crosshair(int screenWidth, int screenHeight);
+	~Crosshair();
+
+	void render();
+private:
+
+	void draw();
+};

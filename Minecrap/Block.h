@@ -6,10 +6,17 @@
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#include "minecrap.h"
 
-@interface Block : NSObject
+class Block {
+public:
+	static void setup();
+	static void render(GLubyte blockType);
 
-+ (void) setup;
-+ (void) render:(GLubyte)blockType;
-@end
+protected:
+		static void drawRock();
+		static void drawDirt();
+		static void drawWater();
+		static void drawBlock();
+		static void drawTest();
+};

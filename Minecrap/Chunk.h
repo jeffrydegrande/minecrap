@@ -6,29 +6,46 @@
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-
-#include <OpenGl/gl.h>
-#include <GLUT/glut.h>
-#include <GLUT/gutil.h>
-
-
 #include "minecrap.h"
 
-@interface Chunk : NSObject
+class Chunk
 {
-    GLubyte blocks[CHUNKX][CHUNKY][CHUNKZ];
-    
-}
+	GLubyte blocks[CHUNKX][CHUNKY][CHUNKZ];
+	int worldX;
+	int worldY;
+	int seed;
 
-@property (assign) NSInteger worldX;
-@property (assign) NSInteger worldY;
-@property (assign) NSInteger seed;
+public:
+
+	Chunk(int x, int y, int seed);
+	~Chunk();
+
+	void setBlock(int x, int y, int z, GLubyte type);
+	int renderBlock(int x, int y, int z);
+
+	void generate();
+	void summarize();
 
 
-- (id) initWithWorldPosition:(int)x :(int)y :(int) worldSeed;
-- (int) renderBlock:(int)x :(int)y :(int)z;
-- (bool) isExposedToAir:(int)x :(int)y :(int)z;
-- (int) heightAtPosition:(int)x :(int)z;
-- (void) setBlock:(int)x :(int)y :(int)z :(GLubyte)blockType;
-@end
+	int X();
+	int Y();
+
+
+private:
+
+	void generateTerrain();
+	void addDirt();
+	void addMarkersAtBoundaries();
+	void addBedrock();
+	void addWaterLevel();
+
+	bool isExposedToAir(int x, int y, int z);
+	bool isBorderBlock(int x, int y, int z);
+
+};
+
+// - (id) initWithWorldPosition:(int)x :(int)y :(int) worldSeed;
+// - (int) renderBlock:(int)x :(int)y :(int)z;
+// - (bool) isExposedToAir:(int)x :(int)y :(int)z;
+// - (int) heightAtPosition:(int)x :(int)z;
+// - (void) setBlock:(int)x :(int)y :(int)z :(GLubyte)blockType;

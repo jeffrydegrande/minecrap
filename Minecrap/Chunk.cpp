@@ -6,33 +6,34 @@
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
 //
 
-#import "Chunk.h"
-#include "Color.h"
-
-#include <OpenGl/gl.h>
-#include <GLUT/glut.h>
-#include <GLUT/gutil.h>
-
 #include "minecrap.h"
-#include "simplex.h"
 #include "Block.h"
+#include "Color.h"
+#include "Chunk.h"
 
-@implementation Chunk
+#include "simplex.h"
+#include <assert.h>
 
-@synthesize worldX, worldY, seed;
-
-- (id)initWithWorldPosition:(int)x :(int)y :(int)worldSeed
-{
-    self = [super init];
-    if (self) {
-        self.seed = worldSeed;
-        self.worldX = x;
-        self.worldY = y;
-        [self build];
-    }
-    return self;
+Chunk::Chunk(int x, int y, int seed) {
+	this->seed = seed;
+	this->worldX = x;
+	this->worldY = y;
+	this->generate();
 }
 
+Chunk::~Chunk() {
+}
+
+int Chunk::X() {
+	return worldX;
+}
+
+int Chunk::Y() {
+	return worldY;
+}
+
+
+/*
 - (int) heightAtPosition:(int)x :(int)z {
     for (int y=CHUNKY; y >= 0; y--) {
         if (blocks[x][y][z] != AIR) {
@@ -41,20 +42,28 @@
     }
     return 0;
 }
+*/
 
-- (void) setBlock:(int)x :(int)y :(int)z :(GLubyte)blockType
+
+void Chunk::setBlock(int x, int y, int z, GLubyte type)
 {    
-    blocks[x][y][z] = blockType;
+    blocks[x][y][z] = type;
 }
 
-- (void) build {
-    [self generateTerrain];
-    [self addDirt];
+void Chunk::generate() {
+	
+	foreach_xyz {
+		blocks[x][y][z] = 0;
+	} endforeach
+
+	generateTerrain();
+	addDirt();
     
+	// addMarkersAtBoundaries();
     // [self addWaterLevel];
     // [self addBedrock];
     // [self addMarkersAtTerrainBoundaries];
-    // [self summarizeTerrain];
+	summarize();
 }
 
 float terrainNoise(float x, float y, float frequency, float amplitude) {
@@ -78,23 +87,21 @@ float terrainNoise(float x, float y, float frequency, float amplitude) {
     return result;
 }
 
-- (int) generateTerrain {
-    int blockCount = 0;
-            
+void Chunk::generateTerrain() {
     for(int x=0; x<CHUNKX; x++) {
             for(int z=0; z<CHUNKZ; z++) {
-                 float maxHeight = terrainNoise(x + self.seed + (worldX << 4), z + self.seed + (worldY << 4), 0.5, 0.5) * 32 + WATER_LEVEL;
+                 float maxHeight = terrainNoise((float)(x + seed + (worldX << 4)),
+												(float)(z + seed + (worldY << 4)), 0.5f, 0.5f) * 32 + WATER_LEVEL;
                  
                  assert(maxHeight <= CHUNKY && maxHeight >= 0);
                  // NSLog(@"%ld,%ld, height: %f (%d)", realX, realZ, maxheight, (int)maxheight);
                  blocks[x][(int)maxHeight][z] = ROCK;
-                blocks[x][(int)maxHeight - 1][z] = ROCK;
+				 blocks[x][(int)maxHeight - 1][z] = ROCK;
             }
         }
-        return blockCount;
 }
 
-- (void) summarizeTerrain {
+void Chunk::summarize() {
     int rock =0, dirt=0, air=0, test=0, empty=0;
     int blockCount = 0;
     
@@ -108,13 +115,11 @@ float terrainNoise(float x, float y, float frequency, float amplitude) {
         }
         blockCount++;
     } endforeach
-    
-    NSLog(@"chunk at %ld/%ld: %d blocks.\n%d stone,\n%d dirt,\n%d empty,\n%d test,\n%d air\n", self.worldX, self.worldY, blockCount, rock, dirt, empty, test, air);
 }
 
 
 
-- (void) addMarkersAtTerrainBoundaries {
+void Chunk::addMarkersAtBoundaries() {
     blocks[0][0][0] = RED;
     blocks[0][0][CHUNKZ-1] = RED;
     blocks[CHUNKX-1][0][0] = RED;
@@ -126,7 +131,7 @@ float terrainNoise(float x, float y, float frequency, float amplitude) {
     blocks[CHUNKX-1][CHUNKY-1][CHUNKZ-1] = RED;
 }
 
-- (int) addDirt {
+void Chunk::addDirt() {
     foreach_xyz {
         int block = blocks[x][y][z];
         int ontop = blocks[x][y+1][z];
@@ -134,41 +139,36 @@ float terrainNoise(float x, float y, float frequency, float amplitude) {
             blocks[x][y][z] = DIRT;
         }
     } endforeach
-    return 0;
 }
 
-- (int) addBedrock {
-    int blockCount = 0;
+void Chunk::addBedrock() {
     for (int x=0; x<CHUNKX; x++) {
         for (int z=0; z<CHUNKZ; z++ ) {
             blocks[x][0][z] = ROCK;
         }
     }
-    return blockCount;
 }
 
-- (int) addWaterLevel {
-    int blockCount = 0;
+void Chunk::addWaterLevel() {
     for (int x=0; x<CHUNKX; x++) {
         for (int z=0; z<CHUNKZ; z++ ) {
             blocks[x][WATER_LEVEL][z] = WATER;
         }
     }
-    return blockCount;
 }
 
-- (bool) isBorderBlock:(int)x :(int)y :(int)z {
-    return (x == 0 || z == 0 || x == CHUNKX || z == CHUNKZ);
+
+bool Chunk::isBorderBlock(int x, int y, int z) {
+	return (x == 0 || z == 0 || x == CHUNKX || z == CHUNKZ);
 }
 
-- (bool) isExposedToAir:(int)x :(int)y :(int)z {
+bool Chunk::isExposedToAir(int x, int y, int z) {
     return (blocks[x+1][y][z] == AIR || blocks[x-1][y][z] == AIR
             || blocks[x][y+1][z] == AIR || blocks[x][y-1][z] == AIR
             || blocks[x][y][z+1] == AIR || blocks[x][y][z-1] == AIR);
 }
 
-- (int) renderBlock:(int) x :(int)y :(int)z {
-    
+int Chunk::renderBlock(int x, int y, int z) {
     if (blocks[x][y][z] == AIR)
         return 0;
     
@@ -181,17 +181,13 @@ float terrainNoise(float x, float y, float frequency, float amplitude) {
 
     
     GLubyte block = blocks[x][y][z];
-    
+
+	if (block == AIR)
+		return 0;
     
     glPushMatrix();
-    glTranslatef((self.worldX << 4) + x,  y, (self.worldY << 4) + z);
-    [Block render:block];
- 
+	glTranslatef((float)((this->worldX << 4) + x),  (float)y, (float)((this->worldY << 4) + z));
+	Block::render(block);
     glPopMatrix();
-
-
- 
     return 1;
 }
-
-@end

@@ -9,7 +9,19 @@
 #ifndef Minecrap_minecrap_h
 #define Minecrap_minecrap_h
 
-#define PI 3.141592654f
+#include <Windows.h>
+#include <SDL.h>
+#include <SDL_opengl.h>
+
+
+#define FULLSCREEN false
+
+#define DEGREES_TO_RADIANS        .017453292F
+#define RADIANS_TO_DEGREES        57.29577951F
+#define PI                        (3.1415926535f)
+
+
+#define STRAFE_DISTANCE 1.0f
 
 
 #define CHUNKX 16
@@ -39,5 +51,8 @@ typedef struct Point3D_ {
             for (int z=0; z < CHUNKZ; z++)
 
 #define endforeach }}
+
+
+#define clamp(value, upper, lower)		max(min(value, (lower)), (upper))
 
 #endif

@@ -1,77 +1,45 @@
-//
-//  Block.m
-//  Minecrap
-//
-//  Created by Jeffry Degrande on 2/9/13.
-//  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
-//
-
-#import "Block.h"
-#import "Color.h"
-#import "minecrap.h"
+#include <Windows.h>
+#include <gl/GLU.h>
+#include <assert.h>
 
 
 
-#include <OpenGl/gl.h>
-#include <GLUT/glut.h>
-#include <GLUT/gutil.h>
-
-@implementation Block
-
-static GLfloat n[6][3] =
-{
-    {-1.0, 0.0, 0.0},
-    {0.0, 1.0, 0.0},
-    {1.0, 0.0, 0.0},
-    {0.0, -1.0, 0.0},
-    {0.0, 0.0, 1.0},
-    {0.0, 0.0, -1.0}
-};
-
-
-static GLint faces[6][4] =
-{
-    {0, 1, 2, 3},
-    {3, 2, 6, 7},
-    {7, 6, 5, 4},
-    {4, 5, 1, 0},
-    {5, 6, 2, 1},
-    {7, 4, 0, 3}
-};
+#include "Color.h"
+#include "Block.h"
 
 static GLuint theRockBlock;
 static GLuint theWaterBlock;
 static GLuint theTestBlock;
 static GLuint theDirtBlock;
 
-+ (void) setup {
+void Block::setup() {
     theRockBlock = glGenLists(1);
     assert(theRockBlock != 0);
     glNewList(theRockBlock, GL_COMPILE);
-    [Block drawRock];
+	Block::drawRock();
     glEndList();
 
     theWaterBlock = glGenLists(1);
     assert(theWaterBlock != 0);
     glNewList(theWaterBlock, GL_COMPILE);
-    [Block drawWater];
+    Block::drawWater();
     glEndList();
     
     theTestBlock = glGenLists(1);
     assert(theTestBlock != 0);
     glNewList(theTestBlock, GL_COMPILE);
-    [Block drawTestBlock];
-    glEndList();
+	Block::drawTest();
+	glEndList();
     
     theDirtBlock = glGenLists(1);
     assert(theDirtBlock != 0);
     glNewList(theDirtBlock, GL_COMPILE);
-    [Block drawDirtBlock];
-    glEndList();
+	Block::drawDirt();
+	glEndList();
 }
 
-+ (void) render:(GLubyte)blockType
-{
+
+void Block::render(GLubyte blockType) {
     switch (blockType) {
         case ROCK:
              glCallList(theRockBlock);
@@ -114,66 +82,76 @@ if (block == ROCK)
 }
 #endif
 
-+ (void) drawRock {
+void Block::drawRock() {
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);
     glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
     glMaterialfv(GL_FRONT, GL_AMBIENT, dstone);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, stone);
-    [Block drawBlock];
-
+	Block::drawBlock();
 }
 
-+ (void) drawDirtBlock {
+void Block::drawDirt() {
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);
     glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
     glMaterialfv(GL_FRONT, GL_AMBIENT, dbrown);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, brown);
-    [Block drawBlock];
+	Block::drawBlock();
 }
 
-+ (void) drawWater {
+void Block::drawWater() {
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);
     glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
     glMaterialfv(GL_FRONT, GL_AMBIENT, dblue);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, blue);
-    [Block drawBlock];
+    Block::drawBlock();
 }
 
-+ (void) drawTestBlock {
+void Block::drawTest() {
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);
     glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
     glMaterialfv(GL_FRONT, GL_AMBIENT, dred);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, red);
-    [Block drawBlock];
+	Block::drawBlock();
 }
 
-+ (void) drawBlock {
-    
-    glutSolidCube(1);
-    
-    
-    return;
-    
-    GLfloat v[8][3];
-    GLint i;
-    
-    v[0][0] = v[1][0] = v[2][0] = v[3][0] = -1.0f;
-    v[4][0] = v[5][0] = v[6][0] = v[7][0] = 1.0f;
-    v[0][1] = v[1][1] = v[4][1] = v[5][1] = -1.0f;
-    v[2][1] = v[3][1] = v[6][1] = v[7][1] = 1.0f;
-    v[0][2] = v[3][2] = v[4][2] = v[7][2] = -1.0f;
-    v[1][2] = v[2][2] = v[5][2] = v[6][2] = 1.0f;
-    
-    for (i = 5; i >= 0; i--) {
-        glBegin(GL_QUADS);
-        glNormal3fv(&n[i][0]);
-        glVertex3fv(&v[faces[i][0]][0]);
-        glVertex3fv(&v[faces[i][1]][0]);
-        glVertex3fv(&v[faces[i][2]][0]);
-        glVertex3fv(&v[faces[i][3]][0]);
-        glEnd();
-    }
-    
-}
 
-@end
+void Block::drawBlock() {
+  GLfloat size = 1;
+  static GLfloat n[6][3] =
+  {
+    {-1.0, 0.0, 0.0},
+    {0.0, 1.0, 0.0},
+    {1.0, 0.0, 0.0},
+    {0.0, -1.0, 0.0},
+    {0.0, 0.0, 1.0},
+    {0.0, 0.0, -1.0}
+  };
+  static GLint faces[6][4] =
+  {
+    {0, 1, 2, 3},
+    {3, 2, 6, 7},
+    {7, 6, 5, 4},
+    {4, 5, 1, 0},
+    {5, 6, 2, 1},
+    {7, 4, 0, 3}
+  };
+  GLfloat v[8][3];
+  GLint i;
+
+  v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
+  v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
+  v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
+  v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
+  v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
+  v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
+
+  for (i = 5; i >= 0; i--) {
+    glBegin(GL_QUADS);
+    glNormal3fv(&n[i][0]);
+    glVertex3fv(&v[faces[i][0]][0]);
+    glVertex3fv(&v[faces[i][1]][0]);
+    glVertex3fv(&v[faces[i][2]][0]);
+    glVertex3fv(&v[faces[i][3]][0]);
+    glEnd();
+  }
+}

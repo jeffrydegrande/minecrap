@@ -6,18 +6,32 @@
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "Chunk.h"
+#include "minecrap.h"
+#include "Chunk.h"
+#include "Grid.h"
 
-@interface World : NSObject
+class Sun;
+class World
 {
-    NSMutableArray *rowOfChunks;
-}
+	Point3D playerSpawnLocation;
+	int seed;
+	Grid<Chunk *> *chunks;	
+	Sun *sun;
 
-@property Point3D playerSpawnPoint;
-@property int seed;
+public:
+	World();
+	World(int seed);
+	~World();
 
-- (id)initWithSeed:(int)worldSeed;
-- (int) render;
-- (NSUInteger) size;
-@end
+	void init(int seed);
+	unsigned int getSize();
+
+	int render();
+
+private:
+	void generateChunks(int count);
+	void calculatePlayerSpawnLocation();
+	int renderTerrain();
+
+	int renderChunk(Chunk *);
+};

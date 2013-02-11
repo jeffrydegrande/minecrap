@@ -9,7 +9,7 @@
 #ifndef Minecrap_colors_h
 #define Minecrap_colors_h
 
-#import <Foundation/Foundation.h>
+#include "minecrap.h"
 
 extern GLfloat blue[];
 extern GLfloat red[];

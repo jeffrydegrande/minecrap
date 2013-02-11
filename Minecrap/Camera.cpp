@@ -1,37 +1,38 @@
-//
-//  Camera.m
-//  Minecrap
-//
-//  Created by Jeffry Degrande on 2/2/13.
-//  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
-//
+#include "minecrap.h"
+#include "Camera.h"
 
-#import "Camera.h"
-#import "minecrap.h"
+#include <math.h>
 
-@implementation Camera
 
-#define STRAFE_DISTANCE 1.0
+Camera::Camera()
+{
+	this->xpos = 0;
+	this->ypos = 140;
+	this->zpos = 0;
+	this->xrot = 11;
+	this->yrot = 0; // face North
 
-// camera positions
-float xpos = 0;
-float ypos = 140;
-float zpos = 0;
-float xrot = 11;
-float yrot = 0; // face North
-
-float lastx = 0;
-float lasty = 0;
-
-int camera_position = 0;
-
-- (void) setPosition:(Point3D)point {
-    xpos = point.x;
-    ypos = point.y;
-    zpos = point.z;
+	this->lastx = 0;
+	this->lasty = 0;
 }
 
+Camera::Camera(float xpos, float ypos, float zpos) {
+	this->xpos = xpos;
+	this->ypos = ypos;
+	this->zpos = zpos;
+}
 
+Camera::Camera(Point3D point) {
+	this->xpos = point.x;
+	this->ypos = point.y;
+	this->zpos = point.z;
+}
+
+Camera::~Camera(void)
+{
+}
+
+/*
 - (int) bound:(int) value {
     if (value < -360) {
         value += 360;
@@ -42,30 +43,31 @@ int camera_position = 0;
     
     return value;
 }
+*/
 
-- (void) moveLeft {
-    yrot = [self bound:yrot - 1];
+void Camera::moveLeft() {
+	yrot -= 1;
 }
 
-- (void) moveRight {
-    yrot = [self bound:yrot + 1];
+void Camera::moveRight() {
+	yrot += 1;
 }
 
-- (void) strafeRight {
+void Camera::strafeRight() {
     float yrotrad;
-    yrotrad = (yrot / 180 * PI);
+    yrotrad = (yrot / 180.0f * PI);
     xpos += (float) cos(yrotrad) * STRAFE_DISTANCE;
     zpos += (float) sin(yrotrad) * STRAFE_DISTANCE;
 }
 
-- (void) strafeLeft {
+void Camera::strafeLeft() {
     float yrotrad;
     yrotrad = (yrot / 180 * PI);
     xpos -= (float) cos(yrotrad) * STRAFE_DISTANCE;
     zpos -= (float) sin(yrotrad) * STRAFE_DISTANCE;
 }
 
-- (void) moveForward {
+void Camera::moveForward() {
     float xrotrad, yrotrad;
     xrotrad = (xrot / 180 * PI);
     yrotrad = (yrot / 180 * PI);
@@ -75,7 +77,7 @@ int camera_position = 0;
     zpos -= (float)cos(yrotrad);
 }
 
-- (void) moveBackward {
+void Camera::moveBackward() {
     float xrotrad, yrotrad;
     xrotrad = (xrot / 180 * PI);
     yrotrad = (yrot / 180 * PI);
@@ -85,8 +87,9 @@ int camera_position = 0;
     zpos += (float)cos(yrotrad);
 }
 
-- (NSString *) stringFromDirection {
-    
+
+/*
+- (NSString *) stringFromDirection {    
     int absyrot = yrot;
     
     if (absyrot < 0)
@@ -124,14 +127,33 @@ int camera_position = 0;
      yrot,
      [self stringFromDirection]];
 }
+*/
 
-- (void) update {
+void Camera::render() {
     glRotatef(xrot, 1.0, 0.0, 0.0);  //rotate our camera on the x-axis (left and right)
-    glRotatef(yrot, 0.0, 1.0, 0.0);  //rotate our camera on they-axis (up and down)
+    glRotatef(yrot, 0.0, 0.0, 1.0);  //rotate our camera on they-axis (up and down)
     glTranslated(-xpos,-ypos,-zpos); //translate the screen to the position of our camera
 }
 
+void Camera::look(int x, int y) {
+	if (lastx == 0 && lasty == 0) {
+        lastx = x;
+        lasty = y;
+    } else {
+        int diffx = x - lastx; // check the difference between the current x and the last x position
+        int diffy = y - lasty; // check the difference between the current y and the last y position
+        lastx = x;             // set lastx to the current x position
+        lasty = y;             // set lasty to the current y position
+        
+        // look up or down by the distance the mouse has travelled        
+        xrot -= (float) diffy;
+        // look left or right by the distance the mouse has travelled
+        yrot += (float) diffx;
+    }
 
+}
+
+/*
 - (void) updateWithPoint: (NSPoint)point {
     
     if (lastx == 0 && lasty == 0) {
@@ -152,5 +174,4 @@ int camera_position = 0;
         yrot = [self bound: yrot + (float) diffx];
     }
 }
-
-@end
+*/

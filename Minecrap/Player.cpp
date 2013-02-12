@@ -78,10 +78,13 @@ void Player::updateCamera ()
 
   cam = position;
   cam.z += EYE_HEIGHT;
-  
+ 
+  /*
   cam.x += sin (angle.z * DEGREES_TO_RADIANS) * cam_distance * horz_delta;
   cam.y += cos (angle.z * DEGREES_TO_RADIANS) * cam_distance * horz_delta;
   cam.z += vert_delta;
+  */
+
 
   //ground = CacheElevation (cam.x, cam.y) + 0.2f;
   //cam.z = max (cam.z, ground);
@@ -96,7 +99,7 @@ void Player::look(int x, int y) {
   x = - x;
   mouse_sense = 1.0f;
   angle.x -= (float)x * mouse_sense;
-  angle.z += (float)y * mouse_sense;
+  angle.z -= (float)y * mouse_sense;
 
   // angle.x = clamp (angle.x, 0.0f, 180.0f);
  /*
@@ -114,7 +117,7 @@ void Player::look(int x, int y) {
 
 void Player::setPosition(const Vec3 &position) {
 	this->position = position;
-	this->angle = Vec3(90.0f, 0, 0);
+	this->angle = Vec3(-90.0f, 0, 0);
 
 	this->cam_distance = 1;
 	this->camera_position = position;

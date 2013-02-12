@@ -168,5 +168,9 @@ $RECYCLE.BIN/
 .DS_Store
 
 *.o
-minecrap
 mc
+
+# CVars
+cvars.xml
+.glconsole_settings
+.cvar_history

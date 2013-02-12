@@ -9,11 +9,12 @@
 #include "minecrap.h"
 #include "Chunk.h"
 #include "Grid.h"
+#include "Vec3.h"
 
 class Sun;
 class World
 {
-	Point3D playerSpawnLocation;
+	Vec3 playerSpawnLocation;
 	int seed;
 	Grid<Chunk *> *chunks;	
 	Sun *sun;
@@ -24,8 +25,9 @@ public:
 	~World();
 
 	void init(int seed);
-	unsigned int getSize();
+	size_t getSize();
 
+	void update();
 	int render();
 
 private:

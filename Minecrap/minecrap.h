@@ -25,8 +25,8 @@
 
 
 #define CHUNKX 16
-#define CHUNKY 128
-#define CHUNKZ 16
+#define CHUNKY 16
+#define CHUNKZ 128
 
 #define WATER_LEVEL 62
 
@@ -52,6 +52,10 @@ typedef struct Point3D_ {
 
 #define endforeach }}
 
+#define foreach_xy \
+	{ \
+		for (int x=0; x < CHUNKX; x++) { \
+			for(int y=0; y < CHUNKY; y++)
 
 #define clamp(value, upper, lower)		max(min(value, (lower)), (upper))
 

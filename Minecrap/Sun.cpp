@@ -24,7 +24,7 @@ void Sun::draw() {
     glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
     glMaterialfv(GL_FRONT, GL_EMISSION, yellow);
     glPushMatrix();
-    glTranslatef(0, 300, 0);
+    glTranslatef(0, 0, 0);
 	this->drawBlock();
     glPopMatrix();
     glMaterialfv(GL_FRONT, GL_EMISSION, black);  

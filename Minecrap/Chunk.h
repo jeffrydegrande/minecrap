@@ -8,12 +8,17 @@
 
 #include "minecrap.h"
 
+#define CHUNKX 16
+#define CHUNKY 16
+#define CHUNKZ 128
+
 class Chunk
 {
 	GLubyte blocks[CHUNKX][CHUNKY][CHUNKZ];
 	int worldX;
 	int worldY;
 	int seed;
+
 
 public:
 
@@ -22,6 +27,9 @@ public:
 
 	void setBlock(int x, int y, int z, GLubyte type);
 	int renderBlock(int x, int y, int z);
+
+	int groundLevel(int x, int y);
+
 
 	void generate();
 	void summarize();

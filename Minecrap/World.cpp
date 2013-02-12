@@ -15,7 +15,7 @@
 #include "Sun.h"
 #include "Block.h"
 
-#define INITIAL_WORLD_SIZE 8
+#define INITIAL_WORLD_SIZE 1
 
 World::World(): chunks(NULL) {
 	init((unsigned int)time(NULL));
@@ -27,6 +27,7 @@ World::World(int seed): chunks(NULL) {
 
 World::~World() {
 	delete sun;
+	sun = NULL;
 }
 
 void World::init(int seed) {
@@ -52,12 +53,36 @@ void World::generateChunks(int count) {
 	}
 }
 
-unsigned int World::getSize() {
+size_t World::getSize() {
 	return chunks->actualSize();
 }
 
+#include <sstream>
+
 void World::calculatePlayerSpawnLocation() {
-	return;
+	size_t size = this->getSize();
+	
+	int x = rand() % size;
+	int y = rand() % size;
+
+	Chunk *chunk = chunks->get( x / CHUNKX, y / CHUNKY);
+
+	int xInChunk = x % CHUNKX;
+	int yInChunk = y % CHUNKY;
+	
+	int ground = chunk->groundLevel(xInChunk, yInChunk);
+	
+	chunk->setBlock(xInChunk, yInChunk, 0, WATER);
+	chunk->setBlock(xInChunk, yInChunk, ground, RED);
+
+	std::ostringstream s;
+	s << x << ", " << y << ", " << ground;
+	SDL_WM_SetCaption(s.str().c_str(), NULL);
+
+	playerSpawnLocation.x = (float)x;
+	playerSpawnLocation.y = (float)y;
+	playerSpawnLocation.z = (float)ground;
+
 
 #if 0
 	NSUInteger size = [self size];
@@ -88,13 +113,8 @@ void World::calculatePlayerSpawnLocation() {
 #endif
 }
 
-/*
-- (Chunk *) findChunkAtPosition:(int)x :(int)y {
-NSMutableArray *chunks = [rowOfChunks objectAtIndex:x];
-return [chunks objectAtIndex:y];
+void World::update() {
 }
-*/
-
 
 int World::render() {
 	int blocksRendered = 0;

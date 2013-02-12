@@ -33,161 +33,167 @@ int Chunk::Y() {
 }
 
 
-/*
-- (int) heightAtPosition:(int)x :(int)z {
-    for (int y=CHUNKY; y >= 0; y--) {
-        if (blocks[x][y][z] != AIR) {
-            return y;
-        }
-    }
-    return 0;
+int Chunk::groundLevel(int x, int y) {
+	for (int z=CHUNKZ; z >= 0; z--) {
+		GLubyte block = blocks[x][y][z];
+		if (block != AIR) {
+			return z;
+		}
+		if (z > 100)
+			setBlock(x, y, z, RED);
+	}
+	return 0;
 }
-*/
 
 
 void Chunk::setBlock(int x, int y, int z, GLubyte type)
 {    
-    blocks[x][y][z] = type;
+	blocks[x][y][z] = type;
 }
 
 void Chunk::generate() {
-	
+
 	foreach_xyz {
 		blocks[x][y][z] = 0;
 	} endforeach
 
 	generateTerrain();
 	addDirt();
-    
+	addWaterLevel();
+	addBedrock();
 	// addMarkersAtBoundaries();
-    // [self addWaterLevel];
-    // [self addBedrock];
-    // [self addMarkersAtTerrainBoundaries];
 	summarize();
 }
 
 float terrainNoise(float x, float y, float frequency, float amplitude) {
-    float result = 0;
-    float amp = 1;
-    float freq = 1;
-    float max = 0;
-    
-    x*= 1/64.0f;
-    y*= 1/64.0f;
-    
-    for (int i = 0; i < 8; i++) {
-        result += noise2D(x * freq, y*freq) * amp;
-        max += amp;
-        freq *= frequency;
-        amp *= amplitude;
-    }
-    
-    result /= max;
-    
-    return result;
+	float result = 0;
+	float amp = 1;
+	float freq = 1;
+	float max = 0;
+
+	x*= 1/64.0f;
+	y*= 1/64.0f;
+
+	for (int i = 0; i < 8; i++) {
+		result += noise2D(x * freq, y*freq) * amp;
+		max += amp;
+		freq *= frequency;
+		amp *= amplitude;
+	}
+
+	result /= max;
+
+	return result;
 }
 
 void Chunk::generateTerrain() {
-    for(int x=0; x<CHUNKX; x++) {
-            for(int z=0; z<CHUNKZ; z++) {
-                 float maxHeight = terrainNoise((float)(x + seed + (worldX << 4)),
-												(float)(z + seed + (worldY << 4)), 0.5f, 0.5f) * 32 + WATER_LEVEL;
-                 
-                 assert(maxHeight <= CHUNKY && maxHeight >= 0);
-                 // NSLog(@"%ld,%ld, height: %f (%d)", realX, realZ, maxheight, (int)maxheight);
-                 blocks[x][(int)maxHeight][z] = ROCK;
-				 blocks[x][(int)maxHeight - 1][z] = ROCK;
-            }
-        }
+	for(int x=0; x<CHUNKX; x++) {
+		for(int y=0; y<CHUNKY; y++) {
+			float maxHeight = terrainNoise(
+				(float)(x + seed + (worldX << 4)),
+				(float)(y + seed + (worldY << 4)),
+				0.5f,
+				0.5f
+			) * 32 + WATER_LEVEL;
+
+			assert(maxHeight <= CHUNKZ && maxHeight >= 0);
+			
+			blocks[x][y][(int)maxHeight] = ROCK;
+			blocks[x][y][(int)maxHeight -1] = ROCK;
+
+			/*
+			for (int z = (int)maxHeight; z > 0; z--) {
+				blocks[x][y][z] = ROCK;
+			}
+			*/
+		}
+	}
 }
 
 void Chunk::summarize() {
-    int rock =0, dirt=0, air=0, test=0, empty=0;
-    int blockCount = 0;
-    
-    foreach_xyz {
-        switch(blocks[x][y][z]) {
-            case AIR: air++; break;
-            case RED: test++; break;
-            case ROCK: rock++; break;
-            case DIRT: dirt++; break;
-            default: empty++;
-        }
-        blockCount++;
-    } endforeach
+	int rock =0, dirt=0, air=0, test=0, empty=0;
+	int blockCount = 0;
+
+	foreach_xyz {
+		switch(blocks[x][y][z]) {
+		case AIR: air++; break;
+		case RED: test++; break;
+		case ROCK: rock++; break;
+		case DIRT: dirt++; break;
+		default: empty++;
+		}
+		blockCount++;
+	} endforeach
 }
 
 
 
 void Chunk::addMarkersAtBoundaries() {
-    blocks[0][0][0] = RED;
-    blocks[0][0][CHUNKZ-1] = RED;
-    blocks[CHUNKX-1][0][0] = RED;
-    blocks[CHUNKX-1][0][CHUNKZ-1] = RED;
-    
-    blocks[0][CHUNKY-1][0] = RED;
-    blocks[0][CHUNKY-1][CHUNKZ-1] = RED;
-    blocks[CHUNKX-1][CHUNKY-1][0] = RED;
-    blocks[CHUNKX-1][CHUNKY-1][CHUNKZ-1] = RED;
+	blocks[0][0][0] = RED;  
+	blocks[0][CHUNKY-1][0] = RED;
+	blocks[CHUNKX-1][0][0] = RED;
+	blocks[CHUNKX-1][CHUNKY-1][0] = RED;
+
+	blocks[0][0][CHUNKZ-1] = RED;
+	blocks[0][CHUNKY-1][CHUNKZ-1] = RED;
+	blocks[CHUNKX-1][0][CHUNKZ-1] = RED;
+	blocks[CHUNKX-1][CHUNKY-1][CHUNKZ-1] = RED;
 }
 
 void Chunk::addDirt() {
-    foreach_xyz {
-        int block = blocks[x][y][z];
-        int ontop = blocks[x][y+1][z];
-        if (block == ROCK && ontop == AIR) {
-            blocks[x][y][z] = DIRT;
-        }
-    } endforeach
+	foreach_xyz {
+		int block = blocks[x][y][z];
+		int ontop = blocks[x][y][z+1];
+		if (block == ROCK && ontop == AIR) {
+			blocks[x][y][z] = DIRT;
+		}
+	} endforeach
 }
 
 void Chunk::addBedrock() {
-    for (int x=0; x<CHUNKX; x++) {
-        for (int z=0; z<CHUNKZ; z++ ) {
-            blocks[x][0][z] = ROCK;
-        }
-    }
+	foreach_xy {
+		blocks[x][y][0] = ROCK;
+	} endforeach;
 }
 
 void Chunk::addWaterLevel() {
-    for (int x=0; x<CHUNKX; x++) {
-        for (int z=0; z<CHUNKZ; z++ ) {
-            blocks[x][WATER_LEVEL][z] = WATER;
-        }
-    }
+	foreach_xy {
+		blocks[x][y][WATER_LEVEL] = WATER;
+	} endforeach;
 }
 
 
 bool Chunk::isBorderBlock(int x, int y, int z) {
-	return (x == 0 || z == 0 || x == CHUNKX || z == CHUNKZ);
+	return (x == 0 || y == 0 || z == 0 || x == CHUNKX || y == CHUNKY || z == CHUNKZ);
 }
 
 bool Chunk::isExposedToAir(int x, int y, int z) {
-    return (blocks[x+1][y][z] == AIR || blocks[x-1][y][z] == AIR
-            || blocks[x][y+1][z] == AIR || blocks[x][y-1][z] == AIR
-            || blocks[x][y][z+1] == AIR || blocks[x][y][z-1] == AIR);
+	return (blocks[x+1][y][z] == AIR || blocks[x-1][y][z] == AIR
+		|| blocks[x][y+1][z] == AIR || blocks[x][y-1][z] == AIR
+		|| blocks[x][y][z+1] == AIR || blocks[x][y][z-1] == AIR);
 }
 
 int Chunk::renderBlock(int x, int y, int z) {
-    if (blocks[x][y][z] == AIR)
-        return 0;
-    
-    
-    /*
-    if (blocks [x][y][z] == AIR || ![self isExposedToAir:x :y :z]) {
-        return 0;
-    }
-     */
+	if (blocks[x][y][z] == AIR)
+		return 0;
 
-    
-    GLubyte block = blocks[x][y][z];
+	/*
+	if (!isExposedToAir(x, y, z)) {
+	return 0;
+	}
+	*/
+
+
+	GLubyte block = blocks[x][y][z];
 
 	if (block == AIR)
 		return 0;
-    
-    glPushMatrix();
-	glTranslatef((float)((this->worldX << 4) + x),  (float)y, (float)((this->worldY << 4) + z));
+
+	glPushMatrix();
+	glTranslatef((float)((this->worldX << 4) + x),
+		(float)((this->worldY << 4) + y),
+		(float)z);
 	Block::render(block);
-    glPopMatrix();
-    return 1;
+	glPopMatrix();
+	return 1;
 }

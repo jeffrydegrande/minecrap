@@ -1,10 +1,10 @@
 #ifndef MINECRAP_ENGINE_H
 #define MINECRAP_ENGINE_H
 
+#include "minecrap.h"
 
-struct SDL_Surface;
 class World;
-class Camera;
+class Player;
 class Crosshair;
 
 class Engine
@@ -19,12 +19,14 @@ class Engine
 	int view_width;
 	int view_height;
 	float view_aspect;
+	
 	SDL_Surface* screen;
+	SDL_Joystick *joystick;
 
 	bool quit;
 
 	World *world;
-	Camera *camera;
+	Player *player;
 	Crosshair *crosshair;
 
 public:
@@ -35,8 +37,15 @@ public:
 private:
 	void init();
 	void initRenderer(int width, int height, int bits, bool fullscreen);
+	
 	void update();
+	void collectInput();
+
+
 	void render();
+	void render2D();
+	void render3D();
+	
 	long tick();
 	void stop();
 };

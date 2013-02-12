@@ -34,15 +34,14 @@ int Chunk::Y() {
 
 
 int Chunk::groundLevel(int x, int y) {
-    for (int z=CHUNKZ; z >= 0; z--) {
-        GLubyte block = blocks[x][y][z];
-        if (block != AIR) {
-            return z;
-        }
-        if (z > 100)
-            setBlock(x, y, z, RED);
-    }
-    return 0;
+
+	for (int z=CHUNKZ-1; z >= 0; --z) {
+		GLubyte block = blocks[x][y][z];
+		if (block != AIR) {
+			return z;
+		}
+	}
+	return 0;
 }
 
 
@@ -57,12 +56,12 @@ void Chunk::generate() {
         blocks[x][y][z] = 0;
     } endforeach
 
-    generateTerrain();
-    addDirt();
-    addWaterLevel();
-    addBedrock();
-    // addMarkersAtBoundaries();
-    summarize();
+
+	generateTerrain();
+	addDirt();
+	addWaterLevel();
+	addBedrock();
+	// addMarkersAtBoundaries();
 }
 
 float terrainNoise(float x, float y, float frequency, float amplitude) {
@@ -108,23 +107,27 @@ void Chunk::generateTerrain() {
             */
         }
     }
-}
 
 void Chunk::summarize() {
-    int rock =0, dirt=0, air=0, test=0, empty=0;
-    int blockCount = 0;
+	int rock =0, dirt=0, air=0, test=0, empty=0, water=0;
+	int blockCount = 0;
 
-    foreach_xyz {
-        switch(blocks[x][y][z]) {
-        case AIR: air++; break;
-        case RED: test++; break;
-        case ROCK: rock++; break;
-        case DIRT: dirt++; break;
-        default: empty++;
-        }
-        blockCount++;
-    } endforeach
+	foreach_xyz {
+		switch(blocks[x][y][z]) {
+		case AIR: air++; break;
+		case RED: test++; break;
+		case ROCK: rock++; break;
+		case DIRT: dirt++; break;
+		case WATER: water++; break;
+		default: 
+			empty++;
+		}
+		blockCount++;
+	} endforeach
+
+	ConsoleLog("Chunk %d, %d: %d blocks (%d rock, %d dirt, %d air, %d water, %d test, %d empty)", this->worldX, this->worldY, blockCount, rock, dirt, air, water, test, empty);
 }
+
 
 void Chunk::addMarkersAtBoundaries() {
     blocks[0][0][0] = RED;

@@ -14,8 +14,12 @@
 #include "Color.h"
 #include "Sun.h"
 #include "Block.h"
+#include "Console.h"
+#include "Player.h"
 
-#define INITIAL_WORLD_SIZE 1
+#include "Vec2.h"
+
+#define INITIAL_WORLD_SIZE 4
 
 World::World(): chunks(NULL) {
 	init((unsigned int)time(NULL));
@@ -36,9 +40,7 @@ void World::init(int seed) {
 
 	Block::setup();
 	sun = new Sun();
-
 	this->generateChunks(INITIAL_WORLD_SIZE);
-	this->calculatePlayerSpawnLocation();
 }
 
 void World::generateChunks(int count) {
@@ -53,64 +55,38 @@ void World::generateChunks(int count) {
 	}
 }
 
-size_t World::getSize() {
-	return chunks->actualSize();
+Vec2 World::getSize() {
+	return Vec2(
+		chunks->numRows() << 4,
+		chunks->numColumns() << 4
+		);
 }
 
-#include <sstream>
 
-void World::calculatePlayerSpawnLocation() {
-	size_t size = this->getSize();
-	
-	int x = rand() % size;
-	int y = rand() % size;
+Player * World::spawnPlayer() {
+	Vec3 playerSpawnLocation;
 
+	// pick a random spot in real world coordinates
+	Vec2 size = this->getSize();
+
+	int x = rand() % (int)size.x;
+	int y = rand() % (int)size.y;
+
+	// find the block for this coordinate
 	Chunk *chunk = chunks->get( x / CHUNKX, y / CHUNKY);
 
+	// and translate the real world coordinates into chunk coordinates
 	int xInChunk = x % CHUNKX;
 	int yInChunk = y % CHUNKY;
-	
 	int ground = chunk->groundLevel(xInChunk, yInChunk);
+
+	chunk->setBlock(xInChunk, yInChunk, ground + 1, RED);
 	
-	chunk->setBlock(xInChunk, yInChunk, 0, WATER);
-	chunk->setBlock(xInChunk, yInChunk, ground, RED);
-
-	std::ostringstream s;
-	s << x << ", " << y << ", " << ground;
-	SDL_WM_SetCaption(s.str().c_str(), NULL);
-
 	playerSpawnLocation.x = (float)x;
 	playerSpawnLocation.y = (float)y;
 	playerSpawnLocation.z = (float)ground;
 
-
-#if 0
-	NSUInteger size = [self size];
-
-	// we need an x and a z that are randoms within the world size
-
-	int x = rand() % size;
-	int z = rand() % size;
-
-	// find the chunk where x,z can be found
-	int xrow = x / 16;
-	int zrow = z / 16;
-
-	Chunk *chunk = [self findChunkAtPosition:xrow :zrow];
-
-	int xChunk = x % 16;
-	int zChunk = z % 16;
-
-	int y = [chunk heightAtPosition:xChunk :zChunk];
-
-	[chunk setBlock:xChunk :(y+1) :zChunk :RED];
-
-	playerSpawnPoint.x = x;
-	playerSpawnPoint.y = y+1;
-	playerSpawnPoint.z = z;
-
-	NSLog(@"spawning at %d,%d,%d (found in chunk %d, %d / %d, %d)", x, y, z, xrow, zrow, xChunk, zChunk);
-#endif
+	return new Player(playerSpawnLocation);
 }
 
 void World::update() {

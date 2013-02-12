@@ -3,6 +3,7 @@
 #include "World.h"
 #include "Player.h"
 #include "Crosshair.h"
+#include "Console.h"
 
 #define RENDER_DISTANCE  1536
 #define NEAR_CLIP		 0.2f
@@ -13,17 +14,14 @@ Engine::Engine() {
 	this->quit = false;
 	init();
 
-	this->world = new World(300);
-	this->player = new Player();		
+	world = new World(300);
+	player = world->spawnPlayer();
 }
 
 Engine::~Engine() {
 	delete this->world;
-	this->world = NULL;
 	delete this->player;
-	this->player = NULL;
 	delete this->crosshair;
-	this->crosshair = NULL;
 }
 
 void Engine::stop() {
@@ -34,7 +32,12 @@ long Engine::tick() {
 	return SDL_GetTicks();
 }
 
+#pragma region initialization
+
 void Engine::init() {
+	char *argv[] = {"Minecrap"};
+	int argc = 1;
+	glutInit(&argc, argv);
 
 	if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_JOYSTICK) != 0) {
 		return;
@@ -46,12 +49,12 @@ void Engine::init() {
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_EnableUNICODE(1);
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-	
+
 	for (int i = 0; i < SDL_NumJoysticks(); i++) {
 		SDL_JoystickEventState(SDL_ENABLE);
 		SDL_JoystickOpen(i);	
 	}
-	
+
 	SDL_ShowCursor (false);
 
 }
@@ -92,9 +95,10 @@ void Engine::initRenderer(int width, int height, int bits, bool fullscreen) {
 	glMatrixMode(GL_MODELVIEW);
 
 	glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
-
 	crosshair = new Crosshair(view_width, view_height);
 }
+
+# pragma endregion
 
 void Engine::run() {
 	long stop;
@@ -120,22 +124,20 @@ void Engine::run() {
 			fps_lasttime = tick();
 			fps_current = fps_frames;
 			fps_frames = 0;
-
-			/*
-			char fps[64];
-			sprintf(fps, "FPS: %d, %d", fps_current, world->getSize());
-			SDL_WM_SetCaption(fps, NULL);
-			*/
 		}
 	}
 }
 
+# pragma region Update phase
+
 
 void Engine::update() {
-	player->update();
-	world->update();
 	this->collectInput();
+	ConsoleUpdate ();
+	world->update();
+	player->update();
 }
+
 
 void Engine::collectInput() {
 	SDL_Event event;
@@ -147,23 +149,34 @@ void Engine::collectInput() {
 			stop();
 			break;
 		case SDL_KEYDOWN:
-			switch(event.key.keysym.sym) {
-			case SDLK_ESCAPE:
-				stop();
-			case SDLK_w:
-				player->moveForward();
+			if (ConsoleIsOpen ()) {
+				ConsoleInput (event.key.keysym.sym, event.key.keysym.unicode);
 				break;
-			case SDLK_s:
-				player->moveBackward();
-				break;
-			case SDLK_a:
-				player->strafeLeft();
-				break;
-			case SDLK_d:
-				player->strafeRight();
-				break;
-			case SDLK_SPACE:
-				break;
+			} else {
+
+
+				switch(event.key.keysym.sym) {
+				case SDLK_ESCAPE:
+					stop();
+					break;
+				case SDLK_BACKQUOTE:
+					ConsoleToggle();
+					break;
+				case SDLK_w:
+					player->moveForward();
+					break;
+				case SDLK_s:
+					player->moveBackward();
+					break;
+				case SDLK_a:
+					player->strafeLeft();
+					break;
+				case SDLK_d:
+					player->strafeRight();
+					break;
+				case SDLK_SPACE:
+					break;
+				}
 			}
 			break;
 		case SDL_JOYAXISMOTION:
@@ -191,7 +204,9 @@ void Engine::collectInput() {
 	last_update = now;
 }
 
+# pragma endregion
 
+# pragma region Render phase
 void Engine::render() {
 	this->render3D();
 	this->render2D();
@@ -248,13 +263,16 @@ void Engine::render2D() {
 
 	glLoadIdentity();
 
-	//crosshair->render();
+	crosshair->render();
 
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
+
+	ConsoleRender();
+
 }
+
+#pragma endregion

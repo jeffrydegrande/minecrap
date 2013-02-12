@@ -18,9 +18,9 @@ class Player
 	float cam_distance;
 
 public:
-	Player(void);
+	Player();
 	Player(float xpos, float ypos, float zpos);
-	Player(const Vec3 & vector);
+	Player(const Vec3 & position);
 
 	~Player(void);
 
@@ -33,6 +33,8 @@ public:
 	void render();
 
 	void look(int x, int y);
+
+	void setPosition(const Vec3 &);
 
 private:
 	void updateCamera();

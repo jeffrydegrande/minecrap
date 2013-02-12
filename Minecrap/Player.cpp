@@ -8,18 +8,17 @@
 #define CAM_MIN         1
 #define CAM_MAX         12
 
-Player::Player()
-{
-    this->position = Vec3(0, 0, 0);
-    this->angle = Vec3(90.0f, 0, 0);
 
-    this->cam_distance = 6;
-    this->camera_position = position;
-    this->camera_angle = angle;
+Player::Player() {
+	this->setPosition(Vec3(0,0,0));
 }
 
 Player::Player(float x, float y, float z) {
-    this->position = Vec3(x, y, z);
+	this->setPosition(Vec3(x, y, z));
+}
+
+Player::Player(const Vec3 & position) {
+	this->setPosition(position);
 }
 
 Player::~Player(void)
@@ -100,17 +99,27 @@ void Player::look(int x, int y) {
   angle.z += (float)y * mouse_sense;
 
   // angle.x = clamp (angle.x, 0.0f, 180.0f);
-  /*
+ /*
   if (angle.x < 0.0f)
       angle.x = 0.0f;
   if (angle.x > 180.0f)
-      angle.x = 180.0f;
- */
+
+	  angle.x = 180.0f;
+	  */
+
   angle.z = fmod (angle.z, 360.0f);
   if (angle.z < 0.0f)
     angle.z += 360.0f;
 }
 
+void Player::setPosition(const Vec3 &position) {
+	this->position = position;
+	this->angle = Vec3(90.0f, 0, 0);
+
+	this->cam_distance = 1;
+	this->camera_position = position;
+	this->camera_angle = angle;
+}
 
 /*
 - (NSString *) stringFromDirection {    

@@ -12,6 +12,8 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
 
+#include "Console.h"
+
 
 #ifdef _WIN32
 #define sleep(N)  Sleep(N)

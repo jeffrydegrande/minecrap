@@ -12,9 +12,10 @@
 #include "Vec3.h"
 
 class Sun;
+class Vec2;
+class Player;
 class World
 {
-	Vec3 playerSpawnLocation;
 	int seed;
 	Grid<Chunk *> *chunks;	
 	Sun *sun;
@@ -25,14 +26,15 @@ public:
 	~World();
 
 	void init(int seed);
-	size_t getSize();
+	Vec2 getSize();
 
 	void update();
 	int render();
 
+	Player * spawnPlayer();
+
 private:
 	void generateChunks(int count);
-	void calculatePlayerSpawnLocation();
 	int renderTerrain();
 
 	int renderChunk(Chunk *);

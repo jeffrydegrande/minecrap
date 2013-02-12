@@ -4,8 +4,8 @@
 #include "minecrap.h"
 
 class World;
-class Player;
 class Crosshair;
+class Player;
 
 class Engine
 {
@@ -21,7 +21,6 @@ class Engine
 	float view_aspect;
 	
 	SDL_Surface* screen;
-	SDL_Joystick *joystick;
 
 	bool quit;
 

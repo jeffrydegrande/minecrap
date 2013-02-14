@@ -1,9 +1,19 @@
-#include "Console.h"
 #include "minecrap.h"
 
 #define MAX_MSG_LEN 1024
 
 #ifdef _WIN32
+
+#include <vector>
+using namespace std;
+#include <windows.h>
+//include this header for CVars and GLConsole
+#include <GLConsole/GLConsole.h>
+//A CVar version of std::vector
+#include <CVars/CVarVectorIO.h>
+//A CVar version of std::map
+#include <CVars/CVarMapIO.h>
+
 
 static GLConsole      con;
 static bool ready;

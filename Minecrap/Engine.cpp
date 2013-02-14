@@ -36,7 +36,7 @@ long Engine::tick() {
 
 void Engine::init() {
 #ifdef _WIN32
-	char argv[] = {"Minecrap"};
+	char *argv[] = {"Minecrap"};
 	int argc = 1;
 	glutInit(&argc, argv);
 #endif

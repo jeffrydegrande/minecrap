@@ -17,6 +17,8 @@
 #include <SDL/SDL_opengl.h>
 #endif
 
+#include <GL/glut.h>
+
 #include "Console.h"
 
 

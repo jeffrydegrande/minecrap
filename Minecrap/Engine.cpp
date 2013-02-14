@@ -112,7 +112,7 @@ void Engine::run() {
 
 		remaining = stop - tick();
 		if (remaining > 0)
-			Sleep(remaining);
+			sleep(remaining);
 
 		fps_frames++;
 		if (fps_lasttime < tick() - FPS_INTERVAL*1000)
@@ -169,7 +169,6 @@ void Engine::collectInput() {
 		case SDL_JOYAXISMOTION:
 			break;
 		case SDL_JOYBUTTONDOWN:
-			OutputDebugString("Joystick button pressed\n");
 			break;
 		case SDL_MOUSEMOTION:
 			// manipulate player
@@ -180,6 +179,9 @@ void Engine::collectInput() {
 			center_y = event.resize.h / 2;
 			initRenderer(event.resize.w, event.resize.h, 32, FULLSCREEN);
 			break;
+                default:
+                        // noop
+                        break;
 		}
 	}
 

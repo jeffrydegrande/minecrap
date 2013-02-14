@@ -14,9 +14,6 @@
 #include <assert.h>
 
 Crosshair::Crosshair(int screenWidth, int screenHeight) {
-	
-	OutputDebugString("Initializing crosshair\n");
-	
 	this->centerX = (float)screenWidth / 2;
 	this->centerY = (float)screenHeight / 2;
 

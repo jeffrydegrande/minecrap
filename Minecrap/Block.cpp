@@ -1,8 +1,10 @@
+#ifdef _WIN32
 #include <Windows.h>
-#include <gl/GLU.h>
+#endif
+
+#include <GL/glu.h>
+
 #include <assert.h>
-
-
 
 #include "Color.h"
 #include "Block.h"

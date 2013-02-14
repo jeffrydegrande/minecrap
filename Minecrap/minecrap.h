@@ -9,13 +9,19 @@
 #ifndef Minecrap_minecrap_h
 #define Minecrap_minecrap_h
 
-#include <Windows.h>
-#include <SDL.h>
-#include <SDL_opengl.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_opengl.h>
+
+
+#ifdef _WIN32
+#define sleep(N)  Sleep(N)
+#else
+#include <unistd.h>
+#define sleep(N)   usleep(N * 1000)
+#endif
 
 
 #define FULLSCREEN false
-
 #define DEGREES_TO_RADIANS        .017453292F
 #define RADIANS_TO_DEGREES        57.29577951F
 #define PI                        (3.1415926535f)

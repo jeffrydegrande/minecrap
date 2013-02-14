@@ -4,13 +4,16 @@
 #include "Player.h"
 #include "Crosshair.h"
 #include "Console.h"
+#include "Text.h"
+
+#include <sstream>
 
 #define RENDER_DISTANCE  1536
 #define NEAR_CLIP		 0.2f
 #define FOV		         60
 #define FPS_INTERVAL	1.0f
 
-Engine::Engine() {
+Engine::Engine() : fps_current(0) {
 	this->quit = false;
 	init();
 
@@ -58,6 +61,8 @@ void Engine::init() {
 	}
 
 	SDL_ShowCursor (false);
+
+    TextInit();
 
 }
 
@@ -108,7 +113,6 @@ void Engine::run() {
 
 
 	unsigned int fps_lasttime = tick(); //the last recorded time.
-	unsigned int fps_current; //the current FPS.
 	unsigned fps_frames = 0; //frames passed since the last recorded fps.
 
 	while(!quit) {
@@ -252,6 +256,7 @@ void Engine::render3D() {
 }
 
 void Engine::render2D() {
+    const char *string = "WTF MAN?";
 	// render 2D stuff
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -265,7 +270,12 @@ void Engine::render2D() {
 
 	glLoadIdentity();
 
+
 	crosshair->render();
+
+	std::ostringstream s;
+	s << "FPS: " << fps_current;
+    TextWrite(view_width - 300, 24, s.str().c_str());
 
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);

@@ -15,6 +15,7 @@ class Engine
 	long last_update;
 	long elapsed;
 	float elapsed_seconds;
+	unsigned int fps_current; //the current FPS.
 
 	int view_width;
 	int view_height;

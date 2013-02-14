@@ -3,7 +3,9 @@
 
 #define MAX_MSG_LEN 1024
 
-static GLConsole      con;  
+#ifdef _WIN32
+
+static GLConsole      con;
 static bool ready;
 static vector<string> queue;
 
@@ -94,3 +96,45 @@ void ConsoleLog (const char* message, ...)
 	con.EnterLogLine (msg_text, LINEPROP_LOG, true);
 
 }
+
+#else
+
+#include <vector>
+
+using namespace std;
+
+void ConsoleToggle()
+{
+}
+
+bool ConsoleIsOpen()
+{
+    return false;
+}
+
+void ConsoleRender() {
+}
+
+
+void ConsoleInput (int key, int char_code)
+{
+}
+
+
+void ConsoleUpdate ()
+{
+}
+
+void ConsoleLog (const char* message, ...)
+{
+
+	static char    msg_text[MAX_MSG_LEN];
+	va_list           marker;
+
+	va_start (marker, message);
+	vsprintf (msg_text, message, marker);
+	va_end (marker);
+    printf("%s\n", msg_text);
+}
+
+#endif

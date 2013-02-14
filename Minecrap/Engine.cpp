@@ -35,9 +35,11 @@ long Engine::tick() {
 #pragma region initialization
 
 void Engine::init() {
-	char *argv[] = {"Minecrap"};
+#ifdef _WIN32
+	char argv[] = {"Minecrap"};
 	int argc = 1;
 	glutInit(&argc, argv);
+#endif
 
 	if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_JOYSTICK) != 0) {
 		return;

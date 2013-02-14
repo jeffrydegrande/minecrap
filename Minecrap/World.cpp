@@ -76,11 +76,11 @@ Player * World::spawnPlayer() {
 	Chunk *chunk = chunks->get( x / CHUNKX, y / CHUNKY);
 
 	// and translate the real world coordinates into chunk coordinates
-	int xInChunk = x % CHUNKX;
-	int yInChunk = y % CHUNKY;
-	int ground = chunk->groundLevel(xInChunk, yInChunk);
+	Vec2 chunkCoordinates = Vec2(x % CHUNKX, y % CHUNKY);
 
-	chunk->setBlock(xInChunk, yInChunk, ground + 1, RED);
+	int ground = chunk->groundLevel(chunkCoordinates.x, chunkCoordinates.y);
+
+	chunk->setBlock(chunkCoordinates.x, chunkCoordinates.y, ground + 1, RED);
 	
 	playerSpawnLocation.x = (float)x;
 	playerSpawnLocation.y = (float)y;

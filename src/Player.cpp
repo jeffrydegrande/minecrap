@@ -29,12 +29,17 @@ Player::~Player(void)
 void Player::move(Vec3 delta) {
     Vec3 movement;
     float forward;
+    bool flying = true;
 
-    forward = sin (angle.x * DEGREES_TO_RADIANS);
-    movement.x = cos (angle.z * DEGREES_TO_RADIANS) * delta.x +  sin (angle.z * DEGREES_TO_RADIANS) * delta.y * forward;
-    movement.y = -sin (angle.z * DEGREES_TO_RADIANS) * delta.x +  cos (angle.z * DEGREES_TO_RADIANS) * delta.y * forward;
-    movement.z = cos (angle.x * DEGREES_TO_RADIANS) * delta.y;
-    position += movement;
+    if(flying) {
+        forward = sin(angle.x * DEGREES_TO_RADIANS);
+        movement.x = cos(angle.z * DEGREES_TO_RADIANS) * delta.x
+                    + sin(angle.z * DEGREES_TO_RADIANS) * delta.y * forward;
+        movement.y = -sin(angle.z * DEGREES_TO_RADIANS) * delta.x
+                    + cos(angle.z * DEGREES_TO_RADIANS) * delta.y * forward;
+        movement.z = cos (angle.x * DEGREES_TO_RADIANS) * delta.y;
+        position += movement;
+    }
 }
 
 void Player::strafeRight() {
@@ -54,44 +59,14 @@ void Player::moveBackward() {
 }
 
 void Player::render() {
-    glRotatef (camera_angle.x, 1.0f, 0.0f, 0.0f);
-    glRotatef (camera_angle.y, 0.0f, 1.0f, 0.0f);
-    glRotatef (camera_angle.z, 0.0f, 0.0f, 1.0f);
-    glTranslatef (-camera_position.x, -camera_position.y, -camera_position.z);
+    glRotatef (angle.x, 1.0f, 0.0f, 0.0f);
+    glRotatef (angle.y, 0.0f, 1.0f, 0.0f);
+    glRotatef (angle.z, 0.0f, 0.0f, 1.0f);
+    glTranslatef (-position.x, -position.y, -position.z);
 }
 
 void Player::update()
 {
-    this->updateCamera();
-}
-
-void Player::updateCamera ()
-{
-  Vec3  cam;
-  float     vert_delta;
-  float     horz_delta;
-  float radsx;
-
-  radsx = angle.x * DEGREES_TO_RADIANS;
-  vert_delta = cos (radsx) * cam_distance;
-  horz_delta = sin (radsx);
-
-  cam = position;
-  cam.z += EYE_HEIGHT;
- 
-  /*
-  cam.x += sin (angle.z * DEGREES_TO_RADIANS) * cam_distance * horz_delta;
-  cam.y += cos (angle.z * DEGREES_TO_RADIANS) * cam_distance * horz_delta;
-  cam.z += vert_delta;
-  */
-
-
-  //ground = CacheElevation (cam.x, cam.y) + 0.2f;
-  //cam.z = max (cam.z, ground);
-  
-  camera_angle = angle;
-  camera_position = cam;
-
 }
 
 void Player::look(int x, int y) {
@@ -118,19 +93,15 @@ void Player::look(int x, int y) {
 void Player::setPosition(const Vec3 &position) {
 	this->position = position;
 	this->angle = Vec3(-90.0f, 0, 0);
-
-	this->cam_distance = 1;
-	this->camera_position = position;
-	this->camera_angle = angle;
 }
 
 /*
 - (NSString *) stringFromDirection {    
     int absyrot = yrot;
-    
+
     if (absyrot < 0)
         absyrot += 360;
-    
+
     if (absyrot >= 0 && absyrot < 45) {
         return @"N";
     } else if (absyrot >= 45 && absyrot < 90) {

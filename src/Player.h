@@ -13,10 +13,6 @@ class Player
 	Vec3 position;
 	Vec3 angle;
 
-	Vec3 camera_angle;
-	Vec3 camera_position;
-	float cam_distance;
-
 public:
 	Player();
 	Player(float xpos, float ypos, float zpos);
@@ -37,7 +33,6 @@ public:
 	void setPosition(const Vec3 &);
 
 private:
-	void updateCamera();
 	void move(Vec3 delta);
 
 };

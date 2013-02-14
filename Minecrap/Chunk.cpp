@@ -107,6 +107,7 @@ void Chunk::generateTerrain() {
             */
         }
     }
+}
 
 void Chunk::summarize() {
 	int rock =0, dirt=0, air=0, test=0, empty=0, water=0;

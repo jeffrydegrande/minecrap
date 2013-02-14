@@ -43,12 +43,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\SDK\SDL\include;C:\SDK\glconsole;c:\SDK\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\SDK\freeglut\include;C:\SDK\SDL\include;C:\SDK\glconsole;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sdl.lib;%(AdditionalDependencies);opengl32.lib;SDL.lib;SDLmain.lib;freeglut.lib;cvars.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\SDK\glconsole\CVars\Debug;C:\SDK\SDL\lib\x86;C:\SDK\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sdl.lib;%(AdditionalDependencies);opengl32.lib;glu32.lib;SDL.lib;SDLmain.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\SDK\freeglut\lib\;C:\SDK\SDL\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -72,8 +72,6 @@
     <ClCompile Include="Crosshair.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="Console.cpp" />
-    <ClCompile Include="simplex.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Block.h" />
@@ -94,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Color.m" />
+    <ClCompile Include="simplex.cpp" />
     <ClCompile Include="Sun.cpp" />
     <ClCompile Include="Vec2.cpp" />
     <ClCompile Include="Vec3.cpp" />

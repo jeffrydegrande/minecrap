@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
 //
 
-#include <stdio.h>
-#include <math.h>
+#include <cstdio>
+#include <cmath>
 
 float grad[12][3] = {
     {1.0,1.0,0.0},{-1.0,1.0,0.0},{1.0,-1.0,0.0},{-1.0,-1.0,0.0},

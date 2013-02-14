@@ -1,9 +1,15 @@
 CC=g++
 DEBUG=-D_DEBUG -g
 CFLAGS=-Werror -fomit-frame-pointer -pipe -O2 -I. -Iinclude/ $(DEBUG) -O2 -Wno-error=switch
-LDFLAGS=-lSDL -lGL -lglut -lGLU
 
-all: minecrap
+OS=$(shell uname -s)
+ifeq ($(OS),Darwin)
+LDFLAGS =-L/usr/local/lib -lSDLmain -lSDL -Wl,-framework,Cocoa -framework OpenGL -framework GLUT
+else
+LDFLAGS=-lSDL -lGL -lglut -lGLU
+endif
+
+all: mc
 
 .cpp.o:
 	$(CC) $(DEBUG) $(CFLAGS) -c -o $@ $<
@@ -11,8 +17,8 @@ all: minecrap
 MINECRAP_SOURCES?=$(wildcard Minecrap/*.cpp)
 MINECRAP_OBJS?=$(addprefix , $(MINECRAP_SOURCES:.cpp=.o))
 
-minecrap: $(MINECRAP_OBJS)
+mc: $(MINECRAP_OBJS)
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(MINECRAP_OBJS) $(LDFLAGS)
 
 clean: 
-	rm Minecrap/*.o
+	rm Minecrap/*.o mc

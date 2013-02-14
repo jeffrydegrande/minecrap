@@ -47,8 +47,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sdl.lib;%(AdditionalDependencies);opengl32.lib;glu32.lib;SDL.lib;SDLmain.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\SDK\freeglut\lib\;C:\SDK\SDL\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sdl.lib;%(AdditionalDependencies);opengl32.lib;glu32.lib;SDL.lib;SDLmain.lib;CVars.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\SDK\glconsole\CVars\Debug;C:\SDK\freeglut\lib\;C:\SDK\SDL\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -66,6 +66,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Block.cpp" />
+    <ClCompile Include="Console.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="Color.cpp" />

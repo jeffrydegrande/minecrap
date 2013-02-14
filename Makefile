@@ -14,11 +14,11 @@ all: mc
 .cpp.o:
 	$(CC) $(DEBUG) $(CFLAGS) -c -o $@ $<
 
-MINECRAP_SOURCES?=$(wildcard Minecrap/*.cpp)
+MINECRAP_SOURCES?=$(wildcard src/*.cpp)
 MINECRAP_OBJS?=$(addprefix , $(MINECRAP_SOURCES:.cpp=.o))
 
 mc: $(MINECRAP_OBJS)
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(MINECRAP_OBJS) $(LDFLAGS)
 
 clean: 
-	rm Minecrap/*.o mc
+	rm src/*.o mc

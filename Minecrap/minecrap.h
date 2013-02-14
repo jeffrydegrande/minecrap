@@ -17,7 +17,11 @@
 #include <SDL/SDL_opengl.h>
 #endif
 
-#include <GL/glut.h>
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+#include <GL/GLUT.h>
+#endif
 
 #include "Console.h"
 

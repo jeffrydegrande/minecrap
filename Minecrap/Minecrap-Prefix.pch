@@ -1,7 +1,0 @@
-//
-// Prefix header for all source files of the 'Minecrap' target in the 'Minecrap' project
-//
-
-#ifdef __OBJC__
-    #import <Cocoa/Cocoa.h>
-#endif

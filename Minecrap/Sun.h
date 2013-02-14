@@ -13,9 +13,7 @@ public:
 
 	int render();
 private:
-
 	void draw();
-	void drawBlock();
 };
 
 #endif

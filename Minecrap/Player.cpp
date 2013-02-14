@@ -5,21 +5,21 @@
 #include <math.h>
 
 #define EYE_HEIGHT      1.75f
-#define CAM_MIN			1
-#define CAM_MAX			12
+#define CAM_MIN         1
+#define CAM_MAX         12
 
 Player::Player()
 {
-	this->position = Vec3(0, 0, 0);
-	this->angle = Vec3(90.0f, 0, 0);
+    this->position = Vec3(0, 0, 0);
+    this->angle = Vec3(90.0f, 0, 0);
 
-	this->cam_distance = 6;
-	this->camera_position = position;
-	this->camera_angle = angle;
+    this->cam_distance = 6;
+    this->camera_position = position;
+    this->camera_angle = angle;
 }
 
 Player::Player(float x, float y, float z) {
-	this->position = Vec3(x, y, z);
+    this->position = Vec3(x, y, z);
 }
 
 Player::~Player(void)
@@ -28,10 +28,10 @@ Player::~Player(void)
 
 
 void Player::move(Vec3 delta) {
-	Vec3 movement;
-	float forward;
+    Vec3 movement;
+    float forward;
 
-	forward = sin (angle.x * DEGREES_TO_RADIANS);
+    forward = sin (angle.x * DEGREES_TO_RADIANS);
     movement.x = cos (angle.z * DEGREES_TO_RADIANS) * delta.x +  sin (angle.z * DEGREES_TO_RADIANS) * delta.y * forward;
     movement.y = -sin (angle.z * DEGREES_TO_RADIANS) * delta.x +  cos (angle.z * DEGREES_TO_RADIANS) * delta.y * forward;
     movement.z = cos (angle.x * DEGREES_TO_RADIANS) * delta.y;
@@ -39,37 +39,35 @@ void Player::move(Vec3 delta) {
 }
 
 void Player::strafeRight() {
-	this->move(Vec3(1, 0, 0));
+    this->move(Vec3(1, 0, 0));
 }
 
 void Player::strafeLeft() {
-	this->move(Vec3(-1, 0, 0));
+    this->move(Vec3(-1, 0, 0));
 }
 
 void Player::moveForward() {
-	this->move(Vec3(0, -1, 0));
+    this->move(Vec3(0, -1, 0));
 }
 
 void Player::moveBackward() {
-	this->move(Vec3(0, 1, 0));
+    this->move(Vec3(0, 1, 0));
 }
 
 void Player::render() {
-	glRotatef (camera_angle.x, 1.0f, 0.0f, 0.0f);
-	glRotatef (camera_angle.y, 0.0f, 1.0f, 0.0f);
-	glRotatef (camera_angle.z, 0.0f, 0.0f, 1.0f);
-	glTranslatef (-camera_position.x, -camera_position.y, -camera_position.z);
+    glRotatef (camera_angle.x, 1.0f, 0.0f, 0.0f);
+    glRotatef (camera_angle.y, 0.0f, 1.0f, 0.0f);
+    glRotatef (camera_angle.z, 0.0f, 0.0f, 1.0f);
+    glTranslatef (-camera_position.x, -camera_position.y, -camera_position.z);
 }
 
 void Player::update()
 {
-	
-	this->updateCamera();
+    this->updateCamera();
 }
 
 void Player::updateCamera ()
 {
-
   Vec3  cam;
   float     vert_delta;
   float     horz_delta;
@@ -85,7 +83,6 @@ void Player::updateCamera ()
   cam.x += sin (angle.z * DEGREES_TO_RADIANS) * cam_distance * horz_delta;
   cam.y += cos (angle.z * DEGREES_TO_RADIANS) * cam_distance * horz_delta;
   cam.z += vert_delta;
-
 
   //ground = CacheElevation (cam.x, cam.y) + 0.2f;
   //cam.z = max (cam.z, ground);
@@ -105,9 +102,9 @@ void Player::look(int x, int y) {
   // angle.x = clamp (angle.x, 0.0f, 180.0f);
   /*
   if (angle.x < 0.0f)
-	  angle.x = 0.0f;
+      angle.x = 0.0f;
   if (angle.x > 180.0f)
-	  angle.x = 180.0f;
+      angle.x = 180.0f;
  */
   angle.z = fmod (angle.z, 360.0f);
   if (angle.z < 0.0f)

@@ -1,8 +1,4 @@
-#ifdef _WIN32
-#include <Windows.h>
-#endif
-
-#include <GL/glu.h>
+#include "minecrap.h"
 
 #include <assert.h>
 
@@ -18,7 +14,7 @@ void Block::setup() {
     theRockBlock = glGenLists(1);
     assert(theRockBlock != 0);
     glNewList(theRockBlock, GL_COMPILE);
-	Block::drawRock();
+    Block::drawRock();
     glEndList();
 
     theWaterBlock = glGenLists(1);
@@ -26,25 +22,25 @@ void Block::setup() {
     glNewList(theWaterBlock, GL_COMPILE);
     Block::drawWater();
     glEndList();
-    
+
     theTestBlock = glGenLists(1);
     assert(theTestBlock != 0);
     glNewList(theTestBlock, GL_COMPILE);
-	Block::drawTest();
-	glEndList();
-    
+    Block::drawTest();
+    glEndList();
+
     theDirtBlock = glGenLists(1);
     assert(theDirtBlock != 0);
     glNewList(theDirtBlock, GL_COMPILE);
-	Block::drawDirt();
-	glEndList();
+    Block::drawDirt();
+    glEndList();
 }
 
 
 void Block::render(GLubyte blockType) {
     switch (blockType) {
         case ROCK:
-             glCallList(theRockBlock);
+            glCallList(theRockBlock);
             break;
         case DIRT:
             glCallList(theDirtBlock);
@@ -89,7 +85,7 @@ void Block::drawRock() {
     glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
     glMaterialfv(GL_FRONT, GL_AMBIENT, dstone);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, stone);
-	Block::drawBlock();
+    Block::draw(1.0f);
 }
 
 void Block::drawDirt() {
@@ -97,7 +93,7 @@ void Block::drawDirt() {
     glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
     glMaterialfv(GL_FRONT, GL_AMBIENT, dbrown);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, brown);
-	Block::drawBlock();
+    Block::draw(1.0f);
 }
 
 void Block::drawWater() {
@@ -105,7 +101,7 @@ void Block::drawWater() {
     glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
     glMaterialfv(GL_FRONT, GL_AMBIENT, dblue);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, blue);
-    Block::drawBlock();
+    Block::draw(1.0f);
 }
 
 void Block::drawTest() {
@@ -113,12 +109,10 @@ void Block::drawTest() {
     glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
     glMaterialfv(GL_FRONT, GL_AMBIENT, dred);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, red);
-	Block::drawBlock();
+    Block::draw(1.0f);
 }
 
-
-void Block::drawBlock() {
-  GLfloat size = 1;
+void Block::draw(GLfloat size) {
   static GLfloat n[6][3] =
   {
     {-1.0, 0.0, 0.0},

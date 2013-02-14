@@ -12,11 +12,11 @@ class Block {
 public:
 	static void setup();
 	static void render(GLubyte blockType);
+    static void draw(GLfloat size);
 
 protected:
-		static void drawRock();
-		static void drawDirt();
-		static void drawWater();
-		static void drawBlock();
-		static void drawTest();
+    static void drawRock();
+    static void drawDirt();
+    static void drawWater();
+    static void drawTest();
 };

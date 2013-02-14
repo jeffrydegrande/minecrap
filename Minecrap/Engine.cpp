@@ -248,7 +248,6 @@ void Engine::render2D() {
 
 	glLoadIdentity();
 
-
 	//crosshair->render();
 
 	glPopMatrix();

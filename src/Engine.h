@@ -51,6 +51,7 @@ private:
 
     void renderFPS();
     void renderPlayerPosition();
+    void renderPlayerDirection();
 };
 
 #endif

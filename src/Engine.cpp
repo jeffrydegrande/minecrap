@@ -273,6 +273,7 @@ void Engine::render2D() {
 
     this->renderFPS();
     this->renderPlayerPosition();
+    this->renderPlayerDirection();
 
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
@@ -295,6 +296,13 @@ void Engine::renderPlayerPosition() {
     Vec3 pos = player->getPosition();
     s << "Player: " << pos.x << "," << pos.y << "," << pos.z;
     TextWrite(view_width / 2, 48, s.str().c_str());
+}
+
+void Engine::renderPlayerDirection() {
+	std::ostringstream s;
+    Vec3 angle = player->getDirection();
+    s << "Player: " << angle.x << "," << angle.y << "," << angle.z;
+    TextWrite(view_width / 2, 72, s.str().c_str());
 }
 
 #pragma endregion

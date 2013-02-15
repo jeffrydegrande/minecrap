@@ -29,6 +29,9 @@ const Vec3 Player::getPosition() const {
     return position;
 }
 
+const Vec3 Player::getDirection() const {
+    return angle;
+}
 
 void Player::move(Vec3 delta) {
     Vec3 movement;

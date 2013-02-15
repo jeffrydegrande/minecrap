@@ -18,7 +18,6 @@ public:
 	Player(float xpos, float ypos, float zpos);
 	Player(const Vec3 & position);
 
-    const Vec3 getPosition() const;
 
 	~Player(void);
 
@@ -33,6 +32,9 @@ public:
 	void look(int x, int y);
 
 	void setPosition(const Vec3 &);
+    const Vec3 getPosition() const;
+
+    const Vec3 getDirection() const;
 
 private:
 	void move(Vec3 delta);

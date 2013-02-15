@@ -25,6 +25,10 @@ Player::~Player(void)
 {
 }
 
+const Vec3 Player::getPosition() const {
+    return position;
+}
+
 
 void Player::move(Vec3 delta) {
     Vec3 movement;

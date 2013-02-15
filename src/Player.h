@@ -18,6 +18,8 @@ public:
 	Player(float xpos, float ypos, float zpos);
 	Player(const Vec3 & position);
 
+    const Vec3 getPosition() const;
+
 	~Player(void);
 
 	void moveForward();

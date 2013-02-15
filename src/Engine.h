@@ -48,6 +48,9 @@ private:
 	
 	long tick();
 	void stop();
+
+    void renderFPS();
+    void renderPlayerPosition();
 };
 
 #endif

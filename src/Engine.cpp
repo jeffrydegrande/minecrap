@@ -144,7 +144,6 @@ void Engine::update() {
 	player->update();
 }
 
-
 void Engine::collectInput() {
 	SDL_Event event;
 	long now;
@@ -270,12 +269,10 @@ void Engine::render2D() {
 
 	glLoadIdentity();
 
-
 	crosshair->render();
 
-	std::ostringstream s;
-	s << "FPS: " << fps_current;
-    TextWrite(view_width - 300, 24, s.str().c_str());
+    this->renderFPS();
+    this->renderPlayerPosition();
 
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
@@ -285,6 +282,19 @@ void Engine::render2D() {
 
 	ConsoleRender();
 
+}
+
+void Engine::renderFPS() {
+	std::ostringstream s;
+	s << "FPS: " << fps_current;
+    TextWrite(view_width / 2, 24, s.str().c_str());
+}
+
+void Engine::renderPlayerPosition() {
+	std::ostringstream s;
+    Vec3 pos = player->getPosition();
+    s << "Player: " << pos.x << "," << pos.y << "," << pos.z;
+    TextWrite(view_width / 2, 48, s.str().c_str());
 }
 
 #pragma endregion

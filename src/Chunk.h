@@ -9,14 +9,14 @@
 #include "minecrap.h"
 
 #define CHUNKX 16
-#define CHUNKY 16
-#define CHUNKZ 128
+#define CHUNKY 128
+#define CHUNKZ 16
 
 class Chunk
 {
 	GLubyte blocks[CHUNKX][CHUNKY][CHUNKZ];
 	int worldX;
-	int worldY;
+	int worldZ;
 	int seed;
 
 
@@ -36,7 +36,7 @@ public:
 
 
 	int X();
-	int Y();
+	int Z();
 
 
 private:
@@ -49,11 +49,4 @@ private:
 
 	bool isExposedToAir(int x, int y, int z);
 	bool isBorderBlock(int x, int y, int z);
-
 };
-
-// - (id) initWithWorldPosition:(int)x :(int)y :(int) worldSeed;
-// - (int) renderBlock:(int)x :(int)y :(int)z;
-// - (bool) isExposedToAir:(int)x :(int)y :(int)z;
-// - (int) heightAtPosition:(int)x :(int)z;
-// - (void) setBlock:(int)x :(int)y :(int)z :(GLubyte)blockType;

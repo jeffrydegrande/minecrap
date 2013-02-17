@@ -42,12 +42,7 @@
 
 #define STRAFE_DISTANCE 1.0f
 
-
-#define CHUNKX 16
-#define CHUNKY 16
-#define CHUNKZ 128
-
-#define WATER_LEVEL 62
+#define WATER_LEVEL 64
 
 #define AIR   0
 #define ROCK  1
@@ -71,10 +66,10 @@ typedef struct Point3D_ {
 
 #define endforeach }}
 
-#define foreach_xy \
+#define foreach_xz \
 	{ \
 		for (int x=0; x < CHUNKX; x++) { \
-			for(int y=0; y < CHUNKY; y++)
+			for(int z=0; z < CHUNKZ; z++)
 
 #define clamp(value, upper, lower)		max(min(value, (lower)), (upper))
 

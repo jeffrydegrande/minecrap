@@ -71,6 +71,7 @@ typedef struct Point3D_ {
 		for (int x=0; x < CHUNKX; x++) { \
 			for(int z=0; z < CHUNKZ; z++)
 
-#define clamp(value, upper, lower)		max(min(value, (lower)), (upper))
+#include <algorithm>
+#define clamp(value, upper, lower)		(std::max)((std::min)(value, (lower)), (upper))
 
 #endif

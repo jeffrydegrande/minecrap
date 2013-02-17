@@ -2,13 +2,15 @@
 
 #define MAX_MSG_LEN 1024
 
-#ifdef _WIN32
-
 #include <vector>
 using namespace std;
+
+#ifdef _WIN32
 #include <windows.h>
+#endif
+
 //include this header for CVars and GLConsole
-#include <GLConsole/GLConsole.h>
+#include "GLConsole.h"
 //A CVar version of std::vector
 #include <CVars/CVarVectorIO.h>
 //A CVar version of std::map
@@ -38,7 +40,6 @@ void ConsoleRender() {
 	glDisable(GL_TEXTURE_2D);
 	con.RenderConsole();
 }
-
 
 void ConsoleInput (int key, int char_code)
 {
@@ -72,14 +73,12 @@ void ConsoleInput (int key, int char_code)
 	}
 	if (key == SDLK_RSHIFT || key == SDLK_LSHIFT) 
 		return;
+
 	con.KeyboardFunc (char_code);
-
 }
-
 
 void ConsoleUpdate ()
 {
-
 	unsigned    i;
 
 	ready = true;
@@ -91,7 +90,6 @@ void ConsoleUpdate ()
 
 void ConsoleLog (const char* message, ...)
 {
-
 	static char    msg_text[MAX_MSG_LEN];
 	va_list           marker;
 
@@ -104,47 +102,4 @@ void ConsoleLog (const char* message, ...)
 		return;
 	}
 	con.EnterLogLine (msg_text, LINEPROP_LOG, true);
-
 }
-
-#else
-
-#include <vector>
-
-using namespace std;
-
-void ConsoleToggle()
-{
-}
-
-bool ConsoleIsOpen()
-{
-    return false;
-}
-
-void ConsoleRender() {
-}
-
-
-void ConsoleInput (int key, int char_code)
-{
-}
-
-
-void ConsoleUpdate ()
-{
-}
-
-void ConsoleLog (const char* message, ...)
-{
-
-	static char    msg_text[MAX_MSG_LEN];
-	va_list           marker;
-
-	va_start (marker, message);
-	vsprintf (msg_text, message, marker);
-	va_end (marker);
-    printf("%s\n", msg_text);
-}
-
-#endif

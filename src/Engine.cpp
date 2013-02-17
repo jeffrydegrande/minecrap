@@ -10,139 +10,138 @@
 #include <sstream>
 
 #define RENDER_DISTANCE  1536
-#define NEAR_CLIP		 0.2f
-#define FOV		         60
-#define FPS_INTERVAL	1.0f
+#define NEAR_CLIP        0.2f
+#define FOV              60
+#define FPS_INTERVAL    1.0f
 
 Engine::Engine() : fps_current(0) {
-	this->quit = false;
-	init();
+    this->quit = false;
+    init();
 
-	world = new World(300);
-	player = world->spawnPlayer();
+    world = new World(300);
+    player = world->spawnPlayer();
 }
 
 Engine::~Engine() {
-	delete this->world;
-	delete this->player;
-	delete this->crosshair;
+    delete this->world;
+    delete this->player;
+    delete this->crosshair;
 }
 
 void Engine::stop() {
-	this->quit = true;
+    this->quit = true;
 }
 
 long Engine::tick() {
-	return SDL_GetTicks();
+    return SDL_GetTicks();
 }
 
 #pragma region initialization
 
 void Engine::init() {
 #ifdef _WIN32
-	char *argv[] = {"Minecrap"};
-	int argc = 1;
-	glutInit(&argc, argv);
+    char *argv[] = {"Minecrap"};
+    int argc = 1;
+    glutInit(&argc, argv);
 #endif
 
-	if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_JOYSTICK) != 0) {
-		return;
-	}
-	SDL_WM_SetCaption("","");
-	initRenderer(800, 600, 32, FULLSCREEN);
+    if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_JOYSTICK) != 0) {
+        return;
+    }
+    SDL_WM_SetCaption("","");
+    initRenderer(800, 600, 32, FULLSCREEN);
 
-	SDL_Init(SDL_INIT_VIDEO);
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_EnableUNICODE(1);
-	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+    SDL_Init(SDL_INIT_VIDEO);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_EnableUNICODE(1);
+    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
-	for (int i = 0; i < SDL_NumJoysticks(); i++) {
-		SDL_JoystickEventState(SDL_ENABLE);
-		SDL_JoystickOpen(i);	
-	}
+    for (int i = 0; i < SDL_NumJoysticks(); i++) {
+        SDL_JoystickEventState(SDL_ENABLE);
+        SDL_JoystickOpen(i);    
+    }
 
-	SDL_ShowCursor (false);
+    SDL_ShowCursor (false);
 
     TextInit();
 
 }
 
 void Engine::initRenderer(int width, int height, int bits, bool fullscreen) {
-	int flags;
-	float fovy;
+    int flags;
+    float fovy;
 
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-	view_width = width;
-	view_height = height;
-	view_aspect = (float)width / (float) height;
+    view_width = width;
+    view_height = height;
+    view_aspect = (float)width / (float) height;
 
-	flags = SDL_OPENGL;
-	if (fullscreen)
-		flags |= SDL_FULLSCREEN;
-	else
-		flags |= SDL_RESIZABLE;
+    flags = SDL_OPENGL;
+    if (fullscreen)
+        flags |= SDL_FULLSCREEN;
+    else
+        flags |= SDL_RESIZABLE;
 
-	screen = SDL_SetVideoMode(width, height, bits, flags);
+    screen = SDL_SetVideoMode(width, height, bits, flags);
 
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+    fovy = FOV;
 
-	fovy = FOV;
+    if (view_aspect > 1.0f)
+        fovy /= view_aspect;
 
-	if (view_aspect > 1.0f)
-		fovy /= view_aspect;
+    gluPerspective(fovy, view_aspect, NEAR_CLIP, RENDER_DISTANCE);
+    glMatrixMode(GL_MODELVIEW);
 
-	gluPerspective(fovy, view_aspect, NEAR_CLIP, RENDER_DISTANCE);
-	glMatrixMode(GL_MODELVIEW);
-
-	glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
-	crosshair = new Crosshair(view_width, view_height);
+    glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
+    crosshair = new Crosshair(view_width, view_height);
 }
 
 # pragma endregion
 
 void Engine::run() {
-	long stop;
-	long remaining;
+    long stop;
+    long remaining;
 
 
-	unsigned int fps_lasttime = tick(); //the last recorded time.
-	unsigned fps_frames = 0; //frames passed since the last recorded fps.
+    unsigned int fps_lasttime = tick(); //the last recorded time.
+    unsigned fps_frames = 0; //frames passed since the last recorded fps.
 
-	while(!quit) {
-		stop = tick() + 15;
-		update();
-		render();
+    while(!quit) {
+        stop = tick() + 15;
+        update();
+        render();
 
-		remaining = stop - tick();
-		if (remaining > 0)
-			sleep(remaining);
+        remaining = stop - tick();
+        if (remaining > 0)
+            sleep(remaining);
 
-		fps_frames++;
-		if (fps_lasttime < tick() - FPS_INTERVAL*1000)
-		{
-			fps_lasttime = tick();
-			fps_current = fps_frames;
-			fps_frames = 0;
-		}
-	}
+        fps_frames++;
+        if (fps_lasttime < tick() - FPS_INTERVAL*1000)
+        {
+            fps_lasttime = tick();
+            fps_current = fps_frames;
+            fps_frames = 0;
+        }
+    }
 }
 
 # pragma region Update phase
 
 
 void Engine::update() {
-	this->collectInput();
-	ConsoleUpdate ();
-	world->update();
-	player->update();
+    this->collectInput();
+    ConsoleUpdate ();
+    world->update();
+    player->update();
 }
 
 void Engine::collectInput() {
@@ -189,106 +188,106 @@ void Engine::collectInput() {
                 default:
                         // noop
                         break;
-		}
-	}
+        }
+    }
 
-	now = this->tick();
-	elapsed = now - last_update;
-	elapsed_seconds = (float)elapsed / 1000.0f;
-	last_update = now;
+    now = this->tick();
+    elapsed = now - last_update;
+    elapsed_seconds = (float)elapsed / 1000.0f;
+    last_update = now;
 }
 
 # pragma endregion
 
 # pragma region Render phase
 void Engine::render() {
-	this->render3D();
-	this->render2D();
+    this->render3D();
+    this->render2D();
 
-	/*
-	[self updateMenuBar:fps :blocksRendered];
+    /*
+    [self updateMenuBar:fps :blocksRendered];
 
-	*/
+    */
 
-	SDL_GL_SwapBuffers();
+    SDL_GL_SwapBuffers();
 }
 
 void Engine::render3D() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
 
-	GLfloat lightPosition[] = {0.0f, 100.0f, 0.0f, 0.0f};
-	GLfloat light_diffuse[]  = { 0.8f, 0.8f, 0.8f, 1.0f };
-	GLfloat light_specular[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-	GLfloat light_full_on[]  = {1.0f, 1.0f, 1.0f, 1.0f};
-	GLfloat white[]    = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat lightPosition[] = {0.0f, 100.0f, 0.0f, 0.0f};
+    GLfloat light_diffuse[]  = { 0.8f, 0.8f, 0.8f, 1.0f };
+    GLfloat light_specular[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+    GLfloat light_full_on[]  = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat white[]    = {1.0f, 1.0f, 1.0f, 1.0f};
 
-	glLightfv(GL_LIGHT0, GL_AMBIENT, white);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_full_on);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-	glLightfv(GL_LIGHT0, GL_EMISSION, light_specular);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, white);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_full_on);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+    glLightfv(GL_LIGHT0, GL_EMISSION, light_specular);
 
-	glViewport (0, 0, view_width, view_height);
-	glDepthFunc (GL_LEQUAL);
-	glEnable(GL_DEPTH_TEST);
-	//Culling and shading
-	glShadeModel(GL_SMOOTH);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glEnable (GL_CULL_FACE);
-	glCullFace (GL_BACK);
+    glViewport (0, 0, view_width, view_height);
+    glDepthFunc (GL_LEQUAL);
+    glEnable(GL_DEPTH_TEST);
+    //Culling and shading
+    glShadeModel(GL_SMOOTH);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glEnable (GL_CULL_FACE);
+    glCullFace (GL_BACK);
 
-	// render 3D stuff
-	player->render();
-	world->render();
+    // render 3D stuff
+    player->render();
+    world->render();
 }
 
 void Engine::render2D() {
     const char *string = "WTF MAN?";
-	// render 2D stuff
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, view_width, view_height, 0, -1, 1);
+    // render 2D stuff
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0, view_width, view_height, 0, -1, 1);
 
-	glMatrixMode(GL_MODELVIEW);
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glPushMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+    glPushMatrix();
 
-	glLoadIdentity();
+    glLoadIdentity();
 
-	crosshair->render();
+    crosshair->render();
 
     this->renderFPS();
     this->renderPlayerPosition();
     this->renderPlayerDirection();
 
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
 
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
 
-	ConsoleRender();
+    ConsoleRender();
 
 }
 
 void Engine::renderFPS() {
-	std::ostringstream s;
-	s << "FPS: " << fps_current;
+    std::ostringstream s;
+    s << "FPS: " << fps_current;
     TextWrite(view_width / 2, 24, s.str().c_str());
 }
 
 void Engine::renderPlayerPosition() {
-	std::ostringstream s;
+    std::ostringstream s;
     Vec3 pos = player->getPosition();
     s << "Player: " << pos.x << "," << pos.y << "," << pos.z;
     TextWrite(view_width / 2, 48, s.str().c_str());
 }
 
 void Engine::renderPlayerDirection() {
-	std::ostringstream s;
+    std::ostringstream s;
     Vec3 angle = player->getDirection();
     s << "Player: " << angle.x << "," << angle.y << "," << angle.z;
     TextWrite(view_width / 2, 72, s.str().c_str());

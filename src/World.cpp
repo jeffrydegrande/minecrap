@@ -55,6 +55,9 @@ void World::generateChunks(int count) {
 	}
 }
 
+/*
+ * return a 2d vector with the number of blocks in each direction
+ */
 Vec2 World::getSize() {
 	return Vec2(
 		chunks->numRows() << 4,

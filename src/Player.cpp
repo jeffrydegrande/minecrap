@@ -92,67 +92,24 @@ void Player::update()
 
 void Player::look(int x, int y) {
   float   mouse_sense;
+
+  // avoid getting the very first update throwing
+  // the player completely off
+  if (abs(x) > 200 && abs(y) > 200)
+      return;
+
   x = - x;
   mouse_sense = 1.0f;
   angle.x -= (float)x * mouse_sense;
-  angle.z -= (float)y * mouse_sense;
+  // angle.x = clamp (angle.x, -90.0f, 90.0f);
 
-  // angle.x = clamp (angle.x, 0.0f, 180.0f);
- /*
-  if (angle.x < 0.0f)
-      angle.x = 0.0f;
-  if (angle.x > 180.0f)
-
-	  angle.x = 180.0f;
-	  */
-
-  angle.z = fmod (angle.z, 360.0f);
-  if (angle.z < 0.0f)
-    angle.z += 360.0f;
+  angle.y += (float)y * mouse_sense;
+  angle.y = fmod (angle.y, 360.0f);
+  if (angle.y < 0.0f)
+    angle.y += 360.0f;
 }
 
 void Player::setPosition(const Vec3 &position) {
 	this->position = position;
-	this->angle = Vec3(-90.0f, 0, 0);
+	this->angle = Vec3(180.0f, 0, 180.0f );
 }
-
-/*
-- (NSString *) stringFromDirection {    
-    int absyrot = yrot;
-
-    if (absyrot < 0)
-        absyrot += 360;
-
-    if (absyrot >= 0 && absyrot < 45) {
-        return @"N";
-    } else if (absyrot >= 45 && absyrot < 90) {
-        return @"NE";
-    } else if (absyrot >= 90 && absyrot < 135) {
-        return @"E";
-    } else if (absyrot >= 135 && absyrot < 180) {
-        return @"SE";
-    } else if (absyrot >= 180 && absyrot < 225) {
-        return @"S";
-    } else if (absyrot >= 225 && absyrot < 270) {
-        return @"SW";
-    } else if (absyrot >= 270 && absyrot < 315) {
-        return @"W";
-    } else if (absyrot >= 315 && yrot < 360) {
-        return @"NW";
-    } else {
-        return @"Unknown";
-    }
-}
-
-
-- (NSString *) stringFromPosition {
-    return
-    [NSString stringWithFormat:@"COORDS: x=%0.2f, y=%0.2f,z=%0.2f, xrot=%0.3f, yrot=%0.2f, facing %@",
-     xpos,
-     ypos,
-     zpos,
-     xrot,
-     yrot,
-     [self stringFromDirection]];
-}
-*/

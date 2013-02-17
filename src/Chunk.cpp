@@ -36,7 +36,6 @@ int Chunk::Z() {
 int Chunk::groundLevel(int x, int z) {
     for (int y = CHUNKY-1; y > 0; y--) {
 		GLubyte block = blocks[x][y][z];
-        printf( "%d, %d, %d: %d\n", x, y, z, block);
 		if (block != AIR) {
 			return y;
 		}

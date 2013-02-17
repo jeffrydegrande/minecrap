@@ -74,6 +74,10 @@ void ConsoleInput (int key, int char_code)
 	if (key == SDLK_RSHIFT || key == SDLK_LSHIFT) 
 		return;
 
+    if (key == SDLK_BACKSPACE) {
+        con.RemoveLastCharacter();
+    }
+
 	con.KeyboardFunc (char_code);
 }
 

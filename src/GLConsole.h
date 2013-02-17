@@ -174,6 +174,7 @@ class GLConsole
         void CursorToEndOfLine();
         void ScrollUpPage();
         void ScrollDownPage();
+        void RemoveLastCharacter();
         void SpecialFunc( int key );
 
         void PrintAllCVars();
@@ -1192,6 +1193,13 @@ inline void GLConsole::CursorToEndOfLine()
     }
 }
 
+inline void GLConsole::RemoveLastCharacter()
+{
+    if( m_sCurrentCommandBeg.size() > 0 ) {
+        m_sCurrentCommandBeg = m_sCurrentCommandBeg.substr(0, m_sCurrentCommandBeg.size() - 1);
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 inline void GLConsole::ScrollUpPage() 
 { 
@@ -1299,7 +1307,6 @@ inline void GLConsole::KeyboardFunc( unsigned char key)
     {
         case '\r':
             //user pressed "enter"
-            printf( "user pressed enter\n" );
             _ProcessCurrentCommand();
             m_sCurrentCommandBeg = "";
             m_sCurrentCommandEnd = "";
@@ -1310,13 +1317,6 @@ inline void GLConsole::KeyboardFunc( unsigned char key)
         case '\t':
             //tab complete
             _TabComplete();
-            break;
-
-        case '\b':
-            // backspace
-            if( m_sCurrentCommandBeg.size() > 0 ) {
-                m_sCurrentCommandBeg = m_sCurrentCommandBeg.substr(0, m_sCurrentCommandBeg.size() - 1);
-            }
             break;
 
         case CVAR_DEL_KEY:

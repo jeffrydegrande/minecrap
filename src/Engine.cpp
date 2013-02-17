@@ -5,6 +5,7 @@
 #include "Crosshair.h"
 #include "Console.h"
 #include "Text.h"
+#include "Input.h"
 
 #include <sstream>
 
@@ -145,58 +146,46 @@ void Engine::update() {
 }
 
 void Engine::collectInput() {
-	SDL_Event event;
-	long now;
+    SDL_Event event;
+    long now;
 
-	while (SDL_PollEvent(&event)) {
-		switch(event.type) {
-		case SDL_QUIT:
-			stop();
-			break;
-		case SDL_KEYDOWN:
-			if (ConsoleIsOpen ()) {
-				ConsoleInput (event.key.keysym.sym, event.key.keysym.unicode);
-				break;
-			} else {
+    while (SDL_PollEvent(&event)) {
+        switch(event.type) {
+        case SDL_QUIT:
+            stop();
+            break;
+        case SDL_KEYUP:
+            Input::keyReleased(event.key.keysym.sym);
+            break;
 
+        case SDL_KEYDOWN:
+            if (ConsoleIsOpen ()) {
+                ConsoleInput (event.key.keysym.sym, event.key.keysym.unicode);
+                break;
+            } else {
+                if (event.key.keysym.sym == SDLK_ESCAPE) {
+                    stop();
+                } else if (event.key.keysym.sym == SDLK_BACKQUOTE) {
+                    ConsoleToggle();
+                } else {
+                    Input::keyPressed(event.key.keysym.sym);
+                }
 
-				switch(event.key.keysym.sym) {
-				case SDLK_ESCAPE:
-					stop();
-					break;
-				case SDLK_BACKQUOTE:
-					ConsoleToggle();
-					break;
-				case SDLK_w:
-					player->moveForward();
-					break;
-				case SDLK_s:
-					player->moveBackward();
-					break;
-				case SDLK_a:
-					player->strafeLeft();
-					break;
-				case SDLK_d:
-					player->strafeRight();
-					break;
-				case SDLK_SPACE:
-					break;
-				}
-			}
-			break;
-		case SDL_JOYAXISMOTION:
-			break;
-		case SDL_JOYBUTTONDOWN:
-			break;
-		case SDL_MOUSEMOTION:
-			// manipulate player
-			player->look(event.motion.yrel, -event.motion.xrel);
-			break;
-		case SDL_VIDEORESIZE:
-			center_x = event.resize.w / 2;
-			center_y = event.resize.h / 2;
-			initRenderer(event.resize.w, event.resize.h, 32, FULLSCREEN);
-			break;
+            }
+            break;
+        case SDL_JOYAXISMOTION:
+            break;
+        case SDL_JOYBUTTONDOWN:
+            break;
+        case SDL_MOUSEMOTION:
+            // manipulate player
+            player->look(event.motion.yrel, -event.motion.xrel);
+            break;
+        case SDL_VIDEORESIZE:
+            center_x = event.resize.w / 2;
+            center_y = event.resize.h / 2;
+            initRenderer(event.resize.w, event.resize.h, 32, FULLSCREEN);
+            break;
                 default:
                         // noop
                         break;

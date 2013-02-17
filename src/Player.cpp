@@ -1,5 +1,6 @@
 #include "minecrap.h"
 #include "Player.h"
+#include "Input.h"
 
 #include "Vec2.h"
 #include <math.h>
@@ -74,6 +75,19 @@ void Player::render() {
 
 void Player::update()
 {
+    // update movement
+    if (Input::isKeyPressed(SDLK_w)) {
+        moveForward();
+    }
+    if (Input::isKeyPressed(SDLK_s)) {
+        moveBackward();
+    }
+    if (Input::isKeyPressed(SDLK_a)) {
+        strafeLeft();
+    }
+    if (Input::isKeyPressed(SDLK_d)) {
+        strafeRight();
+    }
 }
 
 void Player::look(int x, int y) {

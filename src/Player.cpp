@@ -4,6 +4,7 @@
 
 #include "Vec2.h"
 #include <math.h>
+#include <CVars/CVar.h>
 
 #define EYE_HEIGHT      1.75f
 #define CAM_MIN         1
@@ -37,9 +38,8 @@ const Vec3 Player::getDirection() const {
 void Player::move(Vec3 delta) {
     Vec3 movement;
     float forward;
-    bool flying = true;
 
-    if(flying) {
+    if(CVarUtils::GetCVar<bool>("flying")) {
         forward = sin(angle.x * DEGREES_TO_RADIANS);
         movement.x = cos(angle.z * DEGREES_TO_RADIANS) * delta.x
                     + sin(angle.z * DEGREES_TO_RADIANS) * delta.y * forward;

@@ -95,7 +95,7 @@ Player * World::spawnPlayer() {
 	playerSpawnLocation.y = (float)ground;
 	playerSpawnLocation.z = (float)y;
 
-    printf("Spawn location: %0.2f, %0.2f, %0.2f\n",
+    ConsoleLog("Spawn location: %0.2f, %0.2f, %0.2f\n",
             playerSpawnLocation.x, playerSpawnLocation.y, playerSpawnLocation.z);
 
 	return new Player(playerSpawnLocation);

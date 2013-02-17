@@ -119,7 +119,7 @@ void TextInit(void)
     makeRasterFont();
 }
 
-void printString(const char *s)
+void renderText(const char *s)
 {
     glPushAttrib (GL_LIST_BIT);
     glListBase(fontOffset);
@@ -127,34 +127,20 @@ void printString(const char *s)
     glPopAttrib ();
 }
 
-
 void TextWrite(int x, int y, const char *s)
 {
     glRasterPos2i(x, y);
-    printString(s);
+    renderText(s);
 }
 
-
-/*
-void display(void)
-{
-    GLfloat white[3] = { 1.0, 1.0, 1.0 };
-    int i, j;
-    char teststring[33];
-
-    glClear(GL_COLOR_BUFFER_BIT);
-    glColor3fv(white);
-    for (i = 32; i < 127; i += 32) {
-        glRasterPos2i(20, 200 - 18*i/32);
-        for (j = 0; j < 32; j++)
-            teststring[j] = (char) (i+j);
-        teststring[32] = 0;
-        printString(teststring);
-    }
-    glRasterPos2i(20, 100);
-    printString("The quick brown fox jumps");
-    glRasterPos2i(20, 82);
-    printString("over a lazy dog.");
-    glFlush ();
+void  TextWrite(int x , int y, const std::string fmt, ...) {
+    TextWrite(x, y, fmt.c_str());
 }
-*/
+
+int TextCharHeight() {
+    return 13;
+}
+
+int TextCharWidth() {
+    return 8;
+}

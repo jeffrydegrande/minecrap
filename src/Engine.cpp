@@ -36,15 +36,7 @@ long Engine::tick() {
     return SDL_GetTicks();
 }
 
-#pragma region initialization
-
 void Engine::init() {
-#ifdef _WIN32
-    char *argv[] = {"Minecrap"};
-    int argc = 1;
-    glutInit(&argc, argv);
-#endif
-
     if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_JOYSTICK) != 0) {
         return;
     }
@@ -105,8 +97,6 @@ void Engine::initRenderer(int width, int height, int bits, bool fullscreen) {
     crosshair = new Crosshair(view_width, view_height);
 }
 
-# pragma endregion
-
 void Engine::run() {
     long stop;
     long remaining;
@@ -133,9 +123,6 @@ void Engine::run() {
         }
     }
 }
-
-# pragma region Update phase
-
 
 void Engine::update() {
     this->collectInput();
@@ -197,9 +184,6 @@ void Engine::collectInput() {
     last_update = now;
 }
 
-# pragma endregion
-
-# pragma region Render phase
 void Engine::render() {
     this->render3D();
     this->render2D();
@@ -243,7 +227,6 @@ void Engine::render3D() {
 }
 
 void Engine::render2D() {
-    const char *string = "WTF MAN?";
     // render 2D stuff
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -259,9 +242,9 @@ void Engine::render2D() {
 
     crosshair->render();
 
-    this->renderFPS();
-    this->renderPlayerPosition();
-    this->renderPlayerDirection();
+    // this->renderFPS();
+    // this->renderPlayerPosition();
+    // this->renderPlayerDirection();
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -292,5 +275,3 @@ void Engine::renderPlayerDirection() {
     s << "Player: " << angle.x << "," << angle.y << "," << angle.z;
     TextWrite(view_width / 2, 72, s.str().c_str());
 }
-
-#pragma endregion

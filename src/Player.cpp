@@ -92,7 +92,6 @@ void Player::update()
 
 void Player::look(int x, int y) {
   float   mouse_sense;
-
   // avoid getting the very first update throwing
   // the player completely off
   if (abs(x) > 200 && abs(y) > 200)

@@ -9,6 +9,7 @@ static GLuint theRockBlock;
 static GLuint theWaterBlock;
 static GLuint theTestBlock;
 static GLuint theDirtBlock;
+static GLuint theGrassBlock;
 
 void Block::setup() {
     theRockBlock = glGenLists(1);
@@ -34,6 +35,12 @@ void Block::setup() {
     glNewList(theDirtBlock, GL_COMPILE);
     Block::drawDirt();
     glEndList();
+
+    theGrassBlock = glGenLists(1);
+    assert(theGrassBlock != 0);
+    glNewList(theGrassBlock, GL_COMPILE);
+    Block::drawGrass();
+    glEndList();
 }
 
 
@@ -48,37 +55,22 @@ void Block::render(GLubyte blockType) {
         case WATER:
             glCallList(theWaterBlock);
             break;
+        case GRASS:
+            glCallList(theGrassBlock);
+            break;
         case RED:
             glCallList(theTestBlock);
+            break;
     }
 }
 
-
-#if 0
-/* select colour based on value in the world array */
-glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
-
-if (block == ROCK)
-{
-    glMaterialfv(GL_FRONT, GL_AMBIENT, dstone);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, stone);
-} else if (block == GRASS) {
+void Block::drawGrass() {
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
     glMaterialfv(GL_FRONT, GL_AMBIENT, dgreen);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
-} else if (block == DIRT) {
-    glMaterialfv(GL_FRONT, GL_AMBIENT, dbrown);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, brown);
-} else if (block == WATER) {
-    glMaterialfv(GL_FRONT, GL_AMBIENT, dblue);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, blue);
-} else if (block == RED) {
-    glMaterialfv(GL_FRONT, GL_AMBIENT, red);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, red);
-} else {
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, white);
+    Block::draw(1.0f);
 }
-#endif
 
 void Block::drawRock() {
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);

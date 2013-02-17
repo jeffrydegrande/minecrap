@@ -19,4 +19,5 @@ protected:
     static void drawDirt();
     static void drawWater();
     static void drawTest();
+    static void drawGrass();
 };

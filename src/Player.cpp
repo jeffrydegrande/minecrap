@@ -7,9 +7,6 @@
 #include <CVars/CVar.h>
 
 #define EYE_HEIGHT      1.75f
-#define CAM_MIN         1
-#define CAM_MAX         12
-
 
 Player::Player() {
 	this->setPosition(Vec3(0,0,0));
@@ -47,6 +44,8 @@ void Player::move(Vec3 delta) {
                     + cos(angle.z * DEGREES_TO_RADIANS) * delta.y * forward;
         movement.z = cos (angle.x * DEGREES_TO_RADIANS) * delta.y;
         position += movement;
+    } else {
+        ConsoleLog("Not allowed to fly");
     }
 }
 
@@ -67,10 +66,10 @@ void Player::moveBackward() {
 }
 
 void Player::render() {
-    glRotatef (angle.x, 1.0f, 0.0f, 0.0f);
-    glRotatef (angle.y, 0.0f, 1.0f, 0.0f);
-    glRotatef (angle.z, 0.0f, 0.0f, 1.0f);
-    glTranslatef (-position.x, -position.y, -position.z);
+    glRotatef (camera_angle.x, 1.0f, 0.0f, 0.0f);
+    glRotatef (camera_angle.y, 0.0f, 1.0f, 0.0f);
+    glRotatef (camera_angle.z, 0.0f, 0.0f, 1.0f);
+    glTranslatef (-camera_position.x, -camera_position.y, -camera_position.z);
 }
 
 void Player::update()
@@ -88,6 +87,14 @@ void Player::update()
     if (Input::isKeyPressed(SDLK_d)) {
         strafeRight();
     }
+
+    this->updateCamera();
+}
+
+void Player::updateCamera() {
+    camera_position = position;
+    camera_angle = angle;
+    camera_position.y += EYE_HEIGHT;
 }
 
 void Player::look(int x, int y) {
@@ -111,4 +118,6 @@ void Player::look(int x, int y) {
 void Player::setPosition(const Vec3 &position) {
 	this->position = position;
 	this->angle = Vec3(180.0f, 0, 180.0f );
+
+    updateCamera();
 }

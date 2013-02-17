@@ -242,9 +242,9 @@ void Engine::render2D() {
 
     crosshair->render();
 
-    // this->renderFPS();
-    // this->renderPlayerPosition();
-    // this->renderPlayerDirection();
+    this->renderFPS();
+    this->renderPlayerPosition();
+    this->renderPlayerDirection();
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);

@@ -1,12 +1,14 @@
 CC=g++
 DEBUG=-D_DEBUG -g
-CFLAGS=-Werror -fomit-frame-pointer -pipe -O2 -I. -Iinclude/ $(DEBUG) -O2 -Wno-error=switch
+INCLUDES=-I. -Iinclude/ -Ivendor/include
+CFLAGS=-Wall -Werror -fomit-frame-pointer -pipe -O2 $(INCLUDES)
 
 OS=$(shell uname -s)
 ifeq ($(OS),Darwin)
-LDFLAGS =-L/usr/local/lib -lSDLmain -lSDL -Wl,-framework,Cocoa -framework OpenGL -framework GLUT
+CFLAGS+=-DHAVE_APPLE_OPENGL_FRAMEWORK
+LDFLAGS =-L/usr/local/lib -lSDLmain -lSDL -Wl,-framework,Cocoa -framework OpenGL
 else
-LDFLAGS=-lSDL -lGL -lglut -lGLU
+LDFLAGS=-lSDL -lGL -lGLU
 endif
 
 all: mc
@@ -17,8 +19,10 @@ all: mc
 MINECRAP_SOURCES?=$(wildcard src/*.cpp)
 MINECRAP_OBJS?=$(addprefix , $(MINECRAP_SOURCES:.cpp=.o))
 
+VENDOR_OBJS?=./vendor/lib/libcvars.a
+
 mc: $(MINECRAP_OBJS)
-	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(MINECRAP_OBJS) $(LDFLAGS)
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(MINECRAP_OBJS) $(VENDOR_OBJS) $(LDFLAGS)
 
 clean: 
 	rm src/*.o mc

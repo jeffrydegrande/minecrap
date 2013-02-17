@@ -62,27 +62,32 @@ Vec2 World::getSize() {
 		);
 }
 
-
 Player * World::spawnPlayer() {
 	Vec3 playerSpawnLocation;
+
+    int x=0, y=0;
+    int ground=0;
 
 	// pick a random spot in real world coordinates
 	Vec2 size = this->getSize();
 
-	int x = rand() % (int)size.x;
-	int y = rand() % (int)size.y;
+    // If we get to the water level and we haven't encountered
+    // terrain yet, we can't use this to spawn.
+    while (ground <= WATER_LEVEL) {
+        x = rand() % (int)size.x;
+        y = rand() % (int)size.y;
 
-	// find the block for this coordinate
-	Chunk *chunk = chunks->get( x / CHUNKX, y / CHUNKZ);
+        // find the block for this coordinate
+        Chunk *chunk = chunks->get( x / CHUNKX, y / CHUNKZ);
 
-	// and translate the real world coordinates into chunk coordinates
-    // y in 2d => z in 3d
-	Vec2 chunkCoordinates = Vec2(x % CHUNKX, y % CHUNKZ);
+        // and translate the real world coordinates into chunk coordinates
+        // y in 2d => z in 3d
+        Vec2 chunkCoordinates = Vec2(x % CHUNKX, y % CHUNKZ);
 
-	int ground = chunk->groundLevel(chunkCoordinates.x, chunkCoordinates.y);
+        // find the ground level
+        ground = chunk->groundLevel(chunkCoordinates.x, chunkCoordinates.y);
+    }
 
-	chunk->setBlock(chunkCoordinates.x, ground + 1, chunkCoordinates.y, RED);
-	
 	playerSpawnLocation.x = (float)x;
 	playerSpawnLocation.y = (float)ground;
 	playerSpawnLocation.z = (float)y;

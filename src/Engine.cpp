@@ -14,6 +14,8 @@
 #define FOV              60
 #define FPS_INTERVAL    1.0f
 
+static float elapsed_seconds = 0.0f;
+
 Engine::Engine() : fps_current(0) {
     this->quit = false;
     init();
@@ -101,7 +103,6 @@ void Engine::run() {
     long stop;
     long remaining;
 
-
     unsigned int fps_lasttime = tick(); //the last recorded time.
     unsigned fps_frames = 0; //frames passed since the last recorded fps.
 
@@ -180,7 +181,10 @@ void Engine::collectInput() {
 
     now = this->tick();
     elapsed = now - last_update;
-    elapsed_seconds = (float)elapsed / 1000.0f;
+
+    if (elapsed > 0) {
+        elapsed_seconds = (float)elapsed / 1000.0f;
+    }
     last_update = now;
 }
 
@@ -278,4 +282,9 @@ void Engine::renderPlayerDirection() {
     snprintf(s, 95, "ang: %0.2f, %0.2f, %0.2f, facing %s\n",
             angle.x, angle.y, angle.z, player->getDirectionAsString());
     TextWrite(view_width / 2 - 40, 39, s);
+}
+
+
+float Engine::elapsedSeconds() {
+    return elapsed_seconds;
 }

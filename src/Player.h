@@ -13,8 +13,9 @@ class Player
 {
 	Vec3 position;
 	Vec3 angle;
-
     Matrix4 camera_matrix;
+
+    float velocity;
 
 public:
 	Player();

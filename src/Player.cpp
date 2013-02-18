@@ -1,11 +1,13 @@
 #include "minecrap.h"
 #include "Player.h"
 #include "Input.h"
+#include "Engine.h"
 
 #include "Vec2.h"
 #include <math.h>
 #include <CVars/CVar.h>
 
+#define GRAVITY         9.2f
 #define EYE_HEIGHT      1.75f
 #define SPEED			3.0f
 
@@ -89,6 +91,11 @@ void Player::render() {
 
 void Player::update()
 {
+    float elapsed = std::min(Engine::elapsedSeconds(), 0.25f);
+
+    printf( "elapsed %0.2f\n", elapsed);
+    printf( "velocity %0.2f\n", velocity);
+
 	camera_matrix.loadIdentity();
 	camera_matrix.rotateX(angle.x);
 	camera_matrix.rotateY(angle.y);
@@ -107,6 +114,16 @@ void Player::update()
     if (Input::isKeyPressed(SDLK_d)) {
         strafeRight();
     }
+
+    // apply gravity
+    // velocity -= GRAVITY * elapsed;
+    // position.y += velocity * elapsed;
+
+    // TODO:
+    // * acceleration
+    // * jumping
+    // * collision detecting
+    // * gravity
 }
 
 void Player::look(int x, int y) {
@@ -131,4 +148,5 @@ void Player::look(int x, int y) {
 void Player::setPosition(const Vec3 &position) {
 	this->position = position;
 	this->angle = Vec3(0.0f, 0, 0.0f );
+    this->velocity = 0;
 }

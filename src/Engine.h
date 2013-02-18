@@ -14,7 +14,6 @@ class Engine
 	int center_y;
 	long last_update;
 	long elapsed;
-	float elapsed_seconds;
 	unsigned int fps_current; //the current FPS.
 
 	int view_width;
@@ -33,6 +32,8 @@ public:
 	Engine();
 	~Engine();
 	void run();
+
+    static float elapsedSeconds();
 
 private:
 	void init();

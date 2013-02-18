@@ -261,19 +261,21 @@ void Engine::render2D() {
 void Engine::renderFPS() {
     std::ostringstream s;
     s << "FPS: " << fps_current;
-    TextWrite(view_width / 2, 13, s.str().c_str());
+    TextWrite(view_width / 2 - 40, 13, s.str().c_str());
 }
 
 void Engine::renderPlayerPosition() {
-    std::ostringstream s;
+    char s[96];
     Vec3 pos = player->getPosition();
-    s << "Player: " << pos.x << "," << pos.y << "," << pos.z;
-    TextWrite(view_width / 2, 26, s.str().c_str());
+    snprintf(s, 95, "loc: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
+    TextWrite(view_width / 2 - 40, 26, s);
 }
 
 void Engine::renderPlayerDirection() {
-    std::ostringstream s;
+    char s[96];
     Vec3 angle = player->getDirection();
-    s << "Player: " << angle.x << "," << angle.y << "," << angle.z;
-    TextWrite(view_width / 2, 39, s.str().c_str());
+
+    snprintf(s, 95, "ang: %0.2f, %0.2f, %0.2f, facing %s\n",
+            angle.x, angle.y, angle.z, player->getDirectionAsString());
+    TextWrite(view_width / 2 - 40, 39, s);
 }

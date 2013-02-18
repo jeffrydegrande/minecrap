@@ -7,14 +7,14 @@
 //
 
 #include "Vec3.h"
+#include "Matrix.h"
 
 class Player
 {
 	Vec3 position;
 	Vec3 angle;
 
-    Vec3 camera_position;
-    Vec3 camera_angle;
+    Matrix4 camera_matrix;
 
 public:
 	Player();
@@ -38,10 +38,7 @@ public:
     const Vec3 getPosition() const;
 
     const Vec3 getDirection() const;
-
-private:
-	void move(Vec3 delta);
-    void updateCamera();
+    const char *getDirectionAsString();
 };
 
 

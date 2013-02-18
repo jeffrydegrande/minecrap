@@ -7,6 +7,7 @@
 #include <CVars/CVar.h>
 
 #define EYE_HEIGHT      1.75f
+#define SPEED			3.0f
 
 Player::Player() {
 	this->setPosition(Vec3(0,0,0));
@@ -32,48 +33,67 @@ const Vec3 Player::getDirection() const {
     return angle;
 }
 
-void Player::move(Vec3 delta) {
-    Vec3 movement;
-    float forward;
+const char *Player::getDirectionAsString() {
+    float angle = this->angle.y;
 
-    if(CVarUtils::GetCVar<bool>("flying")) {
-        forward = sin(angle.x * DEGREES_TO_RADIANS);
-        movement.x = cos(angle.z * DEGREES_TO_RADIANS) * delta.x
-                    + sin(angle.z * DEGREES_TO_RADIANS) * delta.y * forward;
-        movement.y = -sin(angle.z * DEGREES_TO_RADIANS) * delta.x
-                    + cos(angle.z * DEGREES_TO_RADIANS) * delta.y * forward;
-        movement.z = cos (angle.x * DEGREES_TO_RADIANS) * delta.y;
-        position += movement;
-    } else {
-        ConsoleLog("Not allowed to fly");
-    }
+    if (angle < 22.5f || angle >= 337.5f)
+        return "N";
+    else if (angle < 67.5f)
+        return "NE";
+    else if (angle < 112.5f)
+        return "E";
+    else if (angle < 157.5f)
+        return "SE";
+    else if (angle < 202.5f)
+        return "S";
+    else if (angle < 247.5f)
+        return "SW";
+    else if (angle < 292.5f)
+        return "W";
+    else if (angle < 337.5f)
+        return "NW";
+
+    return "Unknown";
 }
 
 void Player::strafeRight() {
-    this->move(Vec3(1, 0, 0));
+	Vec3 right;
+	camera_matrix.invertPt(Vec3(1.0f, 0.0f, 0.0f), right);
+	position += right;
 }
 
 void Player::strafeLeft() {
-    this->move(Vec3(-1, 0, 0));
+	Vec3 right;
+	camera_matrix.invertPt(Vec3(-1.0f, 0.0f, 0.0f), right);
+	position += right;
 }
 
 void Player::moveForward() {
-    this->move(Vec3(0, -1, 0));
+	Vec3 head;
+	camera_matrix.invertPt(Vec3(0.0f, 0.0f, -1.0f), head);
+	position += head * SPEED;
 }
 
 void Player::moveBackward() {
-    this->move(Vec3(0, 1, 0));
+	Vec3 head, right;
+	camera_matrix.invertPt(Vec3(0.0f, 0.0f, 1.0f), head);
+	position += head * SPEED;
 }
 
 void Player::render() {
-    glRotatef (camera_angle.x, 1.0f, 0.0f, 0.0f);
-    glRotatef (camera_angle.y, 0.0f, 1.0f, 0.0f);
-    glRotatef (camera_angle.z, 0.0f, 0.0f, 1.0f);
-    glTranslatef (-camera_position.x, -camera_position.y, -camera_position.z);
+    glRotatef (angle.x, 1.0f, 0.0f, 0.0f);
+    glRotatef (angle.y, 0.0f, 1.0f, 0.0f);
+    glRotatef (angle.z, 0.0f, 0.0f, 1.0f);
+    glTranslatef (-position.x, -position.y, -position.z);
 }
 
 void Player::update()
 {
+	camera_matrix.loadIdentity();
+	camera_matrix.rotateX(angle.x);
+	camera_matrix.rotateY(angle.y);
+	camera_matrix.rotateZ(angle.z);
+
     // update movement
     if (Input::isKeyPressed(SDLK_w)) {
         moveForward();
@@ -87,14 +107,6 @@ void Player::update()
     if (Input::isKeyPressed(SDLK_d)) {
         strafeRight();
     }
-
-    this->updateCamera();
-}
-
-void Player::updateCamera() {
-    camera_position = position;
-    camera_angle = angle;
-    camera_position.y += EYE_HEIGHT;
 }
 
 void Player::look(int x, int y) {
@@ -107,17 +119,16 @@ void Player::look(int x, int y) {
   x = - x;
   mouse_sense = 1.0f;
   angle.x -= (float)x * mouse_sense;
-  // angle.x = clamp (angle.x, -90.0f, 90.0f);
+  angle.x = clamp (angle.x, -90.0f, 90.0f);
 
-  angle.y += (float)y * mouse_sense;
-  angle.y = fmod (angle.y, 360.0f);
-  if (angle.y < 0.0f)
-    angle.y += 360.0f;
+  angle.y -= (float)y * mouse_sense;
+  if (angle.y < -180.0f)
+	  angle.y += 360.0f;
+  if (angle.y > 180.0f)
+	  angle.y -= 360.0f;
 }
 
 void Player::setPosition(const Vec3 &position) {
 	this->position = position;
-	this->angle = Vec3(180.0f, 0, 180.0f );
-
-    updateCamera();
+	this->angle = Vec3(0.0f, 0, 0.0f );
 }

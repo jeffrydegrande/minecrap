@@ -7,8 +7,10 @@ OS=$(shell uname -s)
 ifeq ($(OS),Darwin)
 CFLAGS+=-DHAVE_APPLE_OPENGL_FRAMEWORK
 LDFLAGS =-L/usr/local/lib -lSDLmain -lSDL -Wl,-framework,Cocoa -framework OpenGL
+VENDOR_OBJS?=./vendor/lib/osx/libcvars.a
 else
 LDFLAGS=-lSDL -lGL -lGLU
+VENDOR_OBJS?=./vendor/lib/linux/libcvars.a
 endif
 
 all: mc
@@ -19,7 +21,6 @@ all: mc
 MINECRAP_SOURCES?=$(wildcard src/*.cpp)
 MINECRAP_OBJS?=$(addprefix , $(MINECRAP_SOURCES:.cpp=.o))
 
-VENDOR_OBJS?=./vendor/lib/libcvars.a
 
 mc: $(MINECRAP_OBJS)
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(MINECRAP_OBJS) $(VENDOR_OBJS) $(LDFLAGS)

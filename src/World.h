@@ -33,6 +33,8 @@ public:
 
 	Player * spawnPlayer();
 
+    bool isGround(int x, int y, int z);
+
 private:
 	void generateChunks(int count);
 	int renderTerrain();

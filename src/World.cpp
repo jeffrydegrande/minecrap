@@ -98,7 +98,16 @@ Player * World::spawnPlayer() {
     ConsoleLog("Spawn location: %0.2f, %0.2f, %0.2f\n",
             playerSpawnLocation.x, playerSpawnLocation.y, playerSpawnLocation.z);
 
-	return new Player(playerSpawnLocation);
+	return new Player(this, playerSpawnLocation);
+}
+
+bool World::isGround(int x, int y, int z) {
+    // get the chunk from the grid
+
+    Chunk *chunk = chunks->get( x / CHUNKX, z / CHUNKZ);
+    Vec2 chunkCoordinates = Vec2(x % CHUNKX, z % CHUNKZ);
+
+    return chunk->isGround(chunkCoordinates.x, y, chunkCoordinates.y);
 }
 
 void World::update() {

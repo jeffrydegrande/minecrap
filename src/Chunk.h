@@ -29,6 +29,7 @@ public:
 	int renderBlock(int x, int y, int z);
 
 	int groundLevel(int x, int y);
+    bool isGround(int x, int y, int z);
 
 
 	void generate();

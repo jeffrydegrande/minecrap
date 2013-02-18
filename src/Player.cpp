@@ -2,24 +2,19 @@
 #include "Player.h"
 #include "Input.h"
 #include "Engine.h"
+#include "World.h"
 
 #include "Vec2.h"
 #include <math.h>
 #include <CVars/CVar.h>
 
-#define GRAVITY         9.2f
+#define GRAVITY         5.5f
 #define EYE_HEIGHT      1.75f
-#define SPEED			3.0f
+#define JUMP_SPEED      4.0f
+#define SPEED			5.0f
 
-Player::Player() {
-	this->setPosition(Vec3(0,0,0));
-}
-
-Player::Player(float x, float y, float z) {
-	this->setPosition(Vec3(x, y, z));
-}
-
-Player::Player(const Vec3 & position) {
+Player::Player(World *world, const Vec3 & position) {
+    this->world = world;
 	this->setPosition(position);
 }
 
@@ -93,9 +88,6 @@ void Player::update()
 {
     float elapsed = std::min(Engine::elapsedSeconds(), 0.25f);
 
-    printf( "elapsed %0.2f\n", elapsed);
-    printf( "velocity %0.2f\n", velocity);
-
 	camera_matrix.loadIdentity();
 	camera_matrix.rotateX(angle.x);
 	camera_matrix.rotateY(angle.y);
@@ -115,9 +107,24 @@ void Player::update()
         strafeRight();
     }
 
+    if (Input::isKeyPressed(SDLK_SPACE) && onGround) {
+        velocity = JUMP_SPEED;
+        onGround = false;
+    }
+
+    float ground = position.y;
+
     // apply gravity
-    // velocity -= GRAVITY * elapsed;
-    // position.y += velocity * elapsed;
+    velocity   -= GRAVITY * elapsed;
+    position.y += velocity * elapsed;
+
+    if (world->isGround(position.x, position.y, position.z)) {
+        velocity = 0.0f;
+        position.y = ground;
+        onGround = true;
+    } else {
+        onGround = false;
+    }
 
     // TODO:
     // * acceleration
@@ -149,4 +156,5 @@ void Player::setPosition(const Vec3 &position) {
 	this->position = position;
 	this->angle = Vec3(0.0f, 0, 0.0f );
     this->velocity = 0;
+    this->onGround = true;
 }

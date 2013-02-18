@@ -32,6 +32,11 @@ int Chunk::Z() {
     return worldZ;
 }
 
+bool Chunk::isGround(int x, int y, int z)
+{
+    GLubyte block = blocks[x][y][z];
+    return (block != AIR);
+}
 
 int Chunk::groundLevel(int x, int z) {
     for (int y = CHUNKY-1; y > 0; y--) {

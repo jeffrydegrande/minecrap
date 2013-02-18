@@ -9,20 +9,19 @@
 #include "Vec3.h"
 #include "Matrix.h"
 
+class World;
 class Player
 {
 	Vec3 position;
 	Vec3 angle;
     Matrix4 camera_matrix;
+    World *world;
 
     float velocity;
+    bool onGround;
 
 public:
-	Player();
-	Player(float xpos, float ypos, float zpos);
-	Player(const Vec3 & position);
-
-
+	Player(World *world, const Vec3 & position);
 	~Player(void);
 
 	void moveForward();
@@ -41,6 +40,3 @@ public:
     const Vec3 getDirection() const;
     const char *getDirectionAsString();
 };
-
-
-

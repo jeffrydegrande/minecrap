@@ -242,9 +242,11 @@ void Engine::render2D() {
 
     crosshair->render();
 
-    this->renderFPS();
-    this->renderPlayerPosition();
-    this->renderPlayerDirection();
+    if(CVarUtils::GetCVar<bool>("player.info")) {
+        this->renderFPS();
+        this->renderPlayerPosition();
+        this->renderPlayerDirection();
+    }
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -259,19 +261,19 @@ void Engine::render2D() {
 void Engine::renderFPS() {
     std::ostringstream s;
     s << "FPS: " << fps_current;
-    TextWrite(view_width / 2, 24, s.str().c_str());
+    TextWrite(view_width / 2, 13, s.str().c_str());
 }
 
 void Engine::renderPlayerPosition() {
     std::ostringstream s;
     Vec3 pos = player->getPosition();
     s << "Player: " << pos.x << "," << pos.y << "," << pos.z;
-    TextWrite(view_width / 2, 48, s.str().c_str());
+    TextWrite(view_width / 2, 26, s.str().c_str());
 }
 
 void Engine::renderPlayerDirection() {
     std::ostringstream s;
     Vec3 angle = player->getDirection();
     s << "Player: " << angle.x << "," << angle.y << "," << angle.z;
-    TextWrite(view_width / 2, 72, s.str().c_str());
+    TextWrite(view_width / 2, 39, s.str().c_str());
 }

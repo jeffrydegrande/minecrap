@@ -13,6 +13,7 @@ int main(int argc, char **argv)
 #endif
 {
 
+    CVarUtils::CreateCVar("player.info", true, "Show player info");
     CVarUtils::CreateCVar("flying", false, "Player can fly?");
     CVarUtils::Load(CONFIG_FILE);
 

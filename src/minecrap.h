@@ -23,6 +23,7 @@
 #include <GL/GLUT.h>
 #endif
 
+#include <CVars/CVar.h>
 #include "Console.h"
 
 

@@ -155,7 +155,12 @@ void Chunk::addBedrock() {
 
 void Chunk::addWaterLevel() {
     foreach_xz {
-        blocks[x][WATER_LEVEL][z] = WATER;
+        int y = CHUNKY - 1;
+        while (y > 0 && blocks[x][y][z] == AIR) {
+            if (y <= WATER_LEVEL)
+                blocks[x][y][z] = WATER;
+            y--;
+        }
     } endforeach;
 }
 
@@ -170,8 +175,12 @@ bool Chunk::isExposedToAir(int x, int y, int z) {
 }
 
 int Chunk::renderBlock(int x, int y, int z) {
+    if (blocks[x][y][z] == AIR)
+        return 0;
+    /*
     if (blocks[x][y][z] == AIR || !isExposedToAir(x, y, z))
         return 0;
+    */
 
     GLubyte block = blocks[x][y][z];
 

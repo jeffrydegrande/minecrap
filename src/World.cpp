@@ -7,7 +7,8 @@
 //
 
 #include <time.h>
-#include <stdlib.h>
+#include <cstdlib>
+#include <cassert>
 
 #include "minecrap.h"
 #include "World.h"
@@ -102,8 +103,16 @@ Player * World::spawnPlayer() {
 }
 
 bool World::isGround(int x, int y, int z) {
-    // get the chunk from the grid
+    if (y < 0 || y > CHUNKY-1) // below or above the world, so no ground
+        return false;
 
+    if (x < 0 || x > (int)chunks->numRows() << 4)
+        return false;
+
+    if (z < 0 || z > (int)chunks->numColumns() << 4)
+        return false;
+
+    // get the chunk from the grid
     Chunk *chunk = chunks->get( x / CHUNKX, z / CHUNKZ);
     Vec2 chunkCoordinates = Vec2(x % CHUNKX, z % CHUNKZ);
 

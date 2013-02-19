@@ -87,6 +87,7 @@ void Player::render() {
 void Player::update()
 {
     float elapsed = std::min(Engine::elapsedSeconds(), 0.25f);
+    bool flying = CVarUtils::GetCVar<bool>("flying");
 
 	camera_matrix.loadIdentity();
 	camera_matrix.rotateX(angle.x);
@@ -115,8 +116,10 @@ void Player::update()
     float ground = position.y;
 
     // apply gravity
-    velocity   -= GRAVITY * elapsed;
-    position.y += velocity * elapsed;
+    if (!flying) {
+        velocity   -= GRAVITY * elapsed;
+        position.y += velocity * elapsed;
+    }
 
     if (world->isGround(position.x, position.y, position.z)) {
         velocity = 0.0f;

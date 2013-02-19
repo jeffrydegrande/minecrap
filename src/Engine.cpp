@@ -20,7 +20,7 @@ Engine::Engine() : fps_current(0) {
     this->quit = false;
     init();
 
-    world = new World(300);
+    world = new World(CVarUtils::GetCVar<int>("seed"));
     player = world->spawnPlayer();
 }
 

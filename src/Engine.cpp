@@ -165,8 +165,16 @@ void Engine::collectInput() {
         case SDL_JOYBUTTONDOWN:
             break;
         case SDL_MOUSEMOTION:
-            // manipulate player
-            player->look(event.motion.yrel, -event.motion.xrel);
+            {
+              if (event.motion.x < 20 || event.motion.x > view_width - 20 ||
+                  event.motion.y < 20 || event.motion.y > view_height - 20) {
+                if (!ConsoleIsOpen()) {
+                  SDL_WarpMouse(view_width / 2, view_height / 2);
+                }
+              } else {
+                player->look(event.motion.yrel, -event.motion.xrel);
+              }
+            }
             break;
         case SDL_VIDEORESIZE:
             center_x = event.resize.w / 2;

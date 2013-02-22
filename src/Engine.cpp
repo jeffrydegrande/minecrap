@@ -181,9 +181,9 @@ void Engine::collectInput() {
             center_y = event.resize.h / 2;
             initRenderer(event.resize.w, event.resize.h, 32, FULLSCREEN);
             break;
-                default:
-                        // noop
-                        break;
+        default:
+            // noop
+            break;
         }
     }
 
@@ -291,7 +291,6 @@ void Engine::renderPlayerDirection() {
             angle.x, angle.y, angle.z, player->getDirectionAsString());
     TextWrite(view_width / 2 - 40, 39, s);
 }
-
 
 float Engine::elapsedSeconds() {
     return elapsed_seconds;

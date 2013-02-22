@@ -34,6 +34,10 @@ int Chunk::Z() {
 
 bool Chunk::isGround(int x, int y, int z)
 {
+    assert(x >= 0 && x < CHUNKX);
+    assert(y >= 0 && y < CHUNKY);
+    assert(z >= 0 && z < CHUNKZ);
+
     GLubyte block = blocks[x][y][z];
     return (block != AIR);
 }
@@ -58,11 +62,11 @@ void Chunk::generate() {
         blocks[x][y][z] = 0;
     } endforeach;
 
-	generateTerrain();
-	addDirt();
-	addWaterLevel();
-	addBedrock();
-	// addMarkersAtBoundaries();
+    generateTerrain();
+    addDirt();
+    addWaterLevel();
+    addBedrock();
+    // addMarkersAtBoundaries();
 }
 
 float terrainNoise(float x, float z, float frequency, float amplitude) {

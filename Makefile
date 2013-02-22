@@ -1,7 +1,8 @@
 CC=g++
 DEBUG=-D_DEBUG -g
 INCLUDES=-I. -Iinclude/ -Ivendor/include
-CFLAGS=-Wall -Werror -fomit-frame-pointer -pipe -O2 $(INCLUDES)
+# CFLAGS=-Wall -Werror -fomit-frame-pointer -pipe -O2 $(INCLUDES)
+CFLAGS=-Wall -Werror $(INCLUDES)
 
 OS=$(shell uname -s)
 ifeq ($(OS),Darwin)

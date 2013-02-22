@@ -23,6 +23,8 @@ public:
 
 	size_t actualSize() const;
 
+    size_t count() const;
+
 private:
 	size_t mNumRows;
 	size_t mNumColumns;
@@ -55,7 +57,6 @@ const T & Grid<T>::get(size_t rowIdx, size_t colIdx) const
 {
 	return mData[rowIdx*mNumColumns + colIdx];
 }
-
 
 template<class T>
 T & Grid<T>::get(size_t rowIdx, size_t colIdx)
@@ -90,4 +91,9 @@ size_t Grid<T>::actualSize() const
 	return mData.size();
 }
 
+template <class T>
+size_t Grid<T>::count() const
+{
+    return this->numRows() * this->numColumns();
+}
 #endif

@@ -38,22 +38,22 @@ void Crosshair::draw() {
     glMaterialfv(GL_FRONT, GL_DIFFUSE, white);
 
     glBegin(GL_LINES);
-    glVertex2f(this->centerX - 16.0f, this->centerY);
+    glVertex2f(this->centerX - 8.0f, this->centerY);
     glVertex2f(this->centerX - 2.0f, this->centerY);
     glEnd();
 
     glBegin(GL_LINES);
-    glVertex2f(this->centerX + 16.0f, this->centerY);
+    glVertex2f(this->centerX + 8.0f, this->centerY);
     glVertex2f(this->centerX + 2.0f, this->centerY);
     glEnd();
 
     glBegin(GL_LINES);
-    glVertex2f(this->centerX, this->centerY - 16.0f);
+    glVertex2f(this->centerX, this->centerY - 8.0f);
     glVertex2f(this->centerX, this->centerY - 2.0f);
     glEnd();
 
     glBegin(GL_LINES);
-    glVertex2f(this->centerX, this->centerY + 16.0f);
+    glVertex2f(this->centerX, this->centerY + 8.0f);
     glVertex2f(this->centerX, this->centerY + 2.0f);
     glEnd();
 }

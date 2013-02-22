@@ -93,7 +93,7 @@ Player * World::spawnPlayer() {
     }
 
 	playerSpawnLocation.x = (float)x;
-	playerSpawnLocation.y = (float)ground;
+	playerSpawnLocation.y = (float)ground + 1;
 	playerSpawnLocation.z = (float)y;
 
     ConsoleLog("Spawn location: %0.2f, %0.2f, %0.2f\n",

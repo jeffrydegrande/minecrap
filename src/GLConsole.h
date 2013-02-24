@@ -1225,6 +1225,8 @@ inline void GLConsole::SpecialFunc( int key )
 
     _CheckInit();
 
+    (void)key;
+
 #if 0
 
     int nGlutModifiers = glutGetModifiers();

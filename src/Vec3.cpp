@@ -10,6 +10,12 @@ Vec3::Vec3(float x, float y, float z): x(x), y(y), z(z)
 {
 }
 
+Vec3::Vec3(const Vec3 &v) {
+    x = v.x;
+    y = v.y;
+    z = v.z;
+}
+
 Vec3 Vec3::operator+(const Vec3 &vector) {
 	return Vec3(x + vector.x, y + vector.y, z + vector.z);
 }
@@ -23,7 +29,11 @@ Vec3 & Vec3::operator +=(const Vec3 &vector) {
 }
 
 Vec3 Vec3::operator -(const Vec3 &vector) {
-	return Vec3(x - vector.x, y - vector.y, z - vector.z);
+    Vec3 res;
+    res.x = x - vector.x;
+    res.y = y - vector.y;
+    res.z = z - vector.z;
+	return res;
 }
 
 Vec3 & Vec3::operator -=(const Vec3 &vector) {
@@ -69,6 +79,10 @@ float Vec3::dotProduct(const Vec3 &v1, const Vec3 &v2) {
 	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
+Vec3 Vec3::operator*(const Vec3 &other) {
+    return Vec3::crossProduct(*this, other);
+}
+
 Vec3 Vec3::crossProduct(const Vec3 &other) {
 	return Vec3::crossProduct(*this, other);
 }
@@ -93,4 +107,10 @@ Vec3 Vec3::normalize(const Vec3 &v) {
 	result.y = v.y / length;
 	result.z = v.z / length;
 	return result;
+}
+
+void Vec3::copy(const Vec3 &v) {
+    x = v.x;
+    y = v.y;
+    z = v.z;
 }

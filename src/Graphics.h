@@ -19,8 +19,8 @@ class Graphics {
 	
 	SDL_Surface* screen;
 
-    Matrix4 cameraMatrix;
     Vec3 cameraPosition;
+    Vec3 cameraDirection;
 
     Frustum frustum;
 
@@ -40,11 +40,10 @@ class Graphics {
         void end2D();
         void flush();
 
+        void setCameraFromPlayer(Player *player);
         bool withinFrustum(float x, float y, float z, float radius);
         void updateFrustum();
 
-    private:
-        void buildFrustumPlanes();
 };
 
 extern Graphics *graphics;

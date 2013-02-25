@@ -69,15 +69,22 @@ void Graphics::updateFrustum() {
     Matrix4 P = p;
     Matrix4 M = m;
     Matrix4 A = M * P;
-
     frustum.setFrustum(A.data());
 }
 
 bool Graphics::withinFrustum(float x, float y, float z, float radius) {
     Vec3 point(x, y, z);
+
+    if ( point.y < cameraPosition.y - 4)
+        return false;
+
     return frustum.sphereInFrustum(point, radius);
 }
 
+void Graphics::setCameraFromPlayer(Player *player) {
+    cameraPosition = player->getPosition();
+    cameraDirection = player->getDirection();
+}
 
 void Graphics::begin3D() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -139,4 +146,3 @@ void Graphics::end2D() {
 void Graphics::flush() {
     SDL_GL_SwapBuffers();
 }
-

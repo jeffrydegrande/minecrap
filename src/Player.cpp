@@ -96,24 +96,26 @@ void Player::render() {
 }
 
 void Player::look(int x, int y) {
-  float mouse_sense = 0.3;
+    float mouse_sense = 0.3;
 
-  // avoid getting the very first update throwing
-  // the player completely off
-  if (abs(x) > 200 || abs(y) > 200)
+    // avoid getting the very first update throwing
+    // the player completely off
+    if (abs(x) > 200 || abs(y) > 200)
       return;
 
-  Matrix4 camera;
+    Matrix4 camera;
 
-  // rotate on the x-axis
-  camera.rotate((float)x * mouse_sense, right);
-  camera.transformVector(angle);
-  camera.transformVector(up);
+    // rotate on the x-axis
+    camera.rotate((float)x * mouse_sense, right);
+    camera.transformVector(angle);
+    camera.transformVector(up);
 
-  Vec3 u(0.0f, 1.0f, 0.0f);
-  camera.rotate((float)y * mouse_sense, u);
-  camera.transformVector(angle);
-  camera.transformVector(up);
+    // rotate on the y-axis
+    Vec3 u(0.0f, 1.0f, 0.0f);
+    camera.rotate((float)y * mouse_sense, u);
+    camera.transformVector(angle);
+    camera.transformVector(up);
+
 
   // TODO: how to clamp rotations on X&Z & how to not rotate on Z at all
   // rotate on the y-axis

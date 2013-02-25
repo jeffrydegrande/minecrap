@@ -67,7 +67,7 @@ void Engine::run() {
     long remaining;
 
     unsigned int fps_lasttime = tick(); //the last recorded time.
-    unsigned fps_frames = 0; //frames passed since the last recorded fps.
+    unsigned fps_frames = 0; // frames passed since the last recorded fps.
 
     while(!quit) {
         stop = tick() + 15;
@@ -75,8 +75,9 @@ void Engine::run() {
         render();
 
         remaining = stop - tick();
-        if (remaining > 0)
+        if (remaining > 0) {
             sleep(remaining);
+        }
 
         fps_frames++;
         if (fps_lasttime < tick() - FPS_INTERVAL*1000)
@@ -168,6 +169,7 @@ void Engine::render() {
     graphics->begin3D();
 
     player->render();
+    graphics->setCameraFromPlayer(player);
     graphics->updateFrustum();
 
     blocksRendered = world->render();

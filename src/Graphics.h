@@ -41,11 +41,7 @@ class Graphics {
         void flush();
 
         bool withinFrustum(float x, float y, float z, float radius);
-
-        void setCameraMatrix(const Matrix4 &m);
-        void setCameraPosition(const Vec3 &p);
-        void setCameraFrom(Player *player);
-        void renderFrustum();
+        void updateFrustum();
 
     private:
         void buildFrustumPlanes();

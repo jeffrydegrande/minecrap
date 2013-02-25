@@ -168,8 +168,7 @@ void Engine::render() {
     graphics->begin3D();
 
     player->render();
-    graphics->setCameraFrom(player);
-    graphics->renderFrustum();
+    graphics->updateFrustum();
 
     blocksRendered = world->render();
     graphics->end3D();

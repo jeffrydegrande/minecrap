@@ -58,30 +58,19 @@ void Graphics::initRenderer(int width, int height, int bits, bool fullscreen) {
     gluPerspective(fovy, this->aspect, NEAR_CLIP, RENDER_DISTANCE);
 
     glMatrixMode(GL_MODELVIEW);
-    frustum.updatePerspective(fovy, this->aspect,
-            NEAR_CLIP, RENDER_DISTANCE);
-
-    glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
 }
 
-void Graphics::setCameraMatrix(const Matrix4 &m) {
-    cameraMatrix = m;
-}
+void Graphics::updateFrustum() {
+    float p[16];
+    float m[16];
+    glGetFloatv(GL_PROJECTION_MATRIX, p);
+    glGetFloatv(GL_MODELVIEW_MATRIX, m);
 
-void Graphics::setCameraPosition(const Vec3 &p) {
-    cameraPosition = p;
-}
+    Matrix4 P = p;
+    Matrix4 M = m;
+    Matrix4 A = M * P;
 
-void Graphics::setCameraFrom(Player *player) {
-    Vec3 eye(player->getPosition());
-    Vec3 lookat(player->getDirection());
-    Vec3 up(0.0f, 1.0f, 0.0f);
-
-    frustum.updateCamera(eye, lookat, up);
-}
-
-void Graphics::renderFrustum() {
-    frustum.render();
+    frustum.setFrustum(A.data());
 }
 
 bool Graphics::withinFrustum(float x, float y, float z, float radius) {
@@ -116,6 +105,7 @@ void Graphics::begin3D() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable (GL_CULL_FACE);
     glCullFace (GL_BACK);
+    glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
 }
 
 void Graphics::end3D() {

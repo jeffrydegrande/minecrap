@@ -1,64 +1,52 @@
 #include "Frustum.h"
 #include "minecrap.h"
+#include "Plane.h"
 
 #include <cmath>
 
 Frustum::Frustum() {}
 Frustum::~Frustum() {}
 
-#define POINT(p)   glVertex3f(p.x, p.y, p.z)
+#define m(row,col)  m[col*4+row-5]
 
-void Frustum::updatePerspective(
-        float angle, float ratio, float near, float far)
-{
-    this->ratio = ratio;
-    this->angle = angle;
-    this->near  = near;
-    this->far   = far;
-
-    tang = (float)tan(angle * DEGREES_TO_RADIANS * 0.5);
-
-    nearHeight = near * tang;
-    nearWidth  = nearHeight * ratio;
-    farHeight  = far * tang;
-    farWidth   = farHeight * ratio;
+void Frustum::setFrustum(float *m) {
+    planes[NEAR].setCoefficients(
+                 m(3,1) + m(4,1),
+                 m(3,2) + m(4,2),
+                 m(3,3) + m(4,3),
+                 m(3,4) + m(4,4));
+    planes[FAR].setCoefficients(
+                -m(3,1) + m(4,1),
+                -m(3,2) + m(4,2),
+                -m(3,3) + m(4,3),
+                -m(3,4) + m(4,4));
+    planes[BOTTOM].setCoefficients(
+                 m(2,1) + m(4,1),
+                 m(2,2) + m(4,2),
+                 m(2,3) + m(4,3),
+                 m(2,4) + m(4,4));
+    planes[TOP].setCoefficients(
+                -m(2,1) + m(4,1),
+                -m(2,2) + m(4,2),
+                -m(2,3) + m(4,3),
+                -m(2,4) + m(4,4));
+    planes[LEFT].setCoefficients(
+                 m(1,1) + m(4,1),
+                 m(1,2) + m(4,2),
+                 m(1,3) + m(4,3),
+                 m(1,4) + m(4,4));
+    planes[RIGHT].setCoefficients(
+                -m(1,1) + m(4,1),
+                -m(1,2) + m(4,2),
+                -m(1,3) + m(4,3),
+                -m(1,4) + m(4,4));
 }
 
-void Frustum::updateCamera(Vec3 &eye, Vec3 &center, Vec3 &up)
-{
-    Vec3 dir, nc, fc, X, Y, Z;
-
-    Z = eye - center;
-    Z.normalize();
-
-    X = up * Z;
-    X.normalize();
-
-    Y = Z * X;
-
-    nc = (eye - Z) * this->near;
-    fc = (eye - Z) * this->far;
-
-    ntl = nc + Y * nearHeight - X * nearWidth;
-    ntr = nc + Y * nearHeight + X * nearWidth;
-    nbl = nc - Y * nearHeight - X * nearWidth;
-    nbr = nc + Y * nearHeight + X * nearWidth;
-
-    ftl = fc + Y * farHeight - X * farWidth;
-    ftr = fc + Y * farHeight + X * farWidth;
-    fbl = fc - Y * farHeight - X * farWidth;
-    fbr = fc + Y * farHeight + X * farWidth;
-
-    planes[TOP].setPoints(ntr, ntl, ftl);
-    planes[BOTTOM].setPoints(nbl, nbr, fbr);
-    planes[LEFT].setPoints(ntl, nbl, fbl);
-    planes[RIGHT].setPoints(nbr, ntr, fbr);
-    planes[NEAR].setPoints(ntl, ntr, nbr);
-    planes[FAR].setPoints(ftr, ftl, fbl);
-}
-
+#undef M
 
 void Frustum::render() {
+
+    #define POINT(p)   glVertex3f(p.x, p.y, p.z)
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLineWidth(2);
@@ -83,6 +71,7 @@ void Frustum::render() {
     glEnd();
     glLineWidth(1);
     glPopMatrix();
+    #undef POINT
 }
 
 

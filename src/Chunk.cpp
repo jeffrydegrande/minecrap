@@ -199,8 +199,6 @@ int Chunk::renderBlock(int x, int y, int z) {
     if (graphics->withinFrustum(world.x, world.y, world.z, 1.0f)) {
         Block::render(block);
         ret = 1;
-    } else {
-        Block::render(RED);
     }
     glPopMatrix();
     return ret;

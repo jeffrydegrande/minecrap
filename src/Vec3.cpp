@@ -16,6 +16,12 @@ Vec3::Vec3(const Vec3 &v) {
     z = v.z;
 }
 
+void Vec3::set(float x, float y, float z) {
+    this->x = x;
+    this->y = y;
+    this->z = z;
+}
+
 Vec3 Vec3::operator+(const Vec3 &vector) {
 	return Vec3(x + vector.x, y + vector.y, z + vector.z);
 }

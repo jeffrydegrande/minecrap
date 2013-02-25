@@ -28,10 +28,7 @@ class Frustum {
         Frustum();
         ~Frustum();
 
-        void updatePerspective(
-                float angle, float ratio, float near, float far);
-
-        void updateCamera(Vec3 &eye, Vec3 &center, Vec3 &up);
+        void setFrustum(float *m);
 
         void render();
 

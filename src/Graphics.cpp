@@ -94,8 +94,8 @@ void Graphics::begin3D() {
     glLoadIdentity();
 
     GLfloat lightPosition[] = {0.0f, 100.0f, 0.0f, 0.0f};
-    GLfloat light_diffuse[]  = { 0.8f, 0.8f, 0.8f, 1.0f };
-    GLfloat light_specular[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+    GLfloat light_diffuse[]  = { 0.8f, 0.8f, 0.8f, 1.0f};
+    // GLfloat light_specular[] = { 0.5f, 0.5f, 0.5f, 1.0f};
     GLfloat light_full_on[]  = {1.0f, 1.0f, 1.0f, 1.0f};
     GLfloat white[]    = {1.0f, 1.0f, 1.0f, 1.0f};
 
@@ -103,11 +103,9 @@ void Graphics::begin3D() {
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_full_on);
     glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-    glLightfv(GL_LIGHT0, GL_EMISSION, light_specular);
 
     glDepthFunc (GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
-    //Culling and shading
     glShadeModel(GL_SMOOTH);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable (GL_CULL_FACE);

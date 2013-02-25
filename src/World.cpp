@@ -20,7 +20,7 @@
 
 #include "Vec2.h"
 
-#define INITIAL_WORLD_SIZE 16
+#define INITIAL_WORLD_SIZE 4
 
 World::World(): chunks(NULL) {
 	init((unsigned int)time(NULL));
@@ -142,10 +142,5 @@ int World::renderTerrain() {
 }
 
 int World::renderChunk(Chunk *chunk) {
-	int renderedBlocksCount = 0;
-	foreach_xyz {
-		renderedBlocksCount += chunk->renderBlock(x, y, z);
-	} endforeach
-
-	return renderedBlocksCount;
+    return chunk->render();
 }

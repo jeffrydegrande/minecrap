@@ -9,6 +9,21 @@
 #ifndef Minecrap_minecrap_h
 #define Minecrap_minecrap_h
 
+
+#define GL_GLEXT_PROTOTYPES
+
+#ifdef HAVE_APPLE_OPENGL_FRAMEWORK
+#    include <OpenGL/gl.h>
+#    include <OpenGL/glu.h>
+#else
+#    ifdef WIN32
+#      include <windows.h>
+#    endif
+#    include <GL/gl.h>
+#    include <GL/glu.h>
+#    include <GL/glext.h>
+#endif
+
 #ifdef _WIN32
 #include <SDL.h>
 #include <SDL_opengl.h>

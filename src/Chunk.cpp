@@ -15,8 +15,11 @@
 
 #include "simplex.h"
 #include <assert.h>
+#include <string>
 
-Chunk::Chunk(int x, int z, int seed) {
+#define B(x,y,z)  blocks[x][y][z]
+
+Chunk::Chunk(int x, int z, int seed) :vertexCount(0) {
     this->seed = seed;
     this->worldX = x;
     this->worldZ = z;
@@ -24,6 +27,7 @@ Chunk::Chunk(int x, int z, int seed) {
 }
 
 Chunk::~Chunk() {
+    glDeleteBuffers(1, &vboVertex);
 }
 
 int Chunk::X() {
@@ -60,6 +64,7 @@ void Chunk::setBlock(int x, int y, int z, GLubyte type)
 }
 
 void Chunk::generate() {
+    printf( "Generating chunk \n" );
     foreach_xyz {
         blocks[x][y][z] = 0;
     } endforeach;
@@ -69,6 +74,7 @@ void Chunk::generate() {
     addWaterLevel();
     addBedrock();
     // addMarkersAtBoundaries();
+    buildMesh();
 }
 
 float terrainNoise(float x, float z, float frequency, float amplitude) {
@@ -180,22 +186,141 @@ bool Chunk::isExposedToAir(int x, int y, int z) {
         ||  blocks[x][y][z+1] == AIR || blocks[x][y][z-1] == AIR);
 }
 
-int Chunk::renderBlock(int x, int y, int z) {
-    int ret = 0;
+inline Vec3 Chunk::inWorld(int x, int y, int z)
+{
+    return Vec3((this->worldX << 4) + x, y, (this->worldZ << 4) + z);
+}
 
-    if (blocks[x][y][z] == AIR)
+static GLint faces[12][3] =
+{
+    {0, 1, 2}, {0, 3, 2}, // front
+    {2, 3, 7}, {2, 7, 6}, // top
+    {5, 4, 6}, {5, 6, 7}, // back
+    {4, 5, 1}, {4, 1, 0}, // bottom
+    {4, 0, 2}, {4, 2, 6}, // left
+    {1, 5, 7}, {1, 7, 3}
+};
+
+static GLfloat n[6][3] =
+{
+	{-1.0, 0.0, 0.0},
+	{0.0, 1.0, 0.0},
+	{1.0, 0.0, 0.0},
+	{0.0, -1.0, 0.0},
+	{0.0, 0.0, 1.0},
+	{0.0, 0.0, -1.0}
+};
+
+void Chunk::buildMesh() {
+    int index = 0;
+    float size = 1.0f;
+
+	vertexCount = 0;
+
+    // calculate the number of vertices need
+    foreach_xyz {
+        if (B(x,y,z) == AIR)
+            continue;
+        vertexCount += 36; // 6 faces, 2 triangles/face, 3verts/trangle
+    } endforeach;
+
+    GLfloat v[8][3];
+
+    v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
+    v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
+    v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
+    v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
+    v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
+    v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
+
+    vertices = new struct vertex_t[vertexCount];
+    foreach_xyz {
+        if (B(x,y,z) == AIR)
+            continue;
+
+		Vec3 world = inWorld(x,y,z);
+
+        for (int i=11; i>=0; i--) {
+            vertices[index].x = world.x + v[faces[i][0]][0];
+            vertices[index].y = world.y + v[faces[i][1]][1];
+            vertices[index].z = world.z + v[faces[i][2]][2];
+
+            vertices[index].nx = n[i][0];
+            vertices[index].ny = n[i][1];
+            vertices[index].nz = n[i][2];
+
+			vertices[index].u = 0;
+			vertices[index].v = 0;
+            index += 3;
+        }
+    } endforeach;
+    printf( "%d vertices added, %d expected.\n", index, vertexCount );
+    assert(index == vertexCount);
+
+    printf( "allocating %ld kb\n", (vertexCount * sizeof(struct vertex_t)) / 1024 );
+
+    glGenBuffers( 1, &vboVertex );
+    glBindBuffer( GL_ARRAY_BUFFER, vboVertex);
+    glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof(struct vertex_t),
+					 vertices, GL_STATIC_DRAW );
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // TODO: texture buffers: see
+    // http://nehe.gamedev.net/tutorial/vertex_buffer_objects/22002/
+
+    // delete [] vertices;
+    // vertices = NULL;
+}
+
+int Chunk::renderMesh() {
+    return 0;
+}
+
+#define CHECK_GL_ERROR assert(GL_NO_ERROR == glGetError())
+
+int Chunk::render() {
+	// step 1
+	glBindBuffer( GL_ARRAY_BUFFER, vboVertex);
+
+	// step 2
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	// step 3
+	glNormalPointer( GL_FLOAT, sizeof(float)*8, (float*)(sizeof(float)*3));
+	glVertexPointer( 3, GL_FLOAT, sizeof(float)*8, NULL );
+
+	/// step 4
+	glDrawArrays( GL_TRIANGLES, 0, vertexCount);
+
+	// step 5
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	/*
+	int renderedBlocksCount = 0;
+	foreach_xyz {
+		renderedBlocksCount += renderBlock(x, y, z);
+	} endforeach
+
+	return renderedBlocksCount;
+	*/
+	return 1;
+}
+
+int Chunk::renderBlock(int x, int y, int z) {
+
+    int ret = 0;
+    GLubyte block = B(x,y,z);
+
+    if (block == AIR)
         return 0;
 
-    Vec3 world((this->worldX << 4) + x,
-               y,
-               (this->worldZ << 4) + z);
-
-
-    GLubyte block = blocks[x][y][z];
-
+    Vec3 world = inWorld(x, y, z);
     glPushMatrix();
     glTranslatef(world.x, world.y, world.z);
-
     if (graphics->withinFrustum(world.x, world.y, world.z, 1.0f)) {
         Block::render(block);
         ret = 1;
@@ -203,3 +328,5 @@ int Chunk::renderBlock(int x, int y, int z) {
     glPopMatrix();
     return ret;
 }
+
+#undef B

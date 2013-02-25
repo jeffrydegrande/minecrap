@@ -187,6 +187,14 @@ void Engine::render() {
     ConsoleRender();
 
     graphics->flush();
+
+	GLenum error;
+	while (GL_NO_ERROR != (error=glGetError())) {
+		std::string s = reinterpret_cast<const char *>(gluErrorString(error));
+		printf( "Error: %s\n", s.c_str());
+        exit(1);
+	}
+
 }
 
 void Engine::renderFPS() {

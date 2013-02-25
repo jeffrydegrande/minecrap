@@ -10,6 +10,8 @@
 #include "Block.h"
 #include "Color.h"
 #include "Chunk.h"
+#include "Vec3.h"
+#include "Graphics.h"
 
 #include "simplex.h"
 #include <assert.h>
@@ -179,23 +181,27 @@ bool Chunk::isExposedToAir(int x, int y, int z) {
 }
 
 int Chunk::renderBlock(int x, int y, int z) {
+    int ret = 0;
+
     if (blocks[x][y][z] == AIR)
         return 0;
-    /*
-    if (blocks[x][y][z] == AIR || !isExposedToAir(x, y, z))
-        return 0;
-    */
+
+    Vec3 world((this->worldX << 4) + x,
+               y,
+               (this->worldZ << 4) + z);
+
 
     GLubyte block = blocks[x][y][z];
 
-    if (block == AIR)
-        return 0;
-
     glPushMatrix();
-    glTranslatef((float)((this->worldX << 4) + x),
-                 (float)y,
-                 (float)((this->worldZ << 4) + z));
-    Block::render(block);
+    glTranslatef(world.x, world.y, world.z);
+
+    if (graphics->withinFrustum(world.x, world.y, world.z, 1.0f)) {
+        Block::render(block);
+        ret = 1;
+    } else {
+        Block::render(RED);
+    }
     glPopMatrix();
-    return 1;
+    return ret;
 }

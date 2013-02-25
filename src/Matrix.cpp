@@ -31,6 +31,48 @@ void Matrix4::invertPt(const Vec3 &from, Vec3 &to) {
     to.z = _31 * x + _32 * y + _33 * z;
 }
 
+void Matrix4::transformVector(Vec3 &to) {
+    float x = to.x - _41;
+    float y = to.y - _42;
+    float z = to.z - _43;
+
+    to.x = x * _11 + y * _12 + z * _13; 
+    to.y = x * _21 + y * _22 + z * _23; 
+    to.z = x * _31 + y * _32 + z * _33;
+}
+
+void Matrix4::rotate( const float &angle, Vec3 &axis )
+{
+    float s = sin(DEGREES_TO_RADIANS * angle);
+    float c = cos(DEGREES_TO_RADIANS * angle);
+
+    axis.normalize();
+
+    float ux = axis.x;
+    float uy = axis.y;
+    float uz = axis.z;
+
+    _11  = c + (1-c) * ux;
+    _12  = (1-c) * ux*uy + s*uz;
+    _13  = (1-c) * ux*uz - s*uy;
+    _14  = 0;
+
+    _21  = (1-c) * uy*ux - s*uz;
+    _22  = c + (1-c) * pow(uy,2);
+    _23  = (1-c) * uy*uz + s*ux;
+    _24  = 0;
+
+    _31  = (1-c) * uz*ux + s*uy;
+    _32  = (1-c) * uz*uz - s*ux;
+    _33  = c + (1-c) * pow(uz,2);
+    _34  = 0;
+
+    _41 = 0;
+    _42 = 0;
+    _43 = 0;
+    _44 = 1;
+}
+
 void Matrix4::rotateX(float degs) {
     Matrix4 rot;
     float rads = degs * DEGREES_TO_RADIANS;

@@ -6,44 +6,36 @@
 #include "Console.h"
 #include "Text.h"
 #include "Input.h"
+#include "Graphics.h"
 
 #include <sstream>
-
-#define RENDER_DISTANCE  1536
-#define NEAR_CLIP        0.2f
-#define FOV              60
-#define FPS_INTERVAL    1.0f
+#define FPS_INTERVAL     1.0f
 
 static float elapsed_seconds = 0.0f;
 
-Engine::Engine() : fps_current(0) {
-    this->quit = false;
-    init();
+Engine::Engine() : fps_current(0),quit(false) {
+    Graphics::Init();
 
+    init();
     world = new World(CVarUtils::GetCVar<int>("seed"));
     player = world->spawnPlayer();
+    crosshair = new Crosshair(graphics->viewWidth(), graphics->viewHeight());
 }
 
 Engine::~Engine() {
     delete this->world;
     delete this->player;
     delete this->crosshair;
+    Graphics::Cleanup();
 }
 
-void Engine::stop() {
-    this->quit = true;
-}
-
-long Engine::tick() {
-    return SDL_GetTicks();
-}
 
 void Engine::init() {
     if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_JOYSTICK) != 0) {
         return;
     }
     SDL_WM_SetCaption("","");
-    initRenderer(800, 600, 32, FULLSCREEN);
+    graphics->initRenderer(800, 600, 32, FULLSCREEN);
 
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -52,7 +44,7 @@ void Engine::init() {
 
     for (int i = 0; i < SDL_NumJoysticks(); i++) {
         SDL_JoystickEventState(SDL_ENABLE);
-        SDL_JoystickOpen(i);    
+        SDL_JoystickOpen(i);
     }
 
     SDL_ShowCursor (false);
@@ -61,42 +53,13 @@ void Engine::init() {
 
 }
 
-void Engine::initRenderer(int width, int height, int bits, bool fullscreen) {
-    int flags;
-    float fovy;
 
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+void Engine::stop() {
+    this->quit = true;
+}
 
-    view_width = width;
-    view_height = height;
-    view_aspect = (float)width / (float) height;
-
-    flags = SDL_OPENGL;
-    if (fullscreen)
-        flags |= SDL_FULLSCREEN;
-    else
-        flags |= SDL_RESIZABLE;
-
-    screen = SDL_SetVideoMode(width, height, bits, flags);
-
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    fovy = FOV;
-
-    if (view_aspect > 1.0f)
-        fovy /= view_aspect;
-
-    gluPerspective(fovy, view_aspect, NEAR_CLIP, RENDER_DISTANCE);
-    glMatrixMode(GL_MODELVIEW);
-
-    glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
-    crosshair = new Crosshair(view_width, view_height);
+long Engine::tick() {
+    return SDL_GetTicks();
 }
 
 void Engine::run() {
@@ -130,6 +93,7 @@ void Engine::update() {
     ConsoleUpdate ();
     world->update();
     player->update();
+
 }
 
 void Engine::collectInput() {
@@ -166,20 +130,23 @@ void Engine::collectInput() {
             break;
         case SDL_MOUSEMOTION:
             {
-              if (event.motion.x < 20 || event.motion.x > view_width - 20 ||
-                  event.motion.y < 20 || event.motion.y > view_height - 20) {
+              int w = graphics->viewWidth();
+              int h = graphics->viewHeight();
+
+              if (event.motion.x < 20 || event.motion.x > w - 20 ||
+                  event.motion.y < 20 || event.motion.y > h - 20) {
                 if (!ConsoleIsOpen()) {
-                  SDL_WarpMouse(view_width / 2, view_height / 2);
+                  SDL_WarpMouse(w / 2, h / 2);
                 }
               } else {
-                player->look(event.motion.yrel, -event.motion.xrel);
+                player->look(event.motion.yrel, event.motion.xrel);
               }
             }
             break;
         case SDL_VIDEORESIZE:
-            center_x = event.resize.w / 2;
-            center_y = event.resize.h / 2;
-            initRenderer(event.resize.w, event.resize.h, 32, FULLSCREEN);
+            graphics->initRenderer(event.resize.w, event.resize.h, 32, FULLSCREEN);
+            delete crosshair;
+            crosshair = new Crosshair(event.resize.w, event.resize.h);
             break;
         default:
             // noop
@@ -197,90 +164,41 @@ void Engine::collectInput() {
 }
 
 void Engine::render() {
-    this->render3D();
-    this->render2D();
+    // 3D stuff
+    graphics->begin3D();
 
-    /*
-    [self updateMenuBar:fps :blocksRendered];
-
-    */
-
-    SDL_GL_SwapBuffers();
-}
-
-void Engine::render3D() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-
-    GLfloat lightPosition[] = {0.0f, 100.0f, 0.0f, 0.0f};
-    GLfloat light_diffuse[]  = { 0.8f, 0.8f, 0.8f, 1.0f };
-    GLfloat light_specular[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-    GLfloat light_full_on[]  = {1.0f, 1.0f, 1.0f, 1.0f};
-    GLfloat white[]    = {1.0f, 1.0f, 1.0f, 1.0f};
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, white);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_full_on);
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-    glLightfv(GL_LIGHT0, GL_EMISSION, light_specular);
-
-    glViewport (0, 0, view_width, view_height);
-    glDepthFunc (GL_LEQUAL);
-    glEnable(GL_DEPTH_TEST);
-    //Culling and shading
-    glShadeModel(GL_SMOOTH);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glEnable (GL_CULL_FACE);
-    glCullFace (GL_BACK);
-
-    // render 3D stuff
     player->render();
-    world->render();
-}
+    graphics->setCameraFrom(player);
+    graphics->renderFrustum();
 
-void Engine::render2D() {
-    // render 2D stuff
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    glOrtho(0, view_width, view_height, 0, -1, 1);
+    blocksRendered = world->render();
+    graphics->end3D();
 
-    glMatrixMode(GL_MODELVIEW);
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-    glPushMatrix();
-
-    glLoadIdentity();
-
+    // 2D stuff
+    graphics->begin2D();
     crosshair->render();
-
-    if(CVarUtils::GetCVar<bool>("player.info")) {
-        this->renderFPS();
-        this->renderPlayerPosition();
-        this->renderPlayerDirection();
-    }
-
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
+    this->renderFPS();
+    this->renderPlayerPosition();
+    this->renderPlayerDirection();
+    this->renderRenderStats();
+    graphics->end2D();
 
     ConsoleRender();
 
+    graphics->flush();
 }
 
 void Engine::renderFPS() {
     std::ostringstream s;
     s << "FPS: " << fps_current;
-    TextWrite(view_width / 2 - 40, 13, s.str().c_str());
+    TextWrite(graphics->viewWidth() / 2 - 40, 13, s.str().c_str());
 }
 
 void Engine::renderPlayerPosition() {
     char s[96];
     Vec3 pos = player->getPosition();
     snprintf(s, 95, "loc: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
-    TextWrite(view_width / 2 - 40, 26, s);
+    TextWrite(graphics->viewWidth() / 2 - 40, 26, s);
 }
 
 void Engine::renderPlayerDirection() {
@@ -289,7 +207,13 @@ void Engine::renderPlayerDirection() {
 
     snprintf(s, 95, "ang: %0.2f, %0.2f, %0.2f, facing %s\n",
             angle.x, angle.y, angle.z, player->getDirectionAsString());
-    TextWrite(view_width / 2 - 40, 39, s);
+    TextWrite(graphics->viewWidth() / 2 - 40, 39, s);
+}
+
+void Engine::renderRenderStats() {
+    char s[96];
+    snprintf(s, 95, "Blocks: %d\n", blocksRendered);
+    TextWrite(graphics->viewWidth() / 2 - 40, 52, s);
 }
 
 float Engine::elapsedSeconds() {

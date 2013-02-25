@@ -14,7 +14,9 @@ class Player
 {
 	Vec3 position;
 	Vec3 angle;
-    Matrix4 camera_matrix;
+    Vec3 up;
+    Vec3 right;
+
     World *world;
 
     float velocity;
@@ -39,4 +41,8 @@ public:
 
     const Vec3 getDirection() const;
     const char *getDirectionAsString();
+
+    // Matrix4 & getCameraMatrix();
+    //const Vec3 & getCameraLookingAt();
+
 };

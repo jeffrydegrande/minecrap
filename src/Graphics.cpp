@@ -73,9 +73,8 @@ void Graphics::setCameraPosition(const Vec3 &p) {
 }
 
 void Graphics::setCameraFrom(Player *player) {
-
     Vec3 eye(player->getPosition());
-    Vec3 lookat(player->getCameraLookingAt());
+    Vec3 lookat(player->getDirection());
     Vec3 up(0.0f, 1.0f, 0.0f);
 
     frustum.updateCamera(eye, lookat, up);

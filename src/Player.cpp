@@ -54,35 +54,82 @@ const char *Player::getDirectionAsString() {
     return "Unknown";
 }
 
-void Player::strafeRight() {
-	Vec3 right;
-	camera_matrix.invertPt(Vec3(1.0f, 0.0f, 0.0f), right);
-	position += right;
-}
-
-void Player::strafeLeft() {
-	Vec3 right;
-	camera_matrix.invertPt(Vec3(-1.0f, 0.0f, 0.0f), right);
-	position += right;
-}
-
-void Player::moveForward() {
-	Vec3 head;
-	camera_matrix.invertPt(Vec3(0.0f, 0.0f, -1.0f), head);
-	position += head;
-}
-
-void Player::moveBackward() {
-	Vec3 head, right;
-	camera_matrix.invertPt(Vec3(0.0f, 0.0f, 1.0f), head);
-	position += head;
-}
-
 void Player::render() {
+    /*
     glRotatef (angle.x, 1.0f, 0.0f, 0.0f);
     glRotatef (angle.y, 0.0f, 1.0f, 0.0f);
     glRotatef (angle.z, 0.0f, 0.0f, 1.0f);
-    glTranslatef (-position.x, -position.y - EYE_HEIGHT, -position.z);
+    glTranslatef (-position.x, -position.y, -position.z);
+    */
+
+	Matrix4 view;
+	angle.normalize();
+	right = angle * up;
+	right.normalize();
+
+	up = right * angle;
+	up.normalize();
+
+    float v[16];
+
+	v[0] =  right.x;
+	v[1] =  up.x;
+	v[2] = -angle.x;
+	v[3] =  0.0f;
+
+	v[4] =  right.y;
+	v[5] =  up.y;
+	v[6] = -angle.y;
+	v[7] =  0.0f;
+
+	v[8]  =  right.z;
+	v[9]  =  up.z;
+	v[10] = -angle.z;
+	v[11] =  0.0f;
+
+	v[12] = -right.dotProduct(position);
+	v[13] = -up.dotProduct(position);
+	v[14] =  angle.dotProduct(position);
+	v[15] =  1.0f;
+
+	glMultMatrixf(v);
+}
+
+void Player::look(int x, int y) {
+  float mouse_sense = 0.3;
+
+  // avoid getting the very first update throwing
+  // the player completely off
+  if (abs(x) > 200 || abs(y) > 200)
+      return;
+
+  Matrix4 camera;
+
+  // rotate on the x-axis
+  camera.rotate((float)x * mouse_sense, right);
+  camera.transformVector(angle);
+  camera.transformVector(up);
+
+  Vec3 u(0.0f, 1.0f, 0.0f);
+  camera.rotate((float)y * mouse_sense, u);
+  camera.transformVector(angle);
+  camera.transformVector(up);
+
+  // TODO: how to clamp rotations on X&Z & how to not rotate on Z at all
+  // rotate on the y-axis
+  /*
+  x = - x;
+  mouse_sense = 0.8f;
+  angle.x -= (float)x * mouse_sense;
+  angle.x = clamp (angle.x, -90.0f, 90.0f);
+
+  angle.y -= (float)y * mouse_sense;
+  if (angle.y < -180.0f)
+	  angle.y += 360.0f;
+  if (angle.y > 180.0f)
+	  angle.y -= 360.0f;
+  */
+
 }
 
 void Player::update()
@@ -90,17 +137,20 @@ void Player::update()
     float elapsed = std::min(Engine::elapsedSeconds(), 0.25f);
     bool flying = CVarUtils::GetCVar<bool>("flying");
 
-    // adapt camera to view angle
-	camera_matrix.loadIdentity();
-	camera_matrix.rotateX(angle.x);
-	camera_matrix.rotateY(angle.y);
-	camera_matrix.rotateZ(angle.z);
-
     // update movement
-    if (Input::isKeyPressed(SDLK_w)) { moveForward(); }
-    if (Input::isKeyPressed(SDLK_s)) { moveBackward(); }
-    if (Input::isKeyPressed(SDLK_a)) { strafeLeft(); }
-    if (Input::isKeyPressed(SDLK_d)) { strafeRight(); }
+    if (Input::isKeyPressed(SDLK_w)) { 
+        position += angle * SPEED * elapsed;
+    }
+
+    if (Input::isKeyPressed(SDLK_s)) { 
+        position -= angle * SPEED * elapsed;
+    }
+    if (Input::isKeyPressed(SDLK_a)) { 
+        position -= right * SPEED * elapsed;
+    }
+    if (Input::isKeyPressed(SDLK_d)) { 
+        position += right * SPEED * elapsed;
+    }
 
     // jumping
     if (Input::isKeyPressed(SDLK_SPACE) && onGround) {
@@ -124,29 +174,11 @@ void Player::update()
     }
 }
 
-void Player::look(int x, int y) {
-  float   mouse_sense;
-  // avoid getting the very first update throwing
-  // the player completely off
-  if (abs(x) > 200 && abs(y) > 200)
-      return;
-
-
-  x = - x;
-  mouse_sense = 0.8f;
-  angle.x -= (float)x * mouse_sense;
-  angle.x = clamp (angle.x, -90.0f, 90.0f);
-
-  angle.y -= (float)y * mouse_sense;
-  if (angle.y < -180.0f)
-	  angle.y += 360.0f;
-  if (angle.y > 180.0f)
-	  angle.y -= 360.0f;
-}
-
 void Player::setPosition(const Vec3 &position) {
 	this->position = position;
-	this->angle = Vec3(0.0f, 0, 0.0f );
+	this->angle = Vec3(-13.0f, 180.0f, 0.0f );
+    this->up    = Vec3(0.0f, 1.0f, 0.0f);
+    this->right = Vec3(1.0f, 0.0f, 0.0f);
     this->velocity = 0;
     this->onGround = true;
 }

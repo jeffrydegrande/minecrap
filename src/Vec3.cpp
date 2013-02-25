@@ -96,17 +96,11 @@ Vec3 Vec3::crossProduct(const Vec3 &v1, const Vec3 &v2) {
 	return result;
 }
 
-Vec3 Vec3::normalize() {
-	return Vec3::normalize(*this);
-}
-
-Vec3 Vec3::normalize(const Vec3 &v) {
-	float length = v.length();
-	Vec3 result;
-	result.x = v.x / length;
-	result.y = v.y / length;
-	result.z = v.z / length;
-	return result;
+void Vec3::normalize() {
+    float l = this->length();
+    this->x = x / l;
+    this->y = y / l;
+    this->z = z / l;
 }
 
 void Vec3::copy(const Vec3 &v) {

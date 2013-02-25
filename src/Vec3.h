@@ -30,8 +30,9 @@ public:
 	Vec3 crossProduct(const Vec3 &);
 	static Vec3 crossProduct(const Vec3 &, const Vec3 &);
 
-	Vec3 normalize();
-	static Vec3 normalize(const Vec3 &);
+    void normalize();
+	// Vec3 normalize();
+	// static Vec3 normalize(const Vec3 &);
 
     void copy(const Vec3 &v);
 

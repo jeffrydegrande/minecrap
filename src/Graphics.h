@@ -9,6 +9,10 @@
 #define NEAR_CLIP        0.2f
 #define FOV              45
 
+
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+
+
 class Player;
 class SDL_Surface;
 class Graphics {

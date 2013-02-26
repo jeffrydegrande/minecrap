@@ -19,6 +19,54 @@
 
 #define B(x,y,z)  blocks[x][y][z]
 
+
+const Vec3 cubeVerts[] =
+{
+  Vec3( 0.5, 0.5, 0.5), //0
+  Vec3( 0.5, 0.5,-0.5), //1
+  Vec3( 0.5,-0.5, 0.5), //2
+  Vec3( 0.5,-0.5,-0.5), //3
+  Vec3(-0.5, 0.5, 0.5), //4
+  Vec3(-0.5, 0.5,-0.5), //5
+  Vec3(-0.5,-0.5, 0.5), //6
+  Vec3(-0.5,-0.5,-0.5)  //7
+};
+
+const Vec3 verts[] = //36 vertices total
+{
+  cubeVerts[0], cubeVerts[4], cubeVerts[6],  //front
+  cubeVerts[0], cubeVerts[6], cubeVerts[2],  
+  cubeVerts[1], cubeVerts[0], cubeVerts[2],  //right 
+  cubeVerts[1], cubeVerts[2], cubeVerts[3],
+  cubeVerts[5], cubeVerts[1], cubeVerts[3],  //back  
+  cubeVerts[5], cubeVerts[3], cubeVerts[7],
+  cubeVerts[4], cubeVerts[5], cubeVerts[7],  //left  
+  cubeVerts[4], cubeVerts[7], cubeVerts[6],
+  cubeVerts[4], cubeVerts[0], cubeVerts[1],  //top 
+  cubeVerts[4], cubeVerts[1], cubeVerts[5],
+  cubeVerts[6], cubeVerts[7], cubeVerts[3],  //bottom 
+  cubeVerts[6], cubeVerts[3], cubeVerts[2],
+}; 
+
+const Vec3 right( 1.0f, 0.0f, 0.0f);
+const Vec3 left(-1.0f, 0.0f, 0.0f);
+const Vec3 top( 0.0f, 1.0f, 0.0f);
+const Vec3 bottom( 0.0f,-1.0f, 0.0f);
+const Vec3 front( 0.0f, 0.0f, 1.0f);
+const Vec3 back( 0.0f, 0.0f,-1.0f);
+
+const Vec3 normsArray[] = 
+{
+  front, front, front, front, front, front,
+  right, right, right, right, right, right,
+  back, back, back, back, back, back,
+  left, left, left, left, left, left,
+  top, top, top, top, top, top,
+  bottom, bottom, bottom, bottom, bottom, bottom
+
+};
+
+
 Chunk::Chunk(int x, int z, int seed) :vertexCount(0) {
     this->seed = seed;
     this->worldX = x;
@@ -188,6 +236,7 @@ inline Vec3 Chunk::inWorld(int x, int y, int z)
     return Vec3((this->worldX << 4) + x, y, (this->worldZ << 4) + z);
 }
 
+/*
 static GLint faces[12][3] =
 {
     {0, 1, 2}, {0, 3, 2}, // front
@@ -197,22 +246,7 @@ static GLint faces[12][3] =
     {4, 0, 2}, {4, 2, 6}, // left
     {1, 5, 7}, {1, 7, 3}  // right
 };
-
-static GLfloat n[12][3] =
-{
-	{-1.0f,  0.0f,  0.0f}, // front
-	{-1.0f,  0.0f,  0.0f}, // front
-	{ 0.0f,  1.0f,  0.0f}, // top
-	{ 0.0f,  1.0f,  0.0f}, // top
-	{ 1.0f,  0.0f,  0.0f}, // back
-	{ 1.0f,  0.0f,  0.0f}, // back
-	{ 0.0f, -1.0f,  0.0f}, // bottom
-	{ 0.0f, -1.0f,  0.0f}, // bottom
-	{ 0.0f,  0.0f,  1.0f}, // left
-	{ 0.0f,  0.0f,  1.0f}, // left
-	{ 0.0f,  0.0f, -1.0f}, // right
-	{ 0.0f,  0.0f, -1.0f}  // right
-};
+*/
 
 void Chunk::buildMesh() {
     int index = 0;
@@ -225,64 +259,45 @@ void Chunk::buildMesh() {
         vertexCount += 36; // 6 faces, 2 triangles/face, 3verts/trangle
     } endforeach;
 
-    GLfloat v[8][3];
-
-    //
-
-    v[0][0] = v[1][0] = v[2][0] = v[3][0] = -0.5f;  // x - front
-    v[4][0] = v[5][0] = v[6][0] = v[7][0] =  0.5f;  // x - back
-
-    v[0][1] = v[1][1] = v[4][1] = v[5][1] = -0.5f;  // y - top
-    v[2][1] = v[3][1] = v[6][1] = v[7][1] =  0.5f;  // y - bottom
-
-    /*
-    v[0][2] = v[3][2] = v[4][2] = v[7][2] = -0.5f;  // z - left
-    v[1][2] = v[2][2] = v[5][2] = v[6][2] =  0.5f;  // z - right
-    */
-
-    v[4][2] = v[0][2] = v[2][2] = v[6][2] = -0.5f;  // z - left
-    v[1][2] = v[5][2] = v[7][2] = v[3][2] =  0.5f;  // z - right
 
     vertices = new struct vertex_t[vertexCount];
+
     foreach_xyz {
         if (B(x,y,z) == AIR)
             continue;
 
         Vec3 world = inWorld(x,y,z);
 
-        // for every triangle making up the 6 planes
-        for (int i=11; i>=0; i--) {
-            // for every vertex in that triangle
-            for (int j=0; j < 3; j++) {
-                vertices[index].x = world.x + v[faces[i][j]][0];
-                vertices[index].y = world.y + v[faces[i][j]][1];
-                vertices[index].z = world.z + v[faces[i][j]][2];
+        for (int i=0; i<36; i++) {
+            vertices[index].x = world.x + verts[i].x;
+            vertices[index].y = world.y + verts[i].y;
+            vertices[index].z = world.z + verts[i].z;
 
-                vertices[index].nx = n[i][0];
-                vertices[index].ny = n[i][1];
-                vertices[index].nz = n[i][2];
-                vertices[index].u = 0;
-                vertices[index].v = 0;
-                index++;
-            }
+            vertices[index].nx = normsArray[i].x;
+            vertices[index].ny = normsArray[i].y;
+            vertices[index].nz = normsArray[i].z;
+            // vertices[index].u = 0;
+            // vertices[index].v = 0;
+            index++;
         }
     } endforeach;
+
     printf( "%d vertices added, %d expected.\n", index, vertexCount );
     assert(index == vertexCount);
 
     printf( "allocating %ld kb\n", (vertexCount * sizeof(struct vertex_t)) / 1024 );
 
     glGenBuffers( 1, &vboVertex );
+
     glBindBuffer( GL_ARRAY_BUFFER, vboVertex);
-    glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof(struct vertex_t),
-					 vertices, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof(struct vertex_t), vertices, GL_STATIC_DRAW );
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // TODO: texture buffers: see
     // http://nehe.gamedev.net/tutorial/vertex_buffer_objects/22002/
 
-    // delete [] vertices;
-    // vertices = NULL;
+    delete [] vertices;
+    vertices = NULL;
 }
 
 int Chunk::renderMesh() {
@@ -292,53 +307,26 @@ int Chunk::renderMesh() {
 #define CHECK_GL_ERROR assert(GL_NO_ERROR == glGetError())
 
 int Chunk::render() {
-    for (int i=0; i < vertexCount; i+=3) {
-        glPushMatrix();
-        glBegin(GL_TRIANGLES);
-            glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-            glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
-            glMaterialfv(GL_FRONT, GL_AMBIENT, dblue);
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, blue);
 
-            glNormal3f(vertices[i].nx, vertices[i].ny, vertices[i].nz);
-            glVertex3f(vertices[i].x, vertices[i].y, vertices[i].z);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, dgreen);
+    // glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
 
-            glNormal3f(vertices[i+1].nx, vertices[i+1].ny, vertices[i+1].nz);
-            glVertex3f(vertices[i+1].x, vertices[i+1].y, vertices[i+1].z);
+    glBindBuffer(GL_ARRAY_BUFFER, vboVertex);
 
-            glNormal3f(vertices[i+2].nx, vertices[i+2].ny, vertices[i+2].nz);
-            glVertex3f(vertices[i+2].x, vertices[i+2].y, vertices[i+2].z);
-        glEnd();
-        glPopMatrix();
-    }
+    glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), BUFFER_OFFSET(0));
+    glEnableVertexAttribArray(ATTRIB_VERTEX); // vertices
 
-    CHECK_GL_ERROR;
+    glVertexAttribPointer(ATTRIB_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), BUFFER_OFFSET(12));
+    glEnableVertexAttribArray(ATTRIB_NORMAL); // normals
 
-    /*
-	glBindBuffer(GL_ARRAY_BUFFER, vboVertex);
+    glDrawArrays( GL_TRIANGLES, 0, vertexCount);
 
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	glNormalPointer( GL_FLOAT, sizeof(float)*8, (float*)(sizeof(float)*3));
-	glVertexPointer( 3, GL_FLOAT, sizeof(float)*8, NULL );
-
-	glDrawArrays( GL_TRIANGLES, 0, vertexCount);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableVertexAttribArray(ATTRIB_VERTEX);
+    glDisableVertexAttribArray(ATTRIB_NORMAL);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    */
-
-	/*
-	int renderedBlocksCount = 0;
-	foreach_xyz {
-		renderedBlocksCount += renderBlock(x, y, z);
-	} endforeach
-
-	return renderedBlocksCount;
-	*/
 	return 1;
 }
 

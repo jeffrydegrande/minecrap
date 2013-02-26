@@ -6,6 +6,14 @@
 
 Graphics *graphics = NULL;
 
+static void displayOpenGLInfo() {
+    printf ("vendor: %s\n",  (const unsigned char *)glGetString(GL_VENDOR));
+    printf ("renderer: %s\n", (const unsigned char *)glGetString(GL_RENDERER));
+    printf ("version: %s\n", (const unsigned char *)glGetString(GL_VERSION));
+    printf ("GLSL version: %s\n", (const unsigned char *)glGetString(GL_SHADING_LANGUAGE_VERSION));
+    printf ("\n");
+}
+
 void Graphics::Init() {
     graphics = new Graphics();
 }
@@ -48,6 +56,8 @@ void Graphics::initRenderer(int width, int height, int bits, bool fullscreen) {
         flags |= SDL_RESIZABLE;
 
     screen = SDL_SetVideoMode(width, height, bits, flags);
+
+    displayOpenGLInfo();
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);

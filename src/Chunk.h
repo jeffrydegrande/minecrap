@@ -15,12 +15,18 @@
 
 struct vertex_t {
     float x, y, z,
-          nx, ny, nz,
-          u, v;
+          nx, ny, nz;
 };
+
 
 class Chunk
 {
+    enum {
+        ATTRIB_VERTEX,
+        ATTRIB_NORMAL,
+        NUMBER_OF_ATTRIBUTES 
+    };
+
 	GLubyte blocks[CHUNKX][CHUNKY][CHUNKZ];
 	int worldX;
 	int worldZ;
@@ -28,6 +34,7 @@ class Chunk
 
     vertex_t* vertices;
     int vertexCount;
+
     unsigned int vboVertex;
 
 public:

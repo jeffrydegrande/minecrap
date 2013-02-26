@@ -64,9 +64,9 @@ void Mesh::addCube(const Vec3 & pos) {
     assert( index <= vertexCount );
 
     for (int i=0; i<36; i++) {
-        vertices[index].x = pos.x;
-        vertices[index].y = pos.y;
-        vertices[index].z = pos.z;
+        vertices[index].x  = pos.x + verts[i].x;
+        vertices[index].y  = pos.y + verts[i].y;
+        vertices[index].z  = pos.z + verts[i].z;
         vertices[index].nx = normsArray[i].x;
         vertices[index].ny = normsArray[i].y;
         vertices[index].nz = normsArray[i].z;

@@ -6,7 +6,6 @@
 static bool down[MAX_KEYS];
 
 
-
 void Input::keyPressed(int key) {
     if (key < 0 || key >= MAX_KEYS)
         return;

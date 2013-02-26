@@ -24,9 +24,14 @@ class Graphics {
 
     Frustum frustum;
 
+    bool renderAsWireframe;
+
     public:
         static void Init();
         static void Cleanup();
+
+        Graphics();
+        ~Graphics();
 
         int viewWidth() const;
         int viewHeight() const;
@@ -43,6 +48,8 @@ class Graphics {
         void setCameraFromPlayer(Player *player);
         bool withinFrustum(float x, float y, float z, float radius);
         void updateFrustum();
+
+        void toggleRenderingAsWireframe();
 
 };
 

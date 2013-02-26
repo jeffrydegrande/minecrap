@@ -115,14 +115,19 @@ void Engine::collectInput() {
                 ConsoleInput (event.key.keysym.sym, event.key.keysym.unicode);
                 break;
             } else {
-                if (event.key.keysym.sym == SDLK_ESCAPE) {
-                    stop();
-                } else if (event.key.keysym.sym == SDLK_BACKQUOTE) {
-                    ConsoleToggle();
-                } else {
-                    Input::keyPressed(event.key.keysym.sym);
+                switch (event.key.keysym.sym) {
+                    case SDLK_ESCAPE:
+                        stop();
+                        break;
+                    case SDLK_BACKQUOTE:
+                        ConsoleToggle();
+                        break;
+                    case SDLK_F3:
+                        graphics->toggleRenderingAsWireframe();
+                        break;
+                    default:
+                        Input::keyPressed(event.key.keysym.sym);
                 }
-
             }
             break;
         case SDL_JOYAXISMOTION:

@@ -14,6 +14,15 @@ void Graphics::Cleanup() {
     delete graphics;
 }
 
+Graphics::Graphics()
+{
+    renderAsWireframe = false;
+}
+
+Graphics::~Graphics()
+{
+}
+
 int Graphics::viewWidth() const {
     return width;
 }
@@ -60,6 +69,16 @@ void Graphics::initRenderer(int width, int height, int bits, bool fullscreen) {
     glMatrixMode(GL_MODELVIEW);
 }
 
+void Graphics::toggleRenderingAsWireframe()
+{
+    renderAsWireframe = !renderAsWireframe;
+
+    if (renderAsWireframe)
+        printf("Wireframe rendering enabled.\n" );
+    else
+        printf("Wireframe rendering disabled.\n");
+}
+
 void Graphics::updateFrustum() {
     float p[16];
     float m[16];
@@ -99,6 +118,7 @@ void Graphics::begin3D() {
     GLfloat light_full_on[]  = {1.0f, 1.0f, 1.0f, 1.0f};
     GLfloat white[]    = {1.0f, 1.0f, 1.0f, 1.0f};
 
+
     glLightfv(GL_LIGHT0, GL_AMBIENT, white);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_full_on);
@@ -107,10 +127,20 @@ void Graphics::begin3D() {
     glDepthFunc (GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
     glShadeModel(GL_SMOOTH);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
+    if (renderAsWireframe) {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    } else {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    }
+
     glEnable (GL_CULL_FACE);
     glCullFace (GL_BACK);
+
+
     glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
+
 }
 
 void Graphics::end3D() {

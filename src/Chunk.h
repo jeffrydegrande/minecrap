@@ -13,29 +13,15 @@
 #define CHUNKY 128
 #define CHUNKZ 16
 
-struct vertex_t {
-    float x, y, z,
-          nx, ny, nz;
-};
-
-
+class Mesh;
 class Chunk
 {
-    enum {
-        ATTRIB_VERTEX,
-        ATTRIB_NORMAL,
-        NUMBER_OF_ATTRIBUTES 
-    };
-
 	GLubyte blocks[CHUNKX][CHUNKY][CHUNKZ];
 	int worldX;
 	int worldZ;
 	int seed;
 
-    vertex_t* vertices;
-    int vertexCount;
-
-    unsigned int vboVertex;
+    Mesh *mesh;
 
 public:
 
@@ -50,14 +36,11 @@ public:
     bool isGround(int x, int y, int z);
 
     int render();
-
 	void generate();
 	void summarize();
 
-
 	int X();
 	int Z();
-
 
 private:
 
@@ -73,5 +56,4 @@ private:
 	bool isBorderBlock(int x, int y, int z);
 
     void buildMesh();
-    int renderMesh();
 };

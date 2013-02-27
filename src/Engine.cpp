@@ -48,9 +48,12 @@ void Engine::init() {
     }
 
     SDL_ShowCursor (false);
-
     TextInit();
 
+    // compile shaders
+    shader.addVertexShader("shaders/hello_world.vert");
+    shader.addFragmentShader("shaders/hello_world.frag");
+    shader.done();
 }
 
 
@@ -177,7 +180,9 @@ void Engine::render() {
     graphics->setCameraFromPlayer(player);
     graphics->updateFrustum();
 
+    shader.use();
     blocksRendered = world->render();
+    shader.dontUse();
     graphics->end3D();
 
     // 2D stuff

@@ -4,6 +4,7 @@
 #include "minecrap.h"
 #include "Matrix.h"
 #include "Vec3.h"
+#include "Shader.h"
 
 class World;
 class Crosshair;
@@ -23,6 +24,7 @@ class Engine
 	Crosshair *crosshair;
     int blocksRendered;
 
+    Shader shader;
 
 public:
 	Engine();

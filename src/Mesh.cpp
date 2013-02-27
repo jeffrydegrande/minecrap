@@ -51,12 +51,16 @@ const Vec3 normsArray[] =
   bottom, bottom, bottom, bottom, bottom, bottom
 };
 
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+
 Mesh::Mesh(ssize_t count): index(0), vertexCount(count) {
     vertices = new struct vertex_t[count];
-
 }
 
 Mesh::~Mesh() {
+    glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
 }
 
@@ -78,12 +82,13 @@ void Mesh::finish() {
     printf( "%ld vertices added, %ld expected.\n", index, vertexCount );
     assert(index == vertexCount);
 
+    glGenVertexArrays(1, &vao );
     glGenBuffers( 1, &vbo );
 
-    printf( "allocating %ld kb\n", (vertexCount * sizeof(struct vertex_t)) / 1024 );
+    printf( "allocating %ld kb, %ld cubes\n", (vertexCount * sizeof(struct vertex_t)) / 1024, index / 36);
 
-    glBindBuffer( GL_ARRAY_BUFFER, vbo);
-    glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof(struct vertex_t), vertices, GL_STATIC_DRAW );
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(struct vertex_t), vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // TODO: texture buffers: see
@@ -98,13 +103,15 @@ void Mesh::render() {
     glMaterialfv(GL_FRONT, GL_AMBIENT, dgreen);
     // glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
 
+    glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), BUFFER_OFFSET(0));
     glEnableVertexAttribArray(ATTRIB_VERTEX); // vertices
     glVertexAttribPointer(ATTRIB_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), BUFFER_OFFSET(12));
     glEnableVertexAttribArray(ATTRIB_NORMAL); // normals
     glDrawArrays( GL_TRIANGLES, 0, vertexCount);
-    // glDisableVertexAttribArray(ATTRIB_VERTEX);
-    // glDisableVertexAttribArray(ATTRIB_NORMAL);
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDisableVertexAttribArray(ATTRIB_VERTEX);
+    glDisableVertexAttribArray(ATTRIB_NORMAL);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }

@@ -29,6 +29,7 @@ class Graphics {
     Frustum frustum;
 
     bool renderAsWireframe;
+    bool renderWithLights;
 
     public:
         static void Init();
@@ -54,6 +55,7 @@ class Graphics {
         void updateFrustum();
 
         void toggleRenderingAsWireframe();
+        void toggleLights();
 
 };
 

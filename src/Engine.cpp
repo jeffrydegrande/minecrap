@@ -125,6 +125,9 @@ void Engine::collectInput() {
                     case SDLK_BACKQUOTE:
                         ConsoleToggle();
                         break;
+                    case SDLK_F2:
+                        graphics->toggleLights();
+                        break;
                     case SDLK_F3:
                         graphics->toggleRenderingAsWireframe();
                         break;

@@ -25,6 +25,7 @@ void Graphics::Cleanup() {
 Graphics::Graphics()
 {
     renderAsWireframe = false;
+    renderWithLights  = true;
 }
 
 Graphics::~Graphics()
@@ -89,6 +90,11 @@ void Graphics::toggleRenderingAsWireframe()
         printf("Wireframe rendering disabled.\n");
 }
 
+void Graphics::toggleLights()
+{
+    renderWithLights = !renderWithLights;
+}
+
 void Graphics::updateFrustum() {
     float p[16];
     float m[16];
@@ -129,14 +135,22 @@ void Graphics::begin3D() {
     GLfloat white[]    = {1.0f, 1.0f, 1.0f, 1.0f};
 
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT, white);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_full_on);
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-
     glDepthFunc (GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
     glShadeModel(GL_SMOOTH);
+
+    if (renderWithLights) {
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+
+        glLightfv(GL_LIGHT0, GL_AMBIENT, white);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, light_full_on);
+        glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+    } else {
+        glDisable(GL_LIGHTING);
+        glDisable(GL_LIGHT0);
+    }
 
 
     if (renderAsWireframe) {

@@ -21,7 +21,7 @@ void Shader::setCameraMatrix(Matrix4 &m) {
     assert(cameraMatrixUniform != -1);
 
     use();
-    glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, m.data());
+    glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, m.value_ptr());
     dontUse();
 }
 
@@ -34,7 +34,7 @@ void Shader::setPerspectiveMatrix(Matrix4 &m) {
     assert(perspectiveMatrixUniform != -1);
 
     use();
-    glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, m.data());
+    glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, m.value_ptr());
     dontUse();
 }
 

@@ -110,7 +110,7 @@ void Graphics::initRenderer(int width, int height, int bits, bool fullscreen) {
     shader->setPerspectiveMatrix(projection);
     ASSERT_NO_GL_ERROR;
 
-    glLoadMatrixf(projection.data());
+    glLoadMatrixf(projection.value_ptr());
     glViewport (0, 0, this->width, this->height);
     glMatrixMode(GL_MODELVIEW);
 }
@@ -165,7 +165,7 @@ void Graphics::updateFrustum() {
     Matrix4 P = p;
     Matrix4 M = m;
     Matrix4 A = M * P;
-    frustum.setFrustum(A.data());
+    frustum.setFrustum(A.value_ptr());
 }
 
 bool Graphics::withinFrustum(float x, float y, float z, float radius) {

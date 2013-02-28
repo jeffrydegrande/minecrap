@@ -132,7 +132,7 @@ Matrix4 Matrix4::operator *(const Matrix4 &m)
 }
 
 
-float *Matrix4::data()
+float *Matrix4::value_ptr()
 {
     return m;
 }

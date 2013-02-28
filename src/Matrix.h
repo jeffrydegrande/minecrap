@@ -32,7 +32,7 @@ class Matrix4 {
         void rotateZ(float degs);
         void inverse(const Matrix4 &m);
 
-        float *data();
+        float *value_ptr();
 
         void print();
 };

@@ -2,20 +2,13 @@
 #define MINECRAP_MESH_H
 
 struct vertex_t {
-    float x, y, z,     //position
-          nx, ny, nz;  //normal
+    float x, y, z, w;     //position
+          ///nx, ny, nz, nw;  //normal
 };
 
 
 class Vec3;
 class Mesh {
-
-    enum {
-        ATTRIB_VERTEX,
-        ATTRIB_NORMAL,
-        NUMBER_OF_ATTRIBUTES 
-    };
-
     ssize_t index;
     ssize_t vertexCount;
 

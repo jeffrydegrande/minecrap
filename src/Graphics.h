@@ -13,6 +13,7 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 
+class Shader;
 class Player;
 class SDL_Surface;
 class Graphics {
@@ -20,13 +21,15 @@ class Graphics {
 	int width;
 	int height;
 	float aspect;
-	
+
 	SDL_Surface* screen;
+    Shader *shader;
 
     Vec3 cameraPosition;
     Vec3 cameraDirection;
 
     Frustum frustum;
+    Matrix4 projection;
 
     bool renderAsWireframe;
     bool renderWithLights;
@@ -41,8 +44,11 @@ class Graphics {
         int viewWidth() const;
         int viewHeight() const;
 
+        void printError();
+
         void initRenderer(int width, int height, int bits, bool fullscreen);
 
+        void setupProjectionMatrix(float fovy, float aspect, float near, float far);
         void begin3D();
         void end3D();
 
@@ -56,6 +62,10 @@ class Graphics {
 
         void toggleRenderingAsWireframe();
         void toggleLights();
+
+    private:
+
+        void compileShaders();
 
 };
 

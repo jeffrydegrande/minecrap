@@ -34,7 +34,8 @@ void Engine::init() {
     if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_JOYSTICK) != 0) {
         return;
     }
-    SDL_WM_SetCaption("","");
+
+    SDL_WM_SetCaption("Minecrap","");
     graphics->initRenderer(800, 600, 32, FULLSCREEN);
 
     SDL_Init(SDL_INIT_VIDEO);
@@ -49,13 +50,7 @@ void Engine::init() {
 
     SDL_ShowCursor (false);
     TextInit();
-
-    // compile shaders
-    shader.addVertexShader("shaders/hello_world.vert");
-    shader.addFragmentShader("shaders/hello_world.frag");
-    shader.done();
 }
-
 
 void Engine::stop() {
     this->quit = true;
@@ -182,10 +177,7 @@ void Engine::render() {
     player->render();
     graphics->setCameraFromPlayer(player);
     graphics->updateFrustum();
-
-    shader.use();
-    blocksRendered = world->render();
-    shader.dontUse();
+    world->render();
     graphics->end3D();
 
     // 2D stuff

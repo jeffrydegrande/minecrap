@@ -210,11 +210,10 @@ void Chunk::buildMesh() {
     mesh->finish();
 }
 
-#define CHECK_GL_ERROR assert(GL_NO_ERROR == glGetError())
-
 int Chunk::render() {
-    if (mesh != NULL)
+    if (mesh != NULL) {
         mesh->render();
+    }
 	return 1;
 }
 

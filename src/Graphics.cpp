@@ -2,7 +2,12 @@
 #include "minecrap.h"
 #include "Player.h"
 #include "Block.h"
+#include "Shader.h"
+
 #include <cassert>
+#include <cmath>
+
+#define ASSERT_NO_GL_ERROR assert(GL_NO_ERROR == glGetError())
 
 Graphics *graphics = NULL;
 
@@ -22,14 +27,16 @@ void Graphics::Cleanup() {
     delete graphics;
 }
 
-Graphics::Graphics()
+Graphics::Graphics(): 
+    shader(NULL),
+    renderAsWireframe(false),
+    renderWithLights(true)
 {
-    renderAsWireframe = false;
-    renderWithLights  = true;
 }
 
 Graphics::~Graphics()
 {
+    delete shader;
 }
 
 int Graphics::viewWidth() const {
@@ -38,6 +45,16 @@ int Graphics::viewWidth() const {
 
 int Graphics::viewHeight() const {
     return height;
+}
+
+void Graphics::compileShaders()
+{
+    if (shader == NULL) {
+        shader = new Shader();
+        shader->addVertexShader("shaders/hello_world.vert");
+        shader->addFragmentShader("shaders/hello_world.frag");
+        shader->done();
+    }
 }
 
 void Graphics::initRenderer(int width, int height, int bits, bool fullscreen) {
@@ -56,6 +73,7 @@ void Graphics::initRenderer(int width, int height, int bits, bool fullscreen) {
     else
         flags |= SDL_RESIZABLE;
 
+    // TODO: this is probably a leak
     screen = SDL_SetVideoMode(width, height, bits, flags);
 
     displayOpenGLInfo();
@@ -69,15 +87,43 @@ void Graphics::initRenderer(int width, int height, int bits, bool fullscreen) {
     glLoadIdentity();
 
     fovy = FOV;
-
     if (this->aspect > 1.0f)
         fovy /= this->aspect;
 
+    this->compileShaders();
+    setupProjectionMatrix(fovy, aspect, NEAR_CLIP, RENDER_DISTANCE);
+    shader->setPerspectiveMatrix(projection);
+    ASSERT_NO_GL_ERROR;
+
+    glLoadMatrixf(projection.data());
     glViewport (0, 0, this->width, this->height);
-
-    gluPerspective(fovy, this->aspect, NEAR_CLIP, RENDER_DISTANCE);
-
     glMatrixMode(GL_MODELVIEW);
+}
+
+void Graphics::setupProjectionMatrix(float fovy, float aspect, float znear, float zfar)
+{
+    float m[16];
+    memset(m, 0, sizeof(m));
+
+    float depth = zfar - znear;
+    float f = 1.0f/tan(fovy*PI/360);
+
+    Matrix4 M;
+    m[0]  = f / aspect;
+    m[5]  = f;
+    m[10] = -(zfar + znear) / depth;
+    m[14] = -2 * (zfar*znear) / depth;
+    m[11] = -1.0f;
+
+    projection = m;
+}
+
+void Graphics::printError()
+{
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        printf("OpenGL error: %s\n", gluErrorString(error));
+    }
 }
 
 void Graphics::toggleRenderingAsWireframe()
@@ -117,23 +163,26 @@ bool Graphics::withinFrustum(float x, float y, float z, float radius) {
 }
 
 void Graphics::setCameraFromPlayer(Player *player) {
+    Matrix4 camera = Matrix4::load(GL_MODELVIEW_MATRIX);
+    shader->setCameraMatrix(camera);
     cameraPosition = player->getPosition();
     cameraDirection = player->getDirection();
 }
 
 void Graphics::begin3D() {
+    ASSERT_NO_GL_ERROR;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-
     glLoadIdentity();
+    shader->use();
 
     GLfloat lightPosition[] = {0.0f, 100.0f, 0.0f, 0.0f};
     GLfloat light_diffuse[]  = { 0.8f, 0.8f, 0.8f, 1.0f};
-    // GLfloat light_specular[] = { 0.5f, 0.5f, 0.5f, 1.0f};
+    //GLfloat light_specular[] = { 0.5f, 0.5f, 0.5f, 1.0f};
     GLfloat light_full_on[]  = {1.0f, 1.0f, 1.0f, 1.0f};
     GLfloat white[]    = {1.0f, 1.0f, 1.0f, 1.0f};
-
 
     glDepthFunc (GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
@@ -161,15 +210,14 @@ void Graphics::begin3D() {
 
     glEnable (GL_CULL_FACE);
     glCullFace (GL_BACK);
-
-
     glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
-
+    ASSERT_NO_GL_ERROR;
 }
 
 void Graphics::end3D() {
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
+    shader->dontUse();
 }
 
 void Graphics::begin2D() {
@@ -184,6 +232,8 @@ void Graphics::begin2D() {
     glLoadIdentity();
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
+
+    ASSERT_NO_GL_ERROR;
 }
 
 void Graphics::end2D() {

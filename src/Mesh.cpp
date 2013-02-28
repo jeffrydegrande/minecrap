@@ -71,9 +71,13 @@ void Mesh::addCube(const Vec3 & pos) {
         vertices[index].x  = pos.x + verts[i].x;
         vertices[index].y  = pos.y + verts[i].y;
         vertices[index].z  = pos.z + verts[i].z;
+        vertices[index].w  = 1.0f;
+        /*
         vertices[index].nx = normsArray[i].x;
         vertices[index].ny = normsArray[i].y;
         vertices[index].nz = normsArray[i].z;
+        vertices[index].nw  = 1.0f;
+        */
         index++;
     }
 }
@@ -83,35 +87,32 @@ void Mesh::finish() {
     assert(index == vertexCount);
 
     glGenVertexArrays(1, &vao );
+    glBindVertexArray(vao);
+
     glGenBuffers( 1, &vbo );
+    printf( "allocating %ld kb, %ld cubes\n", 
+            (vertexCount * sizeof(struct vertex_t)) / 1024, index / 36);
 
-    printf( "allocating %ld kb, %ld cubes\n", (vertexCount * sizeof(struct vertex_t)) / 1024, index / 36);
-
+    // upload data into VBO
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(struct vertex_t), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(struct vertex_t),
+            vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // TODO: texture buffers: see
-    // http://nehe.gamedev.net/tutorial/vertex_buffer_objects/22002/
+    // and get rid of the data on our side
     delete [] vertices;
     vertices = NULL;
 }
 
 void Mesh::render() {
-    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-    glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, dgreen);
-    // glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
-
-    glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glVertexAttribPointer(ATTRIB_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), BUFFER_OFFSET(0));
-    glEnableVertexAttribArray(ATTRIB_VERTEX); // vertices
-    glVertexAttribPointer(ATTRIB_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), BUFFER_OFFSET(12));
-    glEnableVertexAttribArray(ATTRIB_NORMAL); // normals
+    glEnableVertexAttribArray(0); // vertices
+    // glEnableVertexAttribArray(1); // normals
+
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    // glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(16));
+
     glDrawArrays( GL_TRIANGLES, 0, vertexCount);
-    glDisableVertexAttribArray(ATTRIB_VERTEX);
-    glDisableVertexAttribArray(ATTRIB_NORMAL);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    glDisableVertexAttribArray(0);
+    // glDisableVertexAttribArray(1);
 }

@@ -3,15 +3,23 @@
 
 #include "minecrap.h"
 #include <vector>
+#include "Matrix.h"
 
 class Shader {
     GLuint program;
+    GLint perspectiveMatrixUniform;
+    GLint cameraMatrixUniform;
     std::vector<GLuint> shaders;
 
     public:
+        Shader();
+
         void addVertexShader(const char *path);
         void addFragmentShader(const char *path);
         void done();
+
+        void setPerspectiveMatrix(Matrix4 &m);
+        void setCameraMatrix(Matrix4 &m);
 
         void use();
         void dontUse();

@@ -55,14 +55,6 @@ const char *Player::getDirectionAsString() {
 }
 
 void Player::render() {
-    /*
-    glRotatef (angle.x, 1.0f, 0.0f, 0.0f);
-    glRotatef (angle.y, 0.0f, 1.0f, 0.0f);
-    glRotatef (angle.z, 0.0f, 0.0f, 1.0f);
-    glTranslatef (-position.x, -position.y, -position.z);
-    */
-
-	Matrix4 view;
 	angle.normalize();
 	right = angle * up;
 	right.normalize();
@@ -103,7 +95,8 @@ void Player::look(int x, int y) {
     if (abs(x) > 200 || abs(y) > 200)
       return;
 
-    Matrix4 camera;
+    // Matrix4 camera;
+    camera.loadIdentity();
 
     // rotate on the x-axis
     camera.rotate((float)x * mouse_sense, right);

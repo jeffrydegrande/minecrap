@@ -1,5 +1,42 @@
 #include "Shader.h"
 #include "File.h"
+#include "Matrix.h"
+#include "Graphics.h"
+#include <cassert>
+
+Shader::Shader():
+    program(0),
+    perspectiveMatrixUniform(-1),
+    cameraMatrixUniform(-1)
+{
+
+}
+
+void Shader::setCameraMatrix(Matrix4 &m) {
+    assert (program != 0);
+
+    if (cameraMatrixUniform == -1) {
+        cameraMatrixUniform = glGetUniformLocation(program, "cameraMatrix");
+    }
+    assert(cameraMatrixUniform != -1);
+
+    use();
+    glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, m.data());
+    dontUse();
+}
+
+void Shader::setPerspectiveMatrix(Matrix4 &m) {
+    assert (program != 0);
+
+    if (perspectiveMatrixUniform == -1) {
+        perspectiveMatrixUniform = glGetUniformLocation(program, "perspectiveMatrix");
+    }
+    assert(perspectiveMatrixUniform != -1);
+
+    use();
+    glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, m.data());
+    dontUse();
+}
 
 void Shader::use() {
     glUseProgram(program);
@@ -51,7 +88,7 @@ void Shader::checkCompileStatus(GLuint shader)
     int result = 0;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
     if(GL_FALSE == result) {
-        printf("ERROR compiling vertex shader\n");
+        printf("ERROR compiling shader\n");
         int length = 0;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
       if(length > 0) {

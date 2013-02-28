@@ -9,36 +9,39 @@ Matrix4::Matrix4()
 
 Matrix4::Matrix4(float *v)
 {
-    memcpy(&_11, v, sizeof(Matrix4));
+    memcpy(&m, v, sizeof(float) * 16);
 }
 
+Matrix4 Matrix4::load(GLenum matrix)
+{
+    float m[16];
+    glGetFloatv(matrix, m);
+    return Matrix4(m);
+}
 
 void Matrix4::loadIdentity() {
-    _11 = _22 = _33 = _44 = 1.0f;
-    _12 = _13 = _14 = 0.0f;
-    _21 = _23 = _24 = 0.0f;
-    _31 = _32 = _34 = 0.0f;
-    _41 = _42 = _43 = 0.0f;
+    memset(&m, 0, sizeof(float) * 16);
+    m[0] = m[5] = m[10] = m[15] = 1.0f;
 }
 
 void Matrix4::invertPt(const Vec3 &from, Vec3 &to) {
-    float x = from.x - _41;
-    float y = from.y - _42;
-    float z = from.z - _43;
+    float x = from.x - m[12];
+    float y = from.y - m[13];
+    float z = from.z - m[14];
 
-    to.x = _11 * x + _12 * y + _13 * z;
-    to.y = _21 * x + _22 * y + _23 * z;
-    to.z = _31 * x + _32 * y + _33 * z;
+    to.x = m[0] * x + m[1] * y + m[2] * z;
+    to.y = m[4] * x + m[5] * y + m[6] * z;
+    to.z = m[8] * x + m[9] * y + m[10] * z;
 }
 
 void Matrix4::transformVector(Vec3 &to) {
-    float x = to.x - _41;
-    float y = to.y - _42;
-    float z = to.z - _43;
+    float x = to.x - m[12];
+    float y = to.y - m[13];
+    float z = to.z - m[14];
 
-    to.x = x * _11 + y * _12 + z * _13; 
-    to.y = x * _21 + y * _22 + z * _23; 
-    to.z = x * _31 + y * _32 + z * _33;
+    to.x = m[0] * x + m[1] * y + m[2] * z;
+    to.y = m[4] * x + m[5] * y + m[6] * z;
+    to.z = m[8] * x + m[9] * y + m[10] * z;
 }
 
 void Matrix4::rotate( const float &angle, Vec3 &axis )
@@ -52,61 +55,61 @@ void Matrix4::rotate( const float &angle, Vec3 &axis )
     float uy = axis.y;
     float uz = axis.z;
 
-    _11  = c + (1-c) * ux;
-    _12  = (1-c) * ux*uy + s*uz;
-    _13  = (1-c) * ux*uz - s*uy;
-    _14  = 0;
+    m[0]  = c + (1-c) * ux;
+    m[1]  = (1-c) * ux*uy + s*uz;
+    m[2]  = (1-c) * ux*uz - s*uy;
+    m[3]  = 0;
 
-    _21  = (1-c) * uy*ux - s*uz;
-    _22  = c + (1-c) * pow(uy,2);
-    _23  = (1-c) * uy*uz + s*ux;
-    _24  = 0;
+    m[4]  = (1-c) * uy*ux - s*uz;
+    m[5]  = c + (1-c) * pow(uy,2);
+    m[6]  = (1-c) * uy*uz + s*ux;
+    m[7]  = 0;
 
-    _31  = (1-c) * uz*ux + s*uy;
-    _32  = (1-c) * uz*uz - s*ux;
-    _33  = c + (1-c) * pow(uz,2);
-    _34  = 0;
+    m[8]  = (1-c) * uz*ux + s*uy;
+    m[9]  = (1-c) * uz*uz - s*ux;
+    m[10]  = c + (1-c) * pow(uz,2);
+    m[11]  = 0;
 
-    _41 = 0;
-    _42 = 0;
-    _43 = 0;
-    _44 = 1;
+    m[12] = 0;
+    m[13] = 0;
+    m[14] = 0;
+    m[15] = 1;
 }
 
 void Matrix4::rotateX(float degs) {
     Matrix4 rot;
     float rads = degs * DEGREES_TO_RADIANS;
-    rot._22 = cos(rads);
-    rot._23 = sin(rads);
-    rot._32 = -rot._23; // -sin
-    rot._33 = rot._22;  // cos
+    rot.m[5] = cos(rads);
+    rot.m[6] = sin(rads);
+    rot.m[7] = -rot.m[6]; // -sin
+    rot.m[10] = rot.m[5];  // cos
     multiply(rot);
 }
 
 void Matrix4::rotateY(float degs) {
     Matrix4 rot;
     float rads = degs * DEGREES_TO_RADIANS;
-    rot._11 = cos(rads);
-    rot._13 = -sin(rads);
-    rot._31 = -rot._13; // sin
-    rot._33 = rot._11;  // cos
+    rot.m[0] = cos(rads);
+    rot.m[2] = -sin(rads);
+    rot.m[8] = -rot.m[2]; // sin
+    rot.m[10] = rot.m[0];  // cos
     multiply(rot);
 }
 
 void Matrix4::rotateZ(float degs) {
     Matrix4 rot;
     float rads = degs * DEGREES_TO_RADIANS;
-    rot._11 = cos(rads);
-    rot._12 = sin(rads);
-    rot._21 = -rot._12; // -sin
-    rot._22 = rot._11;  // cos
+    rot.m[0] = cos(rads);
+    rot.m[1] = sin(rads);
+    rot.m[4] = -rot.m[1]; // -sin
+    rot.m[5] = rot.m[0];  // cos
     multiply(rot);
 }
 
 Matrix4 Matrix4::Multiply(const Matrix4 &am, const Matrix4 &bm) {
 
-    float *pA = (float *)&am._11;
-    float *pB = (float *)&bm._11;
+    float *pA = (float *)&am.m[0];
+    float *pB = (float *)&bm.m[0];
 
     float pM[16];
 
@@ -131,11 +134,11 @@ Matrix4 Matrix4::operator *(const Matrix4 &m)
 
 float *Matrix4::data()
 {
-    return &_11;
+    return m;
 }
 
 float & Matrix4::operator()(int row, int column) {
-    return ((float *) this)[row * 4 + column];
+    return m[row * 4 + column];
 }
 
 
@@ -264,3 +267,13 @@ void Matrix4::inverse(const Matrix4 &m)
 		}
 	}
 } // end MatrixInverse
+
+void Matrix4::print() {
+    int offset = 0;
+    for (int i=0; i<4; i++) {
+        offset = i << 2;
+        printf( "%0.2f %0.2f %0.2f %0.2f\n", 
+                m[offset+0], m[offset+1], m[offset+2], m[offset+3]);
+    }
+    printf("\n");
+}

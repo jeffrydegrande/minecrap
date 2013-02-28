@@ -16,6 +16,7 @@ class Player
 	Vec3 angle;
     Vec3 up;
     Vec3 right;
+    Matrix4 camera;
 
     World *world;
 
@@ -42,7 +43,7 @@ public:
     const Vec3 getDirection() const;
     const char *getDirectionAsString();
 
-    // Matrix4 & getCameraMatrix();
+    Matrix4 & getCameraMatrix();
     //const Vec3 & getCameraLookingAt();
 
 };

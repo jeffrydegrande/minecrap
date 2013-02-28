@@ -83,14 +83,14 @@ void Mesh::addCube(const Vec3 & pos) {
 }
 
 void Mesh::finish() {
-    printf( "%ld vertices added, %ld expected.\n", index, vertexCount );
+    printf( "%d vertices added, %d expected.\n", index, vertexCount );
     assert(index == vertexCount);
 
     glGenVertexArrays(1, &vao );
     glBindVertexArray(vao);
 
     glGenBuffers( 1, &vbo );
-    printf( "allocating %ld kb, %ld cubes\n", 
+    printf( "allocating %ld kb, %d cubes\n", 
             (vertexCount * sizeof(struct vertex_t)) / 1024, index / 36);
 
     // upload data into VBO

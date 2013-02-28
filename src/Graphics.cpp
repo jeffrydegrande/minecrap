@@ -54,8 +54,13 @@ void Graphics::compileShaders()
 {
     if (shader == NULL) {
         shader = new Shader();
+#ifdef _WIN32
         shader->addVertexShader("..\\shaders\\hello_world.vert");
         shader->addFragmentShader("..\\shaders\\hello_world.frag");
+#else
+        shader->addVertexShader("shaders/hello_world.vert");
+        shader->addFragmentShader("shaders/hello_world.frag");
+#endif
         shader->done();
     }
 }
@@ -78,11 +83,13 @@ void Graphics::initRenderer(int width, int height, int bits, bool fullscreen) {
 
     // TODO: this is probably a leak
     screen = SDL_SetVideoMode(width, height, bits, flags);
+#ifdef _WIN32
     GLenum error = glewInit();
     if (GLEW_OK != error) {
         fprintf(stderr, "Error: %s\n", glewGetErrorString(error));
         exit(1);
     }
+#endif
 
     displayOpenGLInfo();
 

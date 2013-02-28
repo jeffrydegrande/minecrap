@@ -7,12 +7,15 @@
 
 #ifdef _WIN32
 int PASCAL WinMain(HINSTANCE instance_in, HINSTANCE previous_instance, LPSTR command_line, int show_style)
+{
 #else
 int main(int argc, char **argv)
-#endif
 {
+    (void)argc;
+    (void)argv;
+#endif
     CVarUtils::CreateCVar("player.info", true, "Show player info");
-   CVarUtils::CreateCVar("player.jumpspeed", 5.0f, "Player jump speed");
+    CVarUtils::CreateCVar("player.jumpspeed", 5.0f, "Player jump speed");
     CVarUtils::CreateCVar("flying", false, "Player can fly?");
     CVarUtils::CreateCVar("seed", 300, "Game seed (changing requires restart)");
     printf( "Loading %s\n", CONFIG_FILE);

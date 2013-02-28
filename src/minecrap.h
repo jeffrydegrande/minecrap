@@ -10,8 +10,10 @@
 #define Minecrap_minecrap_h
 
 
+#ifdef _WIN32
 #define NO_SDL_GLEXT
 #include <GL/glew.h>
+#endif
 
 #define GL_GLEXT_PROTOTYPES
 
@@ -23,10 +25,13 @@
 #      include <windows.h>
 #      include <cstddef>
 #    endif
+
 #    include <GL/gl.h>
 #    include <GL/glu.h>
 #
-#    include <GL/wglext.h>
+#    ifdef _win32
+#      include <GL/wglext.h>
+#    endif
 #    include <GL/glext.h>
 #endif
 

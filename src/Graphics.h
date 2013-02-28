@@ -15,7 +15,6 @@
 
 class Shader;
 class Player;
-class SDL_Surface;
 class Graphics {
 
 	int width;

@@ -167,7 +167,10 @@ bool Graphics::withinFrustum(float x, float y, float z, float radius) {
     if ( point.y < cameraPosition.y - 4)
         return false;
 
-    return frustum.sphereInFrustum(point, radius);
+    if (Frustum::OUTSIDE != frustum.sphereInFrustum(point, radius))
+        return true;
+    else
+        return false;
 }
 
 void Graphics::setCameraFromPlayer(Player *player) {

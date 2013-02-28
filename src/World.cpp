@@ -61,8 +61,8 @@ void World::generateChunks(int count) {
  */
 Vec2 World::getSize() {
 	return Vec2(
-		chunks->numRows() << 4,
-		chunks->numColumns() << 4
+		(float)(chunks->numRows() << 4),
+		(float)(chunks->numColumns() << 4)
 		);
 }
 
@@ -86,10 +86,11 @@ Player * World::spawnPlayer() {
 
         // and translate the real world coordinates into chunk coordinates
         // y in 2d => z in 3d
-        Vec2 chunkCoordinates = Vec2(x % CHUNKX, y % CHUNKZ);
+        int chunkX = x % CHUNKX;
+        int chunkY = y % CHUNKZ;
 
         // find the ground level
-        ground = chunk->groundLevel(chunkCoordinates.x, chunkCoordinates.y);
+        ground = chunk->groundLevel(chunkX, chunkY);
     }
 
 	playerSpawnLocation.x = (float)x;
@@ -114,9 +115,9 @@ bool World::isGround(int x, int y, int z) {
 
     // get the chunk from the grid
     Chunk *chunk = chunks->get( x / CHUNKX, z / CHUNKZ);
-    Vec2 chunkCoordinates = Vec2(x % CHUNKX, z % CHUNKZ);
-
-    return chunk->isGround(chunkCoordinates.x, y, chunkCoordinates.y);
+    int chunkX = x % CHUNKX;
+    int chunkZ = z % CHUNKZ;
+    return chunk->isGround(chunkX, y, chunkZ);
 }
 
 void World::update() {

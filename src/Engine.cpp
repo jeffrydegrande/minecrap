@@ -36,7 +36,7 @@ void Engine::init() {
     }
 
     SDL_WM_SetCaption("Minecrap","");
-    graphics->initRenderer(800, 600, 32, FULLSCREEN);
+    graphics->initRenderer(1024, 768, 32, FULLSCREEN);
 
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -212,7 +212,8 @@ void Engine::renderPlayerPosition() {
     char s[96];
     Vec3 pos = player->getPosition();
 
-    sprintf(s, "loc: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
+  
+    snprintf(s, 96, "loc: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
     TextWrite(graphics->viewWidth() / 2 - 40, 26, s);
 }
 
@@ -220,14 +221,14 @@ void Engine::renderPlayerDirection() {
     char s[96];
     Vec3 angle = player->getDirection();
 
-    sprintf(s, "ang: %0.2f, %0.2f, %0.2f, facing %s\n",
+    snprintf(s, 96, "ang: %0.2f, %0.2f, %0.2f, facing %s\n",
             angle.x, angle.y, angle.z, player->getDirectionAsString());
     TextWrite(graphics->viewWidth() / 2 - 40, 39, s);
 }
 
 void Engine::renderRenderStats() {
     char s[96];
-    sprintf(s, "Blocks: %d\n", blocksRendered);
+    snprintf(s, 96, "Blocks: %d\n", blocksRendered);
     TextWrite(graphics->viewWidth() / 2 - 40, 52, s);
 }
 

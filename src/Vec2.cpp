@@ -10,6 +10,10 @@ Vec2::Vec2(float x, float y): x(x), y(y)
 {
 }
 
+Vec2::Vec2(int x, int y): x((float)x), y((float)y)
+{
+}
+
 Vec2 Vec2::operator+(const Vec2 &vector) {
 	return Vec2(x + vector.x, y + vector.y);
 }

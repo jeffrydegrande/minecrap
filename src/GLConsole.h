@@ -1730,7 +1730,7 @@ inline bool GLConsole::Help(std::vector<std::string> *vArgs)
                 else
                     PrintHelp( "%s", CVarUtils::GetHelp( vArgs->at(i) ).c_str() );
             }
-            catch( CVarUtils::CVarException e ) {
+            catch( CVarUtils::CVarException) {
                 PrintHelp( "Unknown variable %s.", vArgs->at(i).c_str() );
                 return false;
             }

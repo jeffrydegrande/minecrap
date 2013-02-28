@@ -88,7 +88,7 @@ void Player::render() {
 }
 
 void Player::look(int x, int y) {
-    float mouse_sense = 0.3;
+    float mouse_sense = 0.3f;
 
     // avoid getting the very first update throwing
     // the player completely off
@@ -159,7 +159,7 @@ void Player::update()
         velocity   -= GRAVITY * elapsed;
         position.y += velocity * elapsed;
 
-        if (position.y < 0 || world->isGround(position.x, (int)position.y - 1, position.z)) {
+        if (position.y < 0 || world->isGround((int)position.x, (int)position.y - 1, (int)position.z)) {
             position.y = ground;
             velocity = 0.0f;
             onGround = true;

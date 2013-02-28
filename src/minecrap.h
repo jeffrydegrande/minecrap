@@ -47,9 +47,12 @@
 #include <CVars/CVar.h>
 #include "Console.h"
 
+#include <cstdio>
+
 
 #ifdef _WIN32
 #define sleep(N)  Sleep(N)
+#define snprintf   _snprintf_s
 #else
 #include <unistd.h>
 #define sleep(N)   usleep(N * 1000)

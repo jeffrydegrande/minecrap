@@ -189,7 +189,9 @@ bool Chunk::isExposedToAir(int x, int y, int z) {
 
 inline Vec3 Chunk::inWorld(int x, int y, int z)
 {
-    return Vec3((this->worldX << 4) + x, y, (this->worldZ << 4) + z);
+
+
+    return Vec3((float)((this->worldX << 4) + x), (float)y, (float)((this->worldZ << 4) + z));
 }
 
 void Chunk::buildMesh() {

@@ -193,7 +193,7 @@ inline Vec3 Chunk::inWorld(int x, int y, int z)
 }
 
 void Chunk::buildMesh() {
-	ssize_t vertexCount = 0;
+	int vertexCount = 0;
 
     // calculate the number of vertices need
     foreach_xyz {

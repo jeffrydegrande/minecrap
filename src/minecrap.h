@@ -10,17 +10,23 @@
 #define Minecrap_minecrap_h
 
 
+#define NO_SDL_GLEXT
+#include <GL/glew.h>
+
 #define GL_GLEXT_PROTOTYPES
 
 #ifdef HAVE_APPLE_OPENGL_FRAMEWORK
 #    include <OpenGL/gl.h>
 #    include <OpenGL/glu.h>
 #else
-#    ifdef WIN32
+#    ifdef _WIN32
 #      include <windows.h>
+#      include <cstddef>
 #    endif
 #    include <GL/gl.h>
 #    include <GL/glu.h>
+#
+#    include <GL/wglext.h>
 #    include <GL/glext.h>
 #endif
 

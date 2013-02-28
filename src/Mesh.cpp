@@ -55,7 +55,7 @@ const Vec3 normsArray[] =
 #include <cstdio>
 #include <cstdlib>
 
-Mesh::Mesh(ssize_t count): index(0), vertexCount(count) {
+Mesh::Mesh(int count): index(0), vertexCount(count) {
     vertices = new struct vertex_t[count];
 }
 

@@ -11,9 +11,6 @@ int PASCAL WinMain(HINSTANCE instance_in, HINSTANCE previous_instance, LPSTR com
 int main(int argc, char **argv)
 #endif
 {
-    (void)argc;
-    (void)argv;
-
     CVarUtils::CreateCVar("player.info", true, "Show player info");
    CVarUtils::CreateCVar("player.jumpspeed", 5.0f, "Player jump speed");
     CVarUtils::CreateCVar("flying", false, "Player can fly?");

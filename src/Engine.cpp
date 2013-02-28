@@ -211,7 +211,8 @@ void Engine::renderFPS() {
 void Engine::renderPlayerPosition() {
     char s[96];
     Vec3 pos = player->getPosition();
-    snprintf(s, 95, "loc: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
+
+    sprintf(s, "loc: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
     TextWrite(graphics->viewWidth() / 2 - 40, 26, s);
 }
 
@@ -219,14 +220,14 @@ void Engine::renderPlayerDirection() {
     char s[96];
     Vec3 angle = player->getDirection();
 
-    snprintf(s, 95, "ang: %0.2f, %0.2f, %0.2f, facing %s\n",
+    sprintf(s, "ang: %0.2f, %0.2f, %0.2f, facing %s\n",
             angle.x, angle.y, angle.z, player->getDirectionAsString());
     TextWrite(graphics->viewWidth() / 2 - 40, 39, s);
 }
 
 void Engine::renderRenderStats() {
     char s[96];
-    snprintf(s, 95, "Blocks: %d\n", blocksRendered);
+    sprintf(s, "Blocks: %d\n", blocksRendered);
     TextWrite(graphics->viewWidth() / 2 - 40, 52, s);
 }
 

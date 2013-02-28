@@ -175,3 +175,7 @@ cvars.xml
 .glconsole_settings
 .cvar_history
 user.cfg
+
+
+# vendored stuff
+vendor/glew-1.9.0/

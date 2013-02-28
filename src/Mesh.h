@@ -1,6 +1,11 @@
 #ifndef MINECRAP_MESH_H
 #define MINECRAP_MESH_H
 
+#include "minecrap.h"
+
+#include <cstddef>
+#include <cstdlib>
+
 struct vertex_t {
     float x, y, z, w;     //position
           ///nx, ny, nz, nw;  //normal
@@ -9,8 +14,8 @@ struct vertex_t {
 
 class Vec3;
 class Mesh {
-    ssize_t index;
-    ssize_t vertexCount;
+    int index;
+    int vertexCount;
 
     unsigned int vbo;
     unsigned int vao;
@@ -18,7 +23,7 @@ class Mesh {
     vertex_t* vertices;
 
     public:
-        Mesh(ssize_t count); // number of vertices
+        Mesh(int count); // number of vertices
         ~Mesh();
 
         void addCube(const Vec3 & pos);

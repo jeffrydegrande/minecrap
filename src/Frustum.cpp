@@ -10,12 +10,12 @@ Frustum::~Frustum() {}
 #define m(row,col)  m[col*4+row-5]
 
 void Frustum::setFrustum(float *m) {
-    planes[NEAR].setCoefficients(
+    planes[ZNEAR].setCoefficients(
                  m(3,1) + m(4,1),
                  m(3,2) + m(4,2),
                  m(3,3) + m(4,3),
                  m(3,4) + m(4,4));
-    planes[FAR].setCoefficients(
+    planes[ZFAR].setCoefficients(
                 -m(3,1) + m(4,1),
                 -m(3,2) + m(4,2),
                 -m(3,3) + m(4,3),

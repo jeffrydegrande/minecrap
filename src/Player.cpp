@@ -129,7 +129,7 @@ void Player::look(int x, int y) {
 
 void Player::update()
 {
-    float elapsed = std::min(Engine::elapsedSeconds(), 0.25f);
+    float elapsed = (std::min)(Engine::elapsedSeconds(), 0.25f);
     bool flying = CVarUtils::GetCVar<bool>("flying");
 
     // update movement

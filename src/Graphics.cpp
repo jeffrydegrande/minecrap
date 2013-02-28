@@ -1,3 +1,4 @@
+
 #include "Graphics.h"
 #include "minecrap.h"
 #include "Player.h"
@@ -6,6 +7,7 @@
 
 #include <cassert>
 #include <cmath>
+
 
 #define ASSERT_NO_GL_ERROR assert(GL_NO_ERROR == glGetError())
 
@@ -21,6 +23,7 @@ static void displayOpenGLInfo() {
 
 void Graphics::Init() {
     graphics = new Graphics();
+
 }
 
 void Graphics::Cleanup() {
@@ -51,8 +54,8 @@ void Graphics::compileShaders()
 {
     if (shader == NULL) {
         shader = new Shader();
-        shader->addVertexShader("shaders/hello_world.vert");
-        shader->addFragmentShader("shaders/hello_world.frag");
+        shader->addVertexShader("..\\shaders\\hello_world.vert");
+        shader->addFragmentShader("..\\shaders\\hello_world.frag");
         shader->done();
     }
 }
@@ -75,6 +78,11 @@ void Graphics::initRenderer(int width, int height, int bits, bool fullscreen) {
 
     // TODO: this is probably a leak
     screen = SDL_SetVideoMode(width, height, bits, flags);
+    GLenum error = glewInit();
+    if (GLEW_OK != error) {
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(error));
+        exit(1);
+    }
 
     displayOpenGLInfo();
 

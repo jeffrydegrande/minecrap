@@ -43,12 +43,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\SDK\freeglut\include;C:\SDK\SDL\include;C:\SDK\glconsole;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\vendor\include\;C:\SDK\SDL\include;C:\SDK\glconsole;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sdl.lib;%(AdditionalDependencies);opengl32.lib;glu32.lib;SDL.lib;SDLmain.lib;CVars.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\SDK\glconsole\CVars\Debug;C:\SDK\freeglut\lib\;C:\SDK\SDL\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sdl.lib;%(AdditionalDependencies);opengl32.lib;glu32.lib;glew32.lib;SDL.lib;SDLmain.lib;CVars.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\..\vendor\lib\win32;C:\SDK\glconsole\CVars\Debug;C:\SDK\SDL\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -65,8 +65,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AABox.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="File.cpp" />
+    <ClCompile Include="Frustum.cpp" />
+    <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Matrix.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="Color.cpp" />
@@ -75,13 +83,26 @@
     <ClCompile Include="Engine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AABox.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="Console.h" />
+    <ClInclude Include="File.h" />
+    <ClInclude Include="Frustum.h" />
+    <ClInclude Include="GLColor.h" />
+    <ClInclude Include="GLConsole.h" />
+    <ClInclude Include="GLConsoleFunction.h" />
+    <ClInclude Include="Graphics.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="Matrix.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Crosshair.h" />
     <ClInclude Include="Grid.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="Text.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="minecrap.h" />
     <ClInclude Include="Engine.h" />
@@ -92,13 +113,17 @@
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\shaders\hello_world.frag" />
+    <None Include="..\shaders\hello_world.vert" />
     <None Include="Color.m" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="simplex.cpp" />
     <ClCompile Include="Sun.cpp" />
+    <ClCompile Include="Text.cpp" />
     <ClCompile Include="Vec2.cpp" />
     <ClCompile Include="Vec3.cpp" />
     <ClCompile Include="World.cpp">
-      <FileType>Document</FileType>
+      <FileType>CppCode</FileType>
     </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -5,18 +5,17 @@
 #include "Plane.h"
 
 class Frustum {
-
     enum {
         TOP = 0,
         BOTTOM,
         LEFT,
         RIGHT,
-        NEAR,
-        FAR
+        ZNEAR,
+        ZFAR
     };
 
     Vec3 ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;
-    float angle, ratio, near, far, tang;
+    float angle, ratio, znear, zfar, tang;
     float nearWidth, nearHeight, farWidth, farHeight;
 
     Plane planes[6];

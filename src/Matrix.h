@@ -20,6 +20,8 @@ class Matrix4 {
 
         static Matrix4 Multiply(const Matrix4 &am, const Matrix4 &bm);
 	    Matrix4 operator *(const Matrix4 &m);
+        Vec4 operator *(const Vec4 &m);
+
         void multiply(const Matrix4 &);
 
 
@@ -35,6 +37,19 @@ class Matrix4 {
         float *value_ptr();
 
         void print();
+};
+
+class Matrix3 {
+    float m[9];
+
+    public:
+        Matrix3();
+        Matrix3(float v[9]);
+        Matrix3(Matrix4 &m);
+
+        void identity();
+
+        float *value_ptr();
 };
 
 #endif

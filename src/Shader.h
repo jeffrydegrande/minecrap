@@ -4,11 +4,16 @@
 #include "minecrap.h"
 #include <vector>
 #include "Matrix.h"
+#include "Vec.h"
 
 class Shader {
     GLuint program;
+
     GLint perspectiveMatrixUniform;
     GLint cameraMatrixUniform;
+    GLint directionToLight;
+    GLint normalModelToCameraMatrix;
+
     std::vector<GLuint> shaders;
 
     public:
@@ -20,6 +25,8 @@ class Shader {
 
         void setPerspectiveMatrix(Matrix4 &m);
         void setCameraMatrix(Matrix4 &m);
+        void setDirectionToLight(Vec4 &v);
+        void setNormalToCameraMatrix(Matrix3 &m);
 
         void use();
         void dontUse();

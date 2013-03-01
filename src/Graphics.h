@@ -10,9 +10,6 @@
 #define FOV              45
 
 
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
-
 class Shader;
 class Player;
 class Graphics {

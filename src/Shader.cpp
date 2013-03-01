@@ -7,34 +7,33 @@
 Shader::Shader():
     program(0),
     perspectiveMatrixUniform(-1),
-    cameraMatrixUniform(-1)
+    cameraMatrixUniform(-1),
+    directionToLight(-1)
 {
 
 }
 
 void Shader::setCameraMatrix(Matrix4 &m) {
-    assert (program != 0);
-
-    if (cameraMatrixUniform == -1) {
-        cameraMatrixUniform = glGetUniformLocation(program, "cameraMatrix");
-    }
-    assert(cameraMatrixUniform != -1);
-
     use();
     glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, m.value_ptr());
     dontUse();
 }
 
 void Shader::setPerspectiveMatrix(Matrix4 &m) {
-    assert (program != 0);
-
-    if (perspectiveMatrixUniform == -1) {
-        perspectiveMatrixUniform = glGetUniformLocation(program, "perspectiveMatrix");
-    }
-    assert(perspectiveMatrixUniform != -1);
-
     use();
     glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, m.value_ptr());
+    dontUse();
+}
+
+void Shader::setDirectionToLight(Vec4 &v) {
+    use();
+    glUniform3fv(directionToLight, 1, (GLfloat *)v.value_ptr());
+    dontUse();
+}
+
+void Shader::setNormalToCameraMatrix(Matrix3 &m) {
+    use();
+    glUniformMatrix3fv(normalModelToCameraMatrix, 1, GL_FALSE, m.value_ptr());
     dontUse();
 }
 
@@ -47,6 +46,7 @@ void Shader::dontUse() {
 }
 
 void Shader::done() {
+
     program = glCreateProgram();
     for (std::vector<GLuint>::iterator it = shaders.begin();
                                        it != shaders.end(); it++)
@@ -55,6 +55,11 @@ void Shader::done() {
     }
 
    glLinkProgram(program);
+
+   perspectiveMatrixUniform  = glGetUniformLocation(program, "perspectiveMatrix");
+   cameraMatrixUniform       = glGetUniformLocation(program, "cameraMatrix");
+   directionToLight          = glGetUniformLocation(program, "directToLight");
+   normalModelToCameraMatrix = glGetUniformLocation(program, "normalModelToCameraMatrix");
 }
 
 

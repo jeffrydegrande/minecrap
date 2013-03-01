@@ -1,5 +1,10 @@
 #version 330
 
-void main() {
-  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+smooth in vec4 interpColor;
+
+out vec4 outputColor;
+
+void main()
+{
+    outputColor = interpColor;
 }

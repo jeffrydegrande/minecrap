@@ -96,6 +96,8 @@ public:
     void set(float x, float y, float z, float w);
 
 	float length() const;
+
+    float *value_ptr();
 };
 
 #endif

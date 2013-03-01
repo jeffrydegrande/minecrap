@@ -1,6 +1,10 @@
 #include "Vec.h"
 #include <math.h>
 
+/////////////////////////////////////////////////////////////////
+/// Vec2 Implementation
+/////////////////////////////////////////////////////////////////
+
 Vec2::Vec2(): x(0), y(0)
 {
 }
@@ -52,6 +56,9 @@ Vec2 Vec2::normalize(const Vec2 &v) {
 	return result;
 }
 
+/////////////////////////////////////////////////////////////////
+/// Vec3 Implementation
+/////////////////////////////////////////////////////////////////
 
 Vec3::Vec3(): x(0), y(0), z(0)
 {
@@ -167,13 +174,12 @@ void Vec3::copy(const Vec3 &v) {
 }
 
 
-Vec4::Vec4(): x(0), y(0), z(0), w(0)
-{
-}
+/////////////////////////////////////////////////////////////////
+// Vec4 Implementation
+/////////////////////////////////////////////////////////////////
 
-Vec4::Vec4(float x, float y, float z, float w): x(x), y(y), z(z), w(w)
-{
-}
+Vec4::Vec4(): x(0), y(0), z(0), w(0) { }
+Vec4::Vec4(float x, float y, float z, float w): x(x), y(y), z(z), w(w) { }
 
 Vec4::Vec4(const Vec4 &v) {
     x = v.x;
@@ -289,4 +295,8 @@ void Vec4::copy(const Vec4 &v) {
     y = v.y;
     z = v.z;
     w = v.w;
+}
+
+float * Vec4::value_ptr() {
+    return &x;
 }

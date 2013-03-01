@@ -2,6 +2,50 @@
 #include "Matrix.h"
 #include <cmath>
 
+/////////////////////////////////////////////////////////////////
+/// Matrix3 implementation
+/////////////////////////////////////////////////////////////////
+
+Matrix3::Matrix3() {
+    identity();
+}
+
+
+Matrix3::Matrix3(float v[9]) {
+    memcpy(&m, v, sizeof(float) * 9);
+}
+
+Matrix3::Matrix3(Matrix4 &matrix)
+{
+    float *p = matrix.value_ptr();
+
+    m[0] = p[0];
+    m[1] = p[1];
+    m[2] = p[2];
+
+    m[3] = p[4];
+    m[4] = p[5];
+    m[5] = p[6];
+
+    m[6] = p[8];
+    m[7] = p[9];
+    m[8] = p[10];
+}
+
+void Matrix3::identity() {
+    memset(&m, 0, sizeof(float) * 9);
+    m[0] = m[4] = m[9] = 1.0f;
+}
+
+float * Matrix3::value_ptr()
+{
+    return m;
+}
+
+/////////////////////////////////////////////////////////////////
+/// Matrix4 implementation
+/////////////////////////////////////////////////////////////////
+
 Matrix4::Matrix4()
 {
     loadIdentity();
@@ -107,7 +151,6 @@ void Matrix4::rotateZ(float degs) {
 }
 
 Matrix4 Matrix4::Multiply(const Matrix4 &am, const Matrix4 &bm) {
-
     float *pA = (float *)&am.m[0];
     float *pB = (float *)&bm.m[0];
 
@@ -131,6 +174,15 @@ Matrix4 Matrix4::operator *(const Matrix4 &m)
     return Multiply(*this, m);
 }
 
+Vec4 Matrix4::operator *(const Vec4 &v)
+{
+    Vec4 result;
+    result.x = m[0] * v.x + m[4] + v.y * m[8]  + v.z * m[12] + v.w;
+    result.y = m[1] * v.x + m[5] + v.y * m[9]  + v.z * m[13] + v.w;
+    result.z = m[2] * v.x + m[6] + v.y * m[10] + v.z * m[14] + v.w;
+    result.w = m[3] * v.x + m[7] + v.y * m[10] + v.z * m[15] + v.w;
+    return result;
+}
 
 float *Matrix4::value_ptr()
 {
@@ -277,3 +329,4 @@ void Matrix4::print() {
     }
     printf("\n");
 }
+

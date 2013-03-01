@@ -34,9 +34,6 @@ void Crosshair::render() {
 
 void Crosshair::draw() {
     glLineWidth(2.0f);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, white);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, white);
-
     glBegin(GL_LINES);
     glVertex2f(this->centerX - 8.0f, this->centerY);
     glVertex2f(this->centerX - 2.0f, this->centerY);

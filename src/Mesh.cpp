@@ -5,6 +5,8 @@
 #include "Color.h"
 #include <cassert>
 
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+
 // data used to construct a 1x1 cube used by addCube
 const Vec3 cubeVerts[] =
 {
@@ -68,16 +70,21 @@ void Mesh::addCube(const Vec3 & pos) {
     assert( index <= vertexCount );
 
     for (int i=0; i<36; i++) {
+        // position
         vertices[index].x  = pos.x + verts[i].x;
         vertices[index].y  = pos.y + verts[i].y;
         vertices[index].z  = pos.z + verts[i].z;
-        vertices[index].w  = 1.0f;
-        /*
+
+        // color
+        vertices[index].r  = 0.0f;
+        vertices[index].g  = 1.0f;
+        vertices[index].b  = 0.0f;
+        vertices[index].a  = 1.0f;
+
+        // normals
         vertices[index].nx = normsArray[i].x;
         vertices[index].ny = normsArray[i].y;
         vertices[index].nz = normsArray[i].z;
-        vertices[index].nw  = 1.0f;
-        */
         index++;
     }
 }
@@ -95,6 +102,7 @@ void Mesh::finish() {
 
     // upload data into VBO
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    printf("number of vertices:%d, sizeof vertices: %ld\n", vertexCount, sizeof(struct vertex_t));
     glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(struct vertex_t),
             vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -107,12 +115,18 @@ void Mesh::finish() {
 void Mesh::render() {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glEnableVertexAttribArray(0); // vertices
-    // glEnableVertexAttribArray(1); // normals
+    glEnableVertexAttribArray(1); // colors
+    glEnableVertexAttribArray(2); // normals
 
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-    // glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(16));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), 
+            (GLvoid*)offsetof(struct vertex_t, x));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), 
+            (GLvoid*)offsetof(struct vertex_t, r));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), 
+            (GLvoid*)offsetof(struct vertex_t, nx));
 
-    glDrawArrays( GL_TRIANGLES, 0, vertexCount);
+    glDrawArrays(GL_TRIANGLES, 0, vertexCount);
     glDisableVertexAttribArray(0);
-    // glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
 }

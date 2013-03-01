@@ -125,7 +125,7 @@ void World::update() {
 int World::render() {
 	int blocksRendered = 0;
 	blocksRendered += renderTerrain();
-	blocksRendered += sun->render();
+	// blocksRendered += sun->render();
 	return blocksRendered;
 }
 

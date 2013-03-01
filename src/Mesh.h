@@ -7,8 +7,9 @@
 #include <cstdlib>
 
 struct vertex_t {
-    float x, y, z, w;     //position
-          ///nx, ny, nz, nw;  //normal
+    float x, y, z,     // position
+          r, g, b, a,  // color
+          nx, ny, nz;  // normal
 };
 
 

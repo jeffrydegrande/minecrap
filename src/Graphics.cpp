@@ -186,37 +186,24 @@ void Graphics::setCameraFromPlayer(Player *player) {
 }
 
 void Graphics::begin3D() {
+
     ASSERT_NO_GL_ERROR;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
+
+    Matrix4 M = Matrix4::load(GL_MODELVIEW_MATRIX);
+
+    Vec4 lightDirection(0.0f, 100.0f, 0.0f, 0.0f);
+    Vec4 lightDirectionCameraSpace = M * lightDirection;
+    shader->setDirectionToLight(lightDirectionCameraSpace);
+
+    Matrix3 NM(M);
+    shader->setNormalToCameraMatrix(NM);
+
     shader->use();
-
-    GLfloat lightPosition[] = {0.0f, 100.0f, 0.0f, 0.0f};
-    GLfloat light_diffuse[]  = { 0.8f, 0.8f, 0.8f, 1.0f};
-    //GLfloat light_specular[] = { 0.5f, 0.5f, 0.5f, 1.0f};
-    GLfloat light_full_on[]  = {1.0f, 1.0f, 1.0f, 1.0f};
-    GLfloat white[]    = {1.0f, 1.0f, 1.0f, 1.0f};
-
-    glDepthFunc (GL_LEQUAL);
-    glEnable(GL_DEPTH_TEST);
-    glShadeModel(GL_SMOOTH);
-
-    if (renderWithLights) {
-        glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
-
-        glLightfv(GL_LIGHT0, GL_AMBIENT, white);
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, light_full_on);
-        glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-    } else {
-        glDisable(GL_LIGHTING);
-        glDisable(GL_LIGHT0);
-    }
-
 
     if (renderAsWireframe) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -224,10 +211,12 @@ void Graphics::begin3D() {
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     }
 
+    glDepthFunc (GL_LEQUAL);
+    glEnable(GL_DEPTH_TEST);
+    glShadeModel(GL_SMOOTH);
     glEnable (GL_CULL_FACE);
     glCullFace (GL_BACK);
     glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
-    ASSERT_NO_GL_ERROR;
 }
 
 void Graphics::end3D() {
@@ -258,7 +247,6 @@ void Graphics::end2D() {
 
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
-
 }
 
 void Graphics::flush() {

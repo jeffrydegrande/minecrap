@@ -181,6 +181,7 @@ void Engine::render() {
     graphics->end3D();
 
     // 2D stuff
+    /*
     graphics->begin2D();
     crosshair->render();
     this->renderFPS();
@@ -190,6 +191,7 @@ void Engine::render() {
     graphics->end2D();
 
     ConsoleRender();
+    */
 
     graphics->flush();
 

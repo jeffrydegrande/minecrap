@@ -38,7 +38,6 @@ void OSD::write(const char *fmt, ...)
     va_start(ap, fmt);
     vsprintf(text, fmt, ap);
     va_end(ap);
-
     TextWrite(this->width / 2 - 40, currentLine * 13, text);
     currentLine++;
 }

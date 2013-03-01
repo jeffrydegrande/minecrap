@@ -56,12 +56,13 @@ Engine::~Engine() {
 void Engine::init() {
     int flags;
 
+
     if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_JOYSTICK) != 0) {
         return;
     }
 
-    width  = WINDOW_WIDTH;
-    height = WINDOW_HEIGHT;
+    this->width  = WINDOW_WIDTH;
+    this->height = WINDOW_HEIGHT;
 
     flags = SDL_OPENGL;
     if (FULLSCREEN)
@@ -87,19 +88,16 @@ void Engine::init() {
     resizeWindow(width, height);
 
     SDL_WM_SetCaption("Minecrap","");
-
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_EnableUNICODE(1);
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+    SDL_ShowCursor (false);
 
     for (int i = 0; i < SDL_NumJoysticks(); i++) {
         SDL_JoystickEventState(SDL_ENABLE);
         SDL_JoystickOpen(i);
     }
-
-    SDL_ShowCursor (false);
-
 
     world = new World(CVarUtils::GetCVar<int>("seed"));
     player = world->spawnPlayer();
@@ -107,11 +105,11 @@ void Engine::init() {
 }
 
 void Engine::resizeWindow(int width, int height) {
+
     this->width  = width;
     this->height = height;
 
     printf( "Setting window size to %d by %d\n", width, height );
-
     glMatrixMode(GL_PROJECTION);
 
     setupProjectionMatrix();
@@ -303,6 +301,22 @@ void Engine::render() {
     glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    render2D();
+    render3D();
+
+    flush();
+
+	GLenum error;
+
+	while (GL_NO_ERROR != (error=glGetError())) {
+		std::string s = reinterpret_cast<const char *>(gluErrorString(error));
+		printf( "Error: %s\n", s.c_str());
+        exit(1);
+	}
+}
+
+void Engine::render3D() {
+    ASSERT_NO_GL_ERROR;
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
@@ -315,8 +329,8 @@ void Engine::render() {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc (GL_LEQUAL);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     glEnable (GL_CULL_FACE);
     glCullFace (GL_BACK);
     glShadeModel(GL_SMOOTH);
@@ -325,10 +339,9 @@ void Engine::render() {
 
     Vec4 lightDirection(0.0f, 100.0f, 0.0f, 0.0f);
     Vec4 lightDirectionCameraSpace = M * lightDirection;
+    Matrix3 NM(M);
 
     shader->setDirectionToLight(lightDirectionCameraSpace);
-
-    Matrix3 NM(M);
     shader->setNormalToCameraMatrix(NM);
     shader->use();
 
@@ -340,10 +353,12 @@ void Engine::render() {
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
     shader->dontUse();
-
     ASSERT_NO_GL_ERROR;
+}
 
+void Engine::render2D() {
     // render 2D stuff
+    ASSERT_NO_GL_ERROR;
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -357,7 +372,6 @@ void Engine::render() {
 
     crosshair->render();
     renderOnScreenDisplay();
-
     ConsoleRender();
 
     glPopMatrix();
@@ -365,28 +379,18 @@ void Engine::render() {
 
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
-
-    flush();
-
-	GLenum error;
-
-	while (GL_NO_ERROR != (error=glGetError())) {
-		std::string s = reinterpret_cast<const char *>(gluErrorString(error));
-		printf( "Error: %s\n", s.c_str());
-        exit(1);
-	}
+    ASSERT_NO_GL_ERROR;
 }
 
 void Engine::renderOnScreenDisplay() {
     Vec3 pos   = player->getPosition();
     Vec3 angle = player->getDirection();
 
-    osd->write("FPS: %d\n", fps_current);
+    osd->write("FPS: %d", fps_current);
     osd->write("Loc: %0.2f, %0.2f, %0.2f",
                 pos.x, pos.y, pos.z);
-    osd->write("Ang: %0.2f, %0.2f, %0.2f, facing %s\n",
+    osd->write("Ang: %0.2f, %0.2f, %0.2f, facing %s",
                 angle.x, angle.y, angle.z, player->getDirectionAsString());
-    osd->write("Blocks: %d\n", blocksRendered);
 
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {

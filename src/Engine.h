@@ -30,7 +30,6 @@ class Engine
 	World *world;
 	Player *player;
 	Crosshair *crosshair;
-    int blocksRendered;
 
     Shader *shader;
 
@@ -74,6 +73,8 @@ private:
 	void stop();
 
 	void render();
+    void render3D();
+    void render2D();
     void renderOnScreenDisplay();
 };
 

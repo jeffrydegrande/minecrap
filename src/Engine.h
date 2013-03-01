@@ -20,8 +20,6 @@ class Engine
 	int width;
 	int height;
 
-	// SDL_Surface* screen;
-
     Vec3 cameraPosition;
     Vec3 cameraDirection;
 

@@ -7,7 +7,7 @@
 //
 
 #include "minecrap.h"
-#include "Vec3.h"
+#include "Vec.h"
 
 #define CHUNKX 16
 #define CHUNKY 128

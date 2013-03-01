@@ -1,7 +1,7 @@
 #include "minecrap.h"
 #include "Graphics.h"
 #include "Mesh.h"
-#include "Vec3.h"
+#include "Vec.h"
 #include "Color.h"
 #include <cassert>
 

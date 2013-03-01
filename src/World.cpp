@@ -18,7 +18,7 @@
 #include "Console.h"
 #include "Player.h"
 
-#include "Vec2.h"
+#include "Vec.h"
 
 #define INITIAL_WORLD_SIZE 4
 

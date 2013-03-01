@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Block.h"
 #include "Shader.h"
+#include "Vec.h"
 
 #include <cassert>
 #include <cmath>

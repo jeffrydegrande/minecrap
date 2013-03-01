@@ -5,7 +5,7 @@
 #include "World.h"
 #include "Text.h"
 
-#include "Vec2.h"
+#include "Vec.h"
 #include <math.h>
 #include <CVars/CVar.h>
 

@@ -1,7 +1,7 @@
 #ifndef MINECRAP_PLANE_H
 #define MINECRAP_PLANE_H
 
-#include "Vec3.h"
+#include "Vec.h"
 
 class Plane {
     Vec3 normal, point;

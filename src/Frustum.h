@@ -1,7 +1,7 @@
 #ifndef MINECRAP_FRUSTUM_H
 #define MINECRAP_FRUSTUM_H
 
-#include "Vec3.h"
+#include "Vec.h"
 #include "Plane.h"
 
 class Frustum {

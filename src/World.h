@@ -9,7 +9,7 @@
 #include "minecrap.h"
 #include "Chunk.h"
 #include "Grid.h"
-#include "Vec3.h"
+#include "Vec.h"
 
 class Sun;
 class Vec2;

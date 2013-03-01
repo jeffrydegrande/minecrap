@@ -3,7 +3,7 @@
 
 #include "minecrap.h"
 #include "Matrix.h"
-#include "Vec3.h"
+#include "Vec.h"
 
 class World;
 class Crosshair;

@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
 //
 
-#include "Vec3.h"
+#include "Vec.h"
 #include "Matrix.h"
 
 class World;

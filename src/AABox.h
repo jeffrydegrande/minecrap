@@ -1,7 +1,7 @@
 #ifndef MINECRAP_AABOX_H
 #define MINECRAP_AABOX_H
 
-#include "Vec3.h"
+#include "Vec.h"
 
 class AABox {
     Vec3 corner;

@@ -1,7 +1,7 @@
 #ifndef MINECRAP_GRAPHICS_H
 #define MINECRAP_GRAPHICS_H
 
-#include "Vec3.h"
+#include "Vec.h"
 #include "Matrix.h"
 #include "Frustum.h"
 

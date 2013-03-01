@@ -2,7 +2,7 @@
 #define MINECRAP_MATRIX_H
 
 #include "minecrap.h"
-#include "Vec3.h"
+#include "Vec.h"
 
 class Plane;
 class Matrix4 {

@@ -1,5 +1,4 @@
 #include "Sun.h"
-#include "Block.h"
 #include "Color.h"
 #include <assert.h>
 
@@ -21,12 +20,9 @@ int Sun::render() {
 }
 
 void Sun::draw() {
-    glMaterialfv(GL_FRONT, GL_AMBIENT, dyellow);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
-    glMaterialfv(GL_FRONT, GL_EMISSION, yellow);
     glPushMatrix();
+    glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(0, 300, 0);
-	Block::draw(8.0f);
+	// Block::draw(8.0f);
     glPopMatrix();
-    glMaterialfv(GL_FRONT, GL_EMISSION, black);
 }

@@ -14,7 +14,6 @@
 #include "World.h"
 #include "Color.h"
 #include "Sun.h"
-#include "Block.h"
 #include "Console.h"
 #include "Player.h"
 
@@ -39,7 +38,7 @@ void World::init(int seed) {
 	srand(seed);
 	this->seed = rand() % 65336;
 
-	Block::setup();
+	// Block::setup();
 	sun = new Sun();
 	this->generateChunks(INITIAL_WORLD_SIZE);
 }

@@ -7,7 +7,6 @@
 //
 
 #include "minecrap.h"
-#include "Block.h"
 #include "Color.h"
 #include "Chunk.h"
 #include "Vec.h"
@@ -219,6 +218,7 @@ int Chunk::render() {
 	return 1;
 }
 
+#if 0
 int Chunk::renderBlock(int x, int y, int z) {
 
     int ret = 0;
@@ -237,5 +237,6 @@ int Chunk::renderBlock(int x, int y, int z) {
     glPopMatrix();
     return ret;
 }
+#endif
 
 #undef B

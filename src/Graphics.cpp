@@ -1,14 +1,11 @@
-
 #include "Graphics.h"
 #include "minecrap.h"
 #include "Player.h"
-#include "Block.h"
 #include "Shader.h"
 #include "Vec.h"
 
 #include <cassert>
 #include <cmath>
-
 
 #define ASSERT_NO_GL_ERROR assert(GL_NO_ERROR == glGetError())
 

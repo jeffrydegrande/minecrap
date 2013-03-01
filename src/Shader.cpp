@@ -1,7 +1,6 @@
 #include "Shader.h"
 #include "File.h"
 #include "Matrix.h"
-#include "Graphics.h"
 #include <cassert>
 
 Shader::Shader():

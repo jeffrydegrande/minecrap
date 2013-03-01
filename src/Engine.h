@@ -4,10 +4,12 @@
 #include "minecrap.h"
 #include "Matrix.h"
 #include "Vec.h"
+#include "Frustum.h"
 
 class World;
 class Crosshair;
 class Player;
+class Shader;
 class Engine
 {
 	int center_x;
@@ -15,6 +17,15 @@ class Engine
 	long last_update;
 	long elapsed;
 	unsigned int fps_current; //the current FPS.
+	int width;
+	int height;
+
+	// SDL_Surface* screen;
+
+    Vec3 cameraPosition;
+    Vec3 cameraDirection;
+
+    Frustum frustum;
 
 	bool quit;
 
@@ -23,6 +34,13 @@ class Engine
 	Crosshair *crosshair;
     int blocksRendered;
 
+    Shader *shader;
+
+    bool renderAsWireframe;
+    bool renderWithLights;
+
+    Matrix4 projection;
+
 public:
 	Engine();
 	~Engine();
@@ -30,9 +48,26 @@ public:
 
     static float elapsedSeconds();
 
+    void resizeWindow(int w, int h);
+
+    int viewWidth() const;
+    int viewHeight() const;
+
+    void printError();
+
+    void flush();
+    void setCameraFromPlayer(Player *player);
+    bool withinFrustum(float x, float y, float z, float radius);
+    void updateFrustum();
+
+    void toggleRenderingAsWireframe();
+    void toggleLights();
+
 private:
+
 	void init();
-	void initRenderer(int width, int height, int bits, bool fullscreen);
+    void compileShaders();
+    void setupProjectionMatrix();
 	
 	void update();
 	void collectInput();

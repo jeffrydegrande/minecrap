@@ -64,7 +64,6 @@
 #endif
 
 
-#define FULLSCREEN false
 #define DEGREES_TO_RADIANS        .017453292F
 #define RADIANS_TO_DEGREES        57.29577951F
 #define PI                        (3.1415926535f)

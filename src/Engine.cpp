@@ -6,37 +6,86 @@
 #include "Console.h"
 #include "Text.h"
 #include "Input.h"
-#include "Graphics.h"
+#include "Shader.h"
 
 #include <sstream>
+
+#include <cmath>
+#include <cassert>
+
+#define ZFAR  1536.0f
+#define ZNEAR 0.2f
+#define FOV   45
+
+#define WINDOW_WIDTH  1024
+#define WINDOW_HEIGHT 768
+#define FULLSCREEN false
+
 #define FPS_INTERVAL     1.0f
+#define ASSERT_NO_GL_ERROR assert(GL_NO_ERROR == glGetError())
 
 static float elapsed_seconds = 0.0f;
 
-Engine::Engine() : fps_current(0),quit(false) {
-    Graphics::Init();
+static void displayOpenGLInfo() {
+    printf ("vendor: %s\n",  (const unsigned char *)glGetString(GL_VENDOR));
+    printf ("renderer: %s\n", (const unsigned char *)glGetString(GL_RENDERER));
+    printf ("version: %s\n", (const unsigned char *)glGetString(GL_VERSION));
+    printf ("GLSL version: %s\n", (const unsigned char *)glGetString(GL_SHADING_LANGUAGE_VERSION));
+    printf ("\n");
+}
 
+Engine::Engine():
+    fps_current(0),
+    quit(false),
+    world(NULL),
+    player(NULL),
+    crosshair(NULL),
+    shader(NULL),
+    renderAsWireframe(false),
+    renderWithLights(true)
+{
     init();
-    world = new World(CVarUtils::GetCVar<int>("seed"));
-    player = world->spawnPlayer();
-    crosshair = new Crosshair(graphics->viewWidth(), graphics->viewHeight());
 }
 
 Engine::~Engine() {
     delete this->world;
     delete this->player;
     delete this->crosshair;
-    Graphics::Cleanup();
 }
 
-
 void Engine::init() {
+    int flags;
+
     if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_JOYSTICK) != 0) {
         return;
     }
 
+    width  = WINDOW_WIDTH;
+    height = WINDOW_HEIGHT;
+
+    flags = SDL_OPENGL;
+    if (FULLSCREEN)
+        flags |= SDL_FULLSCREEN;
+    else
+        flags |= SDL_RESIZABLE;
+
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_SetVideoMode(width, height, 32, flags);
+
+#ifdef _WIN32
+    GLenum error = glewInit();
+    if (GLEW_OK != error) {
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(error));
+        exit(1);
+    }
+#endif
+
+    compileShaders();
+
+    displayOpenGLInfo();
+    resizeWindow(width, height);
+
     SDL_WM_SetCaption("Minecrap","");
-    graphics->initRenderer(1024, 768, 32, FULLSCREEN);
 
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -50,13 +99,85 @@ void Engine::init() {
 
     SDL_ShowCursor (false);
     TextInit();
+
+
+    world = new World(CVarUtils::GetCVar<int>("seed"));
+    player = world->spawnPlayer();
+    crosshair = new Crosshair(viewWidth(), viewHeight());
 }
+
+void Engine::resizeWindow(int width, int height) {
+    this->width  = width;
+    this->height = height;
+
+    printf( "Setting window size to %d by %d\n", width, height );
+
+    glMatrixMode(GL_PROJECTION);
+
+    setupProjectionMatrix();
+    glLoadMatrixf(projection.value_ptr());
+    shader->setPerspectiveMatrix(projection);
+
+    glViewport (0, 0, this->width, this->height);
+
+    if (crosshair) {
+        delete crosshair;
+        crosshair = new Crosshair(viewWidth(), viewHeight());
+    }
+
+    ASSERT_NO_GL_ERROR;
+}
+
+void Engine::setupProjectionMatrix()
+{
+    float fovy   = FOV;
+    float aspect = (float)this->width / (float)this->height;
+
+    if (aspect > 1.0f)
+        fovy /= aspect;
+
+
+    float m[16];
+    memset(m, 0, sizeof(m));
+
+    float depth = ZFAR - ZNEAR;
+    float f = 1.0f/tan(fovy*PI/360);
+
+    Matrix4 M;
+    m[0]  = f / aspect;
+    m[5]  = f;
+    m[10] = -(ZFAR + ZNEAR) / depth;
+    m[14] = -2 * (ZFAR*ZNEAR) / depth;
+    m[11] = -1.0f;
+
+    projection = m;
+}
+
+void Engine::compileShaders()
+{
+    if (shader == NULL) {
+        shader = new Shader();
+#ifdef _WIN32
+        shader->addVertexShader("..\\shaders\\hello_world.vert");
+        shader->addFragmentShader("..\\shaders\\hello_world.frag");
+#else
+        shader->addVertexShader("shaders/hello_world.vert");
+        shader->addFragmentShader("shaders/hello_world.frag");
+#endif
+        shader->done();
+    }
+}
+
+
+//////////////////////////////////////////////////////
+// Game Loop
+//////////////////////////////////////////////////////
 
 void Engine::stop() {
     this->quit = true;
 }
 
-long Engine::tick() {
+inline long Engine::tick() {
     return SDL_GetTicks();
 }
 
@@ -86,6 +207,10 @@ void Engine::run() {
         }
     }
 }
+
+//////////////////////////////////////////////////////
+// Advancing the simulation
+//////////////////////////////////////////////////////
 
 void Engine::update() {
     this->collectInput();
@@ -121,10 +246,10 @@ void Engine::collectInput() {
                         ConsoleToggle();
                         break;
                     case SDLK_F2:
-                        graphics->toggleLights();
+                        toggleLights();
                         break;
                     case SDLK_F3:
-                        graphics->toggleRenderingAsWireframe();
+                        toggleRenderingAsWireframe();
                         break;
                     default:
                         Input::keyPressed(event.key.keysym.sym);
@@ -137,8 +262,8 @@ void Engine::collectInput() {
             break;
         case SDL_MOUSEMOTION:
             {
-              int w = graphics->viewWidth();
-              int h = graphics->viewHeight();
+              int w = viewWidth();
+              int h = viewHeight();
 
               if (event.motion.x < 20 || event.motion.x > w - 20 ||
                   event.motion.y < 20 || event.motion.y > h - 20) {
@@ -151,9 +276,7 @@ void Engine::collectInput() {
             }
             break;
         case SDL_VIDEORESIZE:
-            graphics->initRenderer(event.resize.w, event.resize.h, 32, FULLSCREEN);
-            delete crosshair;
-            crosshair = new Crosshair(event.resize.w, event.resize.h);
+            resizeWindow(event.resize.w, event.resize.h);
             break;
         default:
             // noop
@@ -170,30 +293,83 @@ void Engine::collectInput() {
     last_update = now;
 }
 
+
+//////////////////////////////////////////////////////
+// Rendering
+//////////////////////////////////////////////////////
+
 void Engine::render() {
-    // 3D stuff
-    graphics->begin3D();
+
+    glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    if (renderAsWireframe) {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    } else {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    }
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc (GL_LEQUAL);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glEnable (GL_CULL_FACE);
+    glCullFace (GL_BACK);
+    glShadeModel(GL_SMOOTH);
+
+    Matrix4 M = Matrix4::load(GL_MODELVIEW_MATRIX);
+
+    Vec4 lightDirection(0.0f, 100.0f, 0.0f, 0.0f);
+    Vec4 lightDirectionCameraSpace = M * lightDirection;
+
+    shader->setDirectionToLight(lightDirectionCameraSpace);
+
+    Matrix3 NM(M);
+    shader->setNormalToCameraMatrix(NM);
+    shader->use();
 
     player->render();
-    graphics->setCameraFromPlayer(player);
-    graphics->updateFrustum();
+    setCameraFromPlayer(player);
+    updateFrustum();
     world->render();
-    graphics->end3D();
 
-    // 2D stuff
-    /*
-    graphics->begin2D();
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    shader->dontUse();
+
+    ASSERT_NO_GL_ERROR;
+
+    // render 2D stuff
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0, viewWidth(), viewHeight(), 0, -1, 1);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+
     crosshair->render();
     this->renderFPS();
     this->renderPlayerPosition();
     this->renderPlayerDirection();
     this->renderRenderStats();
-    graphics->end2D();
 
     ConsoleRender();
-    */
 
-    graphics->flush();
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+    flush();
 
 	GLenum error;
 	while (GL_NO_ERROR != (error=glGetError())) {
@@ -201,13 +377,12 @@ void Engine::render() {
 		printf( "Error: %s\n", s.c_str());
         exit(1);
 	}
-
 }
 
 void Engine::renderFPS() {
     std::ostringstream s;
     s << "FPS: " << fps_current;
-    TextWrite(graphics->viewWidth() / 2 - 40, 13, s.str().c_str());
+    TextWrite(viewWidth() / 2 - 40, 13, s.str().c_str());
 }
 
 void Engine::renderPlayerPosition() {
@@ -216,7 +391,7 @@ void Engine::renderPlayerPosition() {
 
   
     snprintf(s, 96, "loc: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
-    TextWrite(graphics->viewWidth() / 2 - 40, 26, s);
+    TextWrite(viewWidth() / 2 - 40, 26, s);
 }
 
 void Engine::renderPlayerDirection() {
@@ -225,15 +400,82 @@ void Engine::renderPlayerDirection() {
 
     snprintf(s, 96, "ang: %0.2f, %0.2f, %0.2f, facing %s\n",
             angle.x, angle.y, angle.z, player->getDirectionAsString());
-    TextWrite(graphics->viewWidth() / 2 - 40, 39, s);
+    TextWrite(viewWidth() / 2 - 40, 39, s);
 }
 
 void Engine::renderRenderStats() {
     char s[96];
     snprintf(s, 96, "Blocks: %d\n", blocksRendered);
-    TextWrite(graphics->viewWidth() / 2 - 40, 52, s);
+    TextWrite(viewWidth() / 2 - 40, 52, s);
 }
 
 float Engine::elapsedSeconds() {
     return elapsed_seconds;
+}
+
+int Engine::viewWidth() const {
+    return width;
+}
+
+int Engine::viewHeight() const {
+    return height;
+}
+
+
+void Engine::printError()
+{
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        printf("OpenGL error: %s\n", gluErrorString(error));
+    }
+}
+
+void Engine::toggleRenderingAsWireframe()
+{
+    renderAsWireframe = !renderAsWireframe;
+
+    if (renderAsWireframe)
+        printf("Wireframe rendering enabled.\n" );
+    else
+        printf("Wireframe rendering disabled.\n");
+}
+
+void Engine::toggleLights()
+{
+    renderWithLights = !renderWithLights;
+}
+
+void Engine::updateFrustum() {
+    float p[16];
+    float m[16];
+    glGetFloatv(GL_PROJECTION_MATRIX, p);
+    glGetFloatv(GL_MODELVIEW_MATRIX, m);
+
+    Matrix4 P = p;
+    Matrix4 M = m;
+    Matrix4 A = M * P;
+    frustum.setFrustum(A.value_ptr());
+}
+
+bool Engine::withinFrustum(float x, float y, float z, float radius) {
+    Vec3 point(x, y, z);
+
+    if ( point.y < cameraPosition.y - 4)
+        return false;
+
+    if (Frustum::OUTSIDE != frustum.sphereInFrustum(point, radius))
+        return true;
+    else
+        return false;
+}
+
+void Engine::setCameraFromPlayer(Player *player) {
+    Matrix4 camera = Matrix4::load(GL_MODELVIEW_MATRIX);
+    shader->setCameraMatrix(camera);
+    cameraPosition = player->getPosition();
+    cameraDirection = player->getDirection();
+}
+
+void Engine::flush() {
+    SDL_GL_SwapBuffers();
 }

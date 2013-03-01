@@ -10,7 +10,6 @@
 #include "Color.h"
 #include "Chunk.h"
 #include "Vec.h"
-#include "Graphics.h"
 #include "Mesh.h"
 
 #include "simplex.h"

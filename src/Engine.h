@@ -76,10 +76,7 @@ private:
 	void stop();
 
 	void render();
-    void renderFPS();
-    void renderPlayerPosition();
-    void renderPlayerDirection();
-    void renderRenderStats();
+    void renderOnScreenDisplay();
 };
 
 #endif

@@ -4,7 +4,7 @@
 #include "Player.h"
 #include "Crosshair.h"
 #include "Console.h"
-#include "Text.h"
+#include "OSD.h"
 #include "Input.h"
 #include "Shader.h"
 
@@ -80,9 +80,10 @@ void Engine::init() {
     }
 #endif
 
-    compileShaders();
+    OSD_Init();
 
     displayOpenGLInfo();
+    compileShaders();
     resizeWindow(width, height);
 
     SDL_WM_SetCaption("Minecrap","");
@@ -98,7 +99,6 @@ void Engine::init() {
     }
 
     SDL_ShowCursor (false);
-    TextInit();
 
 
     world = new World(CVarUtils::GetCVar<int>("seed"));
@@ -117,13 +117,14 @@ void Engine::resizeWindow(int width, int height) {
     setupProjectionMatrix();
     glLoadMatrixf(projection.value_ptr());
     shader->setPerspectiveMatrix(projection);
-
     glViewport (0, 0, this->width, this->height);
 
     if (crosshair) {
         delete crosshair;
         crosshair = new Crosshair(viewWidth(), viewHeight());
     }
+
+    osd->setWidth(width);
 
     ASSERT_NO_GL_ERROR;
 }
@@ -299,7 +300,6 @@ void Engine::collectInput() {
 //////////////////////////////////////////////////////
 
 void Engine::render() {
-
     glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -356,10 +356,7 @@ void Engine::render() {
     glDisable(GL_DEPTH_TEST);
 
     crosshair->render();
-    this->renderFPS();
-    this->renderPlayerPosition();
-    this->renderPlayerDirection();
-    this->renderRenderStats();
+    renderOnScreenDisplay();
 
     ConsoleRender();
 
@@ -372,6 +369,7 @@ void Engine::render() {
     flush();
 
 	GLenum error;
+
 	while (GL_NO_ERROR != (error=glGetError())) {
 		std::string s = reinterpret_cast<const char *>(gluErrorString(error));
 		printf( "Error: %s\n", s.c_str());
@@ -379,35 +377,25 @@ void Engine::render() {
 	}
 }
 
-void Engine::renderFPS() {
-    std::ostringstream s;
-    s << "FPS: " << fps_current;
-    TextWrite(viewWidth() / 2 - 40, 13, s.str().c_str());
-}
-
-void Engine::renderPlayerPosition() {
-    char s[96];
-    Vec3 pos = player->getPosition();
-
-  
-    snprintf(s, 96, "loc: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
-    TextWrite(viewWidth() / 2 - 40, 26, s);
-}
-
-void Engine::renderPlayerDirection() {
-    char s[96];
+void Engine::renderOnScreenDisplay() {
+    Vec3 pos   = player->getPosition();
     Vec3 angle = player->getDirection();
 
-    snprintf(s, 96, "ang: %0.2f, %0.2f, %0.2f, facing %s\n",
-            angle.x, angle.y, angle.z, player->getDirectionAsString());
-    TextWrite(viewWidth() / 2 - 40, 39, s);
+    osd->write("FPS: %d\n", fps_current);
+    osd->write("Loc: %0.2f, %0.2f, %0.2f",
+                pos.x, pos.y, pos.z);
+    osd->write("Ang: %0.2f, %0.2f, %0.2f, facing %s\n",
+                angle.x, angle.y, angle.z, player->getDirectionAsString());
+    osd->write("Blocks: %d\n", blocksRendered);
+
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        osd->write("OpenGL error: %s\n", gluErrorString(error));
+    }
+
+    osd->reset();
 }
 
-void Engine::renderRenderStats() {
-    char s[96];
-    snprintf(s, 96, "Blocks: %d\n", blocksRendered);
-    TextWrite(viewWidth() / 2 - 40, 52, s);
-}
 
 float Engine::elapsedSeconds() {
     return elapsed_seconds;
@@ -419,15 +407,6 @@ int Engine::viewWidth() const {
 
 int Engine::viewHeight() const {
     return height;
-}
-
-
-void Engine::printError()
-{
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        printf("OpenGL error: %s\n", gluErrorString(error));
-    }
 }
 
 void Engine::toggleRenderingAsWireframe()

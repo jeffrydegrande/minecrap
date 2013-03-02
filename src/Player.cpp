@@ -12,7 +12,7 @@
 #define GRAVITY         9.2f
 #define EYE_HEIGHT      1.75f
 #define JUMP_SPEED      5.5f
-#define SPEED		    25.0f
+#define SPEED		    8.0f
 
 Player::Player(World *world, const Vec3 & position) {
     this->world = world;

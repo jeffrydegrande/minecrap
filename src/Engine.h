@@ -33,8 +33,8 @@ class Engine
 
     Shader *shader;
 
-    bool renderAsWireframe;
-    bool renderWithLights;
+    bool optionRenderWireframe;
+    bool optionLighting;
 
     Matrix4 projection;
 
@@ -57,8 +57,8 @@ public:
     bool withinFrustum(float x, float y, float z, float radius);
     void updateFrustum();
 
-    void toggleRenderingAsWireframe();
-    void toggleLights();
+    void toggleOptionRenderWireframe();
+    void toggleOptionLighting();
 
 private:
 

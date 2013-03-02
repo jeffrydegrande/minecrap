@@ -41,8 +41,8 @@ Engine::Engine():
     player(NULL),
     crosshair(NULL),
     shader(NULL),
-    renderAsWireframe(false),
-    renderWithLights(true)
+    optionRenderWireframe(false),
+    optionLighting(true)
 {
     init();
 }
@@ -332,7 +332,7 @@ void Engine::render3D() {
     glPushMatrix();
     glLoadIdentity();
 
-    if (renderAsWireframe) {
+    if (optionRenderWireframe) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     } else {
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -426,20 +426,32 @@ int Engine::viewHeight() const {
     return height;
 }
 
-void Engine::toggleRenderingAsWireframe()
+void Engine::toggleOptionRenderWireframe()
 {
-    renderAsWireframe = !renderAsWireframe;
+    optionRenderWireframe = !optionRenderWireframe;
 
-    if (renderAsWireframe)
+    if (optionRenderWireframe)
         printf("Wireframe rendering enabled.\n" );
     else
         printf("Wireframe rendering disabled.\n");
 }
 
-void Engine::toggleLights()
+void Engine::toggleOptionLighting()
 {
-    renderWithLights = !renderWithLights;
+    optionLighting = !optionLighting;
 }
+
+void Engine::setCameraFromPlayer(Player *player) {
+    Matrix4 camera = Matrix4::load(GL_MODELVIEW_MATRIX);
+    shader->setCameraMatrix(camera);
+    cameraPosition = player->getPosition();
+    cameraDirection = player->getDirection();
+}
+
+void Engine::flush() {
+    SDL_GL_SwapBuffers();
+}
+
 
 void Engine::updateFrustum() {
     float p[16];
@@ -465,13 +477,3 @@ bool Engine::withinFrustum(float x, float y, float z, float radius) {
         return false;
 }
 
-void Engine::setCameraFromPlayer(Player *player) {
-    Matrix4 camera = Matrix4::load(GL_MODELVIEW_MATRIX);
-    shader->setCameraMatrix(camera);
-    cameraPosition = player->getPosition();
-    cameraDirection = player->getDirection();
-}
-
-void Engine::flush() {
-    SDL_GL_SwapBuffers();
-}

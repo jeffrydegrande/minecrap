@@ -1,4 +1,4 @@
-#ifdef GLCONSOLE_SUPPORT
+#ifdef SUPPORT_GLCONSOLE
 
 void ConsoleToggle();
 bool ConsoleIsOpen();

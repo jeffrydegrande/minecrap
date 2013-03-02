@@ -228,7 +228,7 @@ void Engine::collectInput() {
             break;
 
         case SDL_KEYDOWN:
-#ifdef GLCONSOLE_SUPPORT
+#ifdef SUPPORT_GLCONSOLE
             if (ConsoleIsOpen ()) {
                 ConsoleInput (event.key.keysym.sym, event.key.keysym.unicode);
                 break;
@@ -239,7 +239,7 @@ void Engine::collectInput() {
                 case SDLK_ESCAPE:
                     stop();
                     break;
-#ifdef GLCONSOLE_SUPPORT
+#ifdef SUPPORT_GLCONSOLE
                 case SDLK_BACKQUOTE:
                     ConsoleToggle();
                     break;
@@ -266,7 +266,7 @@ void Engine::collectInput() {
               if (event.motion.x < 20 || event.motion.x > w - 20 ||
                   event.motion.y < 20 || event.motion.y > h - 20) {
 
-#ifdef GLCONSOLE_SUPPORT
+#ifdef SUPPORT_GLCONSOLE
                 if (ConsoleIsOpen())
                     break;
 #endif
@@ -373,7 +373,7 @@ void Engine::render2D() {
 
     crosshair->render();
     renderOnScreenDisplay();
-#ifdef GLCONSOLE_SUPPORT
+#ifdef SUPPORT_GLCONSOLE
     ConsoleRender();
 #endif
 

@@ -1,6 +1,5 @@
+#ifdef SUPPORT_GLCONSOLE
 #include "minecrap.h"
-
-#ifdef GLCONSOLE_SUPPORT
 #define MAX_MSG_LEN 1024
 
 #include <vector>

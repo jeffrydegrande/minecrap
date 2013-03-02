@@ -102,7 +102,7 @@ Player * World::spawnPlayer() {
 	playerSpawnLocation.y = (float)ground + 1;
 	playerSpawnLocation.z = (float)y;
 
-#ifdef GLCONSOLE_SUPPORT
+#ifdef SUPPORT_GLCONSOLE
     ConsoleLog("Spawn location: %0.2f, %0.2f, %0.2f\n",
             playerSpawnLocation.x, playerSpawnLocation.y, playerSpawnLocation.z);
 #endif

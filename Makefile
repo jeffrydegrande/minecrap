@@ -2,11 +2,13 @@ CC=g++
 DEBUG=-D_DEBUG -g
 INCLUDES=-I. -Ivendor/include
 # CFLAGS=-Wall -Werror -fomit-frame-pointer -pipe -O2 $(INCLUDES)
+#
+FEATURES=-DSUPPORT_GLCONSOLE
 
 WARNINGS=-pedantic -Werror -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror -Wno-unused
 WARNINGS=-Wall -Werror -Wextra
 
-CFLAGS=$(WARNINGS) $(INCLUDES)
+CFLAGS=$(WARNINGS) $(INCLUDES) $(FEATURES)
 
 OS=$(shell uname -s)
 ifeq ($(OS),Darwin)

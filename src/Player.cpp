@@ -96,7 +96,7 @@ void Player::look(int x, int y) {
       return;
 
     // Matrix4 camera;
-    camera.loadIdentity();
+    camera.identity();
 
     // rotate on the x-axis
     camera.rotate((float)x * mouse_sense, right);

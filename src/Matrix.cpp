@@ -54,7 +54,7 @@ void Matrix3::print() {
 
 Matrix4::Matrix4()
 {
-    loadIdentity();
+    identity();
 }
 
 Matrix4::Matrix4(float *v)
@@ -69,7 +69,7 @@ Matrix4 Matrix4::Load(GLenum matrix)
     return Matrix4(m);
 }
 
-void Matrix4::loadIdentity() {
+void Matrix4::identity() {
     memset(&m, 0, sizeof(float) * 16);
     m[0] = m[5] = m[10] = m[15] = 1.0f;
 }

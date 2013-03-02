@@ -300,12 +300,11 @@ void Engine::collectInput() {
 //////////////////////////////////////////////////////
 
 void Engine::render() {
-    printf( "Starting render pass\n");
     glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     render3D();
-    // render2D();
+    render2D();
     flush();
 
 	GLenum error;
@@ -360,9 +359,6 @@ void Engine::render3D() {
 }
 
 void Engine::render2D() {
-    return;
-
-    // render 2D stuff
     ASSERT_NO_GL_ERROR;
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();

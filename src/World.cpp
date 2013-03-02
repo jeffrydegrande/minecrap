@@ -19,7 +19,7 @@
 
 #include "Vec.h"
 
-#define INITIAL_WORLD_SIZE 4
+#define INITIAL_WORLD_SIZE 16
 
 World::World(): chunks(NULL) {
 	init((unsigned int)time(NULL));

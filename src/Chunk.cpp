@@ -72,6 +72,7 @@ void Chunk::generate() {
     generateTerrain();
     addDirt();
     addWaterLevel();
+    addSand(); // need to do this after adding water
     addBedrock();
     // addMarkersAtBoundaries();
     buildMesh();
@@ -161,6 +162,15 @@ void Chunk::addBedrock() {
     } endforeach;
 }
 
+void Chunk::addSand() {
+    // everything on WATER_LEVEL that is not WATER or AIR
+    foreach_xz {
+        GLubyte block = B(x,WATER_LEVEL,z);
+        if (block != WATER && block != AIR)
+            B(x,WATER_LEVEL,z) = SAND;
+    } endforeach;
+}
+
 void Chunk::addWaterLevel() {
     foreach_xz {
         int y = CHUNKY - 1;
@@ -200,9 +210,10 @@ void Chunk::buildMesh() {
 
     mesh = new Mesh(vertexCount);
     foreach_xyz {
-        if (B(x,y,z) == AIR)
+        GLubyte block = B(x,y,z);
+        if (block == AIR)
             continue;
-        mesh->addCube(inWorld(x,y,z));
+        mesh->addCube(inWorld(x,y,z), block);
     } endforeach;
     mesh->finish();
 }

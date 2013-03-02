@@ -80,8 +80,9 @@
 #define GRASS 4
 #define LAVA  5
 #define WATER 6
+#define SAND  7
 
-#define RED   7
+#define RED   8
 
 typedef struct Point3D_ {
     GLfloat x, y, z;

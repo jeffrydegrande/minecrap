@@ -48,6 +48,7 @@ private:
 
 	void generateTerrain();
 	void addDirt();
+    void addSand();
 	void addMarkersAtBoundaries();
 	void addBedrock();
 	void addWaterLevel();

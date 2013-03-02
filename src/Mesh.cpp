@@ -65,7 +65,7 @@ Mesh::~Mesh() {
     glDeleteBuffers(1, &vbo);
 }
 
-void Mesh::addCube(const Vec3 & pos) {
+void Mesh::addCube(const Vec3 & pos, GLubyte kind) {
     assert( index <= vertexCount );
 
     for (int i=0; i<36; i++) {
@@ -75,9 +75,33 @@ void Mesh::addCube(const Vec3 & pos) {
         vertices[index].z  = pos.z + verts[i].z;
 
         // color
-        vertices[index].r  = 0.0f;
-        vertices[index].g  = 1.0f;
-        vertices[index].b  = 0.0f;
+        switch (kind) {
+        case GRASS:
+            vertices[index].r  = 0.0f;
+            vertices[index].g  = 0.5f;
+            vertices[index].b  = 0.0f;
+            break;
+        case ROCK:
+            vertices[index].r  = 0.25f;
+            vertices[index].g  = 0.25f;
+            vertices[index].b  = 0.25f;
+            break;
+        case DIRT:
+            vertices[index].r = 102.0f/510;
+            vertices[index].g = 69.0f/510;
+            vertices[index].b = 35.0f/510;
+            break;
+        case WATER:
+            vertices[index].r  = 0.0f;
+            vertices[index].g  = 0.0f;
+            vertices[index].b  = 0.5f;
+            break;
+        case SAND:
+            vertices[index].r  = 0.5f;
+            vertices[index].g  = 0.5f;
+            vertices[index].b  = 0.0f;
+            break;
+        }
         vertices[index].a  = 1.0f;
 
         // normals

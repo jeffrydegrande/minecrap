@@ -27,7 +27,7 @@ class Mesh {
         Mesh(int count); // number of vertices
         ~Mesh();
 
-        void addCube(const Vec3 & pos);
+        void addCube(const Vec3 & pos, GLubyte kind);
         void finish();
 
         void build();

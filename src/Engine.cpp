@@ -7,6 +7,7 @@
 #include "OSD.h"
 #include "Input.h"
 #include "Shader.h"
+#include "MatrixStack.h"
 
 #include <sstream>
 
@@ -86,7 +87,9 @@ void Engine::init() {
     OSD_Init();
 
     displayOpenGLInfo();
+
     compileShaders();
+
     resizeWindow(width, height);
 
     SDL_WM_SetCaption("Minecrap","");
@@ -107,16 +110,18 @@ void Engine::init() {
 }
 
 void Engine::resizeWindow(int width, int height) {
+    float aspect = (float)width / (float)height;
 
     this->width  = width;
     this->height = height;
 
-    printf( "Setting window size to %d by %d\n", width, height );
-    glMatrixMode(GL_PROJECTION);
+	projection.Perspective(FOV, aspect, ZNEAR, ZFAR);
 
-    setupProjectionMatrix();
-    glLoadMatrixf(projection.value_ptr());
-    shader->setPerspectiveMatrix(projection);
+	// TODO: executing this here throws an error while it's
+	//		 really the optimal place to do this. Investigate
+    // shader->setCameraToClipMatrix(perspective);
+	// ASSERT_NO_GL_ERROR;
+
     glViewport (0, 0, this->width, this->height);
 
     if (crosshair) {
@@ -124,38 +129,24 @@ void Engine::resizeWindow(int width, int height) {
         crosshair = new Crosshair(viewWidth(), viewHeight());
     }
 
-    osd->setWidth(width);
 
+    osd->setWidth(width);
     ASSERT_NO_GL_ERROR;
+}
+
+void printCurrentMatrix(GLenum matrix)
+{
+    Matrix4 M = Matrix4::Load(matrix);
+    M.print();
 }
 
 void Engine::setupProjectionMatrix()
 {
-    float fovy   = FOV;
-    float aspect = (float)this->width / (float)this->height;
-
-    if (aspect > 1.0f)
-        fovy /= aspect;
-
-
-    float m[16];
-    memset(m, 0, sizeof(m));
-
-    float depth = ZFAR - ZNEAR;
-    float f = 1.0f/tan(fovy*PI/360);
-
-    Matrix4 M;
-    m[0]  = f / aspect;
-    m[5]  = f;
-    m[10] = -(ZFAR + ZNEAR) / depth;
-    m[14] = -2 * (ZFAR*ZNEAR) / depth;
-    m[11] = -1.0f;
-
-    projection = m;
 }
 
 void Engine::compileShaders()
 {
+    printf("Compiling shaders\n");
     if (shader == NULL) {
         shader = new Shader();
 #ifdef _WIN32
@@ -254,10 +245,10 @@ void Engine::collectInput() {
                     break;
 #endif
                 case SDLK_F2:
-                    toggleOptionLighting();
+                    optionLighting = !optionLighting;
                     break;
                 case SDLK_F3:
-                    toggleOptionRenderWireframe();
+                    optionRenderWireframe = !optionRenderWireframe;
                     break;
                 default:
                     Input::keyPressed(event.key.keysym.sym);
@@ -309,12 +300,12 @@ void Engine::collectInput() {
 //////////////////////////////////////////////////////
 
 void Engine::render() {
+    printf( "Starting render pass\n");
     glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    render2D();
     render3D();
-
+    // render2D();
     flush();
 
 	GLenum error;
@@ -328,46 +319,49 @@ void Engine::render() {
 
 void Engine::render3D() {
     ASSERT_NO_GL_ERROR;
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
 
-    if (optionRenderWireframe) {
-        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-    } else {
-        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-    }
-
+    glPolygonMode( GL_FRONT_AND_BACK, optionRenderWireframe ? GL_LINE : GL_FILL );
     glEnable(GL_DEPTH_TEST);
     glDepthFunc (GL_LEQUAL);
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    glEnable (GL_CULL_FACE);
-    glCullFace (GL_BACK);
-    glShadeModel(GL_SMOOTH);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
-    Matrix4 M = Matrix4::load(GL_MODELVIEW_MATRIX);
+	UseShader use(*shader);
 
-    Vec4 lightDirection(0.0f, 100.0f, 0.0f, 0.0f);
-    Vec4 lightDirectionCameraSpace = M * lightDirection;
-    Matrix3 NM(M);
+	Matrix4 cameraToClipMatrix = projection.top();
+    shader->setCameraToClipMatrix(cameraToClipMatrix);
 
-    shader->setDirectionToLight(lightDirectionCameraSpace);
-    shader->setNormalToCameraMatrix(NM);
-    shader->use();
-
+    MatrixStack model;
     player->render();
-    setCameraFromPlayer(player);
-    updateFrustum();
-    world->render();
 
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
+    Matrix4 camera = player->getCameraMatrix();
+    model.apply(camera);
+
+    Vec4 lightDirectionCameraSpace = camera * Vec4(0.866f, 1.0f, 0.0f, 0.0f);
+    shader->setDirectionToLight(lightDirectionCameraSpace);
+    {
+        PushStack push(model);
+        {
+            PushStack push(model);
+            shader->setModelToCameraMatrix(camera);
+            Matrix3 normal(camera);
+            shader->setNormalModelToCameraMatrix(normal);
+        }
+        glShadeModel(GL_SMOOTH);
+
+        {
+            PushStack push(model);
+            world->render();
+        }
+    }
     shader->dontUse();
+
     ASSERT_NO_GL_ERROR;
 }
 
 void Engine::render2D() {
+    return;
+
     // render 2D stuff
     ASSERT_NO_GL_ERROR;
     glMatrixMode(GL_PROJECTION);
@@ -426,34 +420,14 @@ int Engine::viewHeight() const {
     return height;
 }
 
-void Engine::toggleOptionRenderWireframe()
-{
-    optionRenderWireframe = !optionRenderWireframe;
-
-    if (optionRenderWireframe)
-        printf("Wireframe rendering enabled.\n" );
-    else
-        printf("Wireframe rendering disabled.\n");
-}
-
-void Engine::toggleOptionLighting()
-{
-    optionLighting = !optionLighting;
-}
-
-void Engine::setCameraFromPlayer(Player *player) {
-    Matrix4 camera = Matrix4::load(GL_MODELVIEW_MATRIX);
-    shader->setCameraMatrix(camera);
-    cameraPosition = player->getPosition();
-    cameraDirection = player->getDirection();
-}
 
 void Engine::flush() {
     SDL_GL_SwapBuffers();
 }
 
-
 void Engine::updateFrustum() {
+    return;
+
     float p[16];
     float m[16];
     glGetFloatv(GL_PROJECTION_MATRIX, p);

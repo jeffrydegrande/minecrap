@@ -3,37 +3,35 @@
 #include "Matrix.h"
 #include <cassert>
 
-Shader::Shader():
-    program(0),
-    perspectiveMatrixUniform(-1),
-    cameraMatrixUniform(-1),
-    directionToLight(-1)
-{
+#define ASSERT_NO_GL_ERROR  assert(GL_NO_ERROR == glGetError())
 
+Shader::Shader(): program(0) { }
+
+Shader::~Shader() {
+    for (size_t i=0; i<shaders.size(); i++) {
+        glDeleteShader(shaders[i]);
+    }
 }
 
-void Shader::setCameraMatrix(Matrix4 &m) {
-    use();
-    glUniformMatrix4fv(cameraMatrixUniform, 1, GL_FALSE, m.value_ptr());
-    dontUse();
+void Shader::setModelToCameraMatrix(Matrix4 &m) {
+    assert(program != 0);
+    glUniformMatrix4fv(modelToCameraMatrix, 1, GL_FALSE, m.value_ptr());
 }
 
-void Shader::setPerspectiveMatrix(Matrix4 &m) {
-    use();
-    glUniformMatrix4fv(perspectiveMatrixUniform, 1, GL_FALSE, m.value_ptr());
-    dontUse();
+void Shader::setCameraToClipMatrix(Matrix4 &m) {
+    assert(program != 0);
+    assert(cameraToClipMatrix != -1);
+    glUniformMatrix4fv(cameraToClipMatrix, 1, GL_FALSE, m.value_ptr());
 }
 
 void Shader::setDirectionToLight(Vec4 &v) {
-    use();
+    assert(program != 0);
     glUniform3fv(directionToLight, 1, (GLfloat *)v.value_ptr());
-    dontUse();
 }
 
-void Shader::setNormalToCameraMatrix(Matrix3 &m) {
-    use();
+void Shader::setNormalModelToCameraMatrix(Matrix3 &m) {
+    assert(program != 0);
     glUniformMatrix3fv(normalModelToCameraMatrix, 1, GL_FALSE, m.value_ptr());
-    dontUse();
 }
 
 void Shader::use() {
@@ -47,18 +45,37 @@ void Shader::dontUse() {
 void Shader::done() {
 
     program = glCreateProgram();
-    for (std::vector<GLuint>::iterator it = shaders.begin();
-                                       it != shaders.end(); it++)
+    for (size_t i=0; i<shaders.size(); i++)
     {
-        glAttachShader(program, *it);
+        glAttachShader(program, shaders[i]);
     }
-
    glLinkProgram(program);
 
-   perspectiveMatrixUniform  = glGetUniformLocation(program, "perspectiveMatrix");
-   cameraMatrixUniform       = glGetUniformLocation(program, "cameraMatrix");
-   directionToLight          = glGetUniformLocation(program, "directToLight");
-   normalModelToCameraMatrix = glGetUniformLocation(program, "normalModelToCameraMatrix");
+    //Note the different functions here: glGetProgram* instead of glGetShader*.
+    GLint isLinked = 0;
+    glGetProgramiv(program, GL_LINK_STATUS, (int *)&isLinked);
+
+    if(isLinked == GL_FALSE)
+    {
+        printf("Can not link shader program\n");
+        exit(1);
+    }
+
+    for (size_t i=0; i<shaders.size(); i++) {
+        glDetachShader(program, shaders[i]);
+    }
+
+    cameraToClipMatrix        = glGetUniformLocation(program, "cameraToClipMatrix");
+    directionToLight          = glGetUniformLocation(program, "directionToLight");
+    modelToCameraMatrix       = glGetUniformLocation(program, "modelToCameraMatrix");
+    normalModelToCameraMatrix = glGetUniformLocation(program, "normalModelToCameraMatrix");
+
+    printf("%d\n", cameraToClipMatrix);
+    printf("%d\n", directionToLight);
+    printf("%d\n", modelToCameraMatrix);
+    printf("%d\n", normalModelToCameraMatrix);
+
+    ASSERT_NO_GL_ERROR;
 }
 
 
@@ -66,12 +83,14 @@ void Shader::addVertexShader(const char *path)
 {
     GLuint shader = addShader(GL_VERTEX_SHADER, path);
     shaders.push_back(shader);
+    ASSERT_NO_GL_ERROR;
 }
 
 void Shader::addFragmentShader(const char *path)
 {
     GLuint shader = addShader(GL_FRAGMENT_SHADER, path);
     shaders.push_back(shader);
+    ASSERT_NO_GL_ERROR;
 }
 
 GLuint Shader::addShader(GLenum type, const char *path)
@@ -103,6 +122,7 @@ void Shader::checkCompileStatus(GLuint shader)
         printf("Shader error log;\n%s\n", errorLog);
         delete [] errorLog;
       }
+      glDeleteShader(shader);
       exit (-1);
     }
 }

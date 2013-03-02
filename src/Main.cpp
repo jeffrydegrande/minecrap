@@ -2,6 +2,8 @@
 #include "World.h"
 #include <CVars/CVar.h>
 
+#include "Matrix.h"
+
 
 #define CONFIG_FILE "user.cfg"
 

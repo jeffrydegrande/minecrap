@@ -10,7 +10,6 @@ Matrix3::Matrix3() {
     identity();
 }
 
-
 Matrix3::Matrix3(float v[9]) {
     memcpy(&m, v, sizeof(float) * 9);
 }
@@ -42,6 +41,13 @@ float * Matrix3::value_ptr()
     return m;
 }
 
+void Matrix3::print() {
+    printf("%0.2f %0.2f %0.2f\n", m[0], m[3], m[6]);
+    printf("%0.2f %0.2f %0.2f\n", m[1], m[4], m[7]);
+    printf("%0.2f %0.2f %0.2f\n", m[2], m[5], m[8]);
+    printf("\n");
+}
+
 /////////////////////////////////////////////////////////////////
 /// Matrix4 implementation
 /////////////////////////////////////////////////////////////////
@@ -56,7 +62,7 @@ Matrix4::Matrix4(float *v)
     memcpy(&m, v, sizeof(float) * 16);
 }
 
-Matrix4 Matrix4::load(GLenum matrix)
+Matrix4 Matrix4::Load(GLenum matrix)
 {
     float m[16];
     glGetFloatv(matrix, m);
@@ -172,6 +178,12 @@ void Matrix4::multiply(const Matrix4 &m) {
 Matrix4 Matrix4::operator *(const Matrix4 &m)
 {
     return Multiply(*this, m);
+}
+
+Matrix4 Matrix4::operator *=(const Matrix4 &m)
+{
+    multiply(m);
+    return *this;
 }
 
 Vec4 Matrix4::operator *(const Vec4 &v)
@@ -321,12 +333,27 @@ void Matrix4::inverse(const Matrix4 &m)
 } // end MatrixInverse
 
 void Matrix4::print() {
-    int offset = 0;
-    for (int i=0; i<4; i++) {
-        offset = i << 2;
-        printf( "%0.2f %0.2f %0.2f %0.2f\n", 
-                m[offset+0], m[offset+1], m[offset+2], m[offset+3]);
-    }
+    printf("%0.2f %0.2f %0.2f %0.2f\n", m[0], m[4], m[8], m[12]);
+    printf("%0.2f %0.2f %0.2f %0.2f\n", m[1], m[5], m[9], m[13]);
+    printf("%0.2f %0.2f %0.2f %0.2f\n", m[2], m[6], m[10], m[14]);
+    printf("%0.2f %0.2f %0.2f %0.2f\n", m[3], m[7], m[11], m[15]);
     printf("\n");
 }
 
+Matrix4 Matrix4::Perspective(float fovy, float aspect, float zNear, float zFar) {
+    if (aspect > 1.0f)
+        fovy /= aspect;
+
+
+    float depth = zFar - zNear;
+    float f     = 1.0f/tan(fovy*PI/360);
+    Matrix4 M;
+
+    M.m[0]  = f / aspect;
+    M.m[5]  = f;
+    M.m[10] = -(zFar + zNear) / depth;
+    M.m[14] = -2 * (zFar*zNear) / depth;
+    M.m[11] = -1.0f;
+
+    return M;
+}

@@ -115,16 +115,21 @@ void makeRasterFont(void)
 
 void TextInit(void)
 {
+    /*
     glShadeModel (GL_FLAT);
     makeRasterFont();
+    */
 }
 
 void renderText(const char *s)
 {
+    (void) s;
+    /*
     glPushAttrib (GL_LIST_BIT);
     glListBase(fontOffset);
     glCallLists(strlen(s), GL_UNSIGNED_BYTE, (GLubyte *) s);
     glPopAttrib ();
+    */
 }
 
 void TextWrite(int x, int y, const char *s)

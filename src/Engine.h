@@ -5,6 +5,7 @@
 #include "Matrix.h"
 #include "Vec.h"
 #include "Frustum.h"
+#include "MatrixStack.h"
 
 class World;
 class Crosshair;
@@ -36,7 +37,7 @@ class Engine
     bool optionRenderWireframe;
     bool optionLighting;
 
-    Matrix4 projection;
+    MatrixStack projection;
 
 public:
 	Engine();
@@ -53,12 +54,8 @@ public:
     void printError();
 
     void flush();
-    void setCameraFromPlayer(Player *player);
     bool withinFrustum(float x, float y, float z, float radius);
     void updateFrustum();
-
-    void toggleOptionRenderWireframe();
-    void toggleOptionLighting();
 
 private:
 

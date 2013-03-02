@@ -22,27 +22,27 @@ const Vec3 cubeVerts[] =
 const Vec3 verts[] = //36 vertices total
 {
   cubeVerts[0], cubeVerts[4], cubeVerts[6],  //front
-  cubeVerts[0], cubeVerts[6], cubeVerts[2],  
-  cubeVerts[1], cubeVerts[0], cubeVerts[2],  //right 
+  cubeVerts[0], cubeVerts[6], cubeVerts[2],
+  cubeVerts[1], cubeVerts[0], cubeVerts[2],  //right
   cubeVerts[1], cubeVerts[2], cubeVerts[3],
-  cubeVerts[5], cubeVerts[1], cubeVerts[3],  //back  
+  cubeVerts[5], cubeVerts[1], cubeVerts[3],  //back
   cubeVerts[5], cubeVerts[3], cubeVerts[7],
-  cubeVerts[4], cubeVerts[5], cubeVerts[7],  //left  
+  cubeVerts[4], cubeVerts[5], cubeVerts[7],  //left
   cubeVerts[4], cubeVerts[7], cubeVerts[6],
-  cubeVerts[4], cubeVerts[0], cubeVerts[1],  //top 
+  cubeVerts[4], cubeVerts[0], cubeVerts[1],  //top
   cubeVerts[4], cubeVerts[1], cubeVerts[5],
-  cubeVerts[6], cubeVerts[7], cubeVerts[3],  //bottom 
+  cubeVerts[6], cubeVerts[7], cubeVerts[3],  //bottom
   cubeVerts[6], cubeVerts[3], cubeVerts[2],
-}; 
+};
 
-const Vec3 right( 1.0f, 0.0f, 0.0f);
+const Vec3 right(1.0f, 0.0f, 0.0f);
 const Vec3 left(-1.0f, 0.0f, 0.0f);
-const Vec3 top( 0.0f, 1.0f, 0.0f);
-const Vec3 bottom( 0.0f,-1.0f, 0.0f);
-const Vec3 front( 0.0f, 0.0f, 1.0f);
-const Vec3 back( 0.0f, 0.0f,-1.0f);
+const Vec3 top(0.0f, 1.0f, 0.0f);
+const Vec3 bottom(0.0f, -1.0f, 0.0f);
+const Vec3 front(0.0f, 0.0f, 1.0f);
+const Vec3 back(0.0f, 0.0f, -1.0f);
 
-const Vec3 normsArray[] = 
+const Vec3 normsArray[] =
 {
   front, front, front, front, front, front,
   right, right, right, right, right, right,
@@ -89,22 +89,23 @@ void Mesh::addCube(const Vec3 & pos) {
 }
 
 void Mesh::finish() {
-    printf( "%d vertices added, %d expected.\n", index, vertexCount );
+    // printf( "%d vertices added, %d expected.\n", index, vertexCount );
     assert(index == vertexCount);
 
     glGenVertexArrays(1, &vao );
     glBindVertexArray(vao);
 
     glGenBuffers( 1, &vbo );
-    printf( "allocating %ld kb, %d cubes\n", 
-            (vertexCount * sizeof(struct vertex_t)) / 1024, index / 36);
-
+    //printf( "allocating %ld kb, %d cubes\n",
+    //       (vertexCount * sizeof(struct vertex_t)) / 1024, index / 36);
     // upload data into VBO
+    // printf("number of vertices:%d, sizeof vertices: %ld\n", vertexCount, sizeof(struct vertex_t));
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    printf("number of vertices:%d, sizeof vertices: %ld\n", vertexCount, sizeof(struct vertex_t));
     glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(struct vertex_t),
             vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    assert(GL_NO_ERROR == glGetError());
 
     // and get rid of the data on our side
     delete [] vertices;
@@ -112,20 +113,24 @@ void Mesh::finish() {
 }
 
 void Mesh::render() {
+    glBindVertexArray(vao);
+
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glEnableVertexAttribArray(0); // vertices
     glEnableVertexAttribArray(1); // colors
     glEnableVertexAttribArray(2); // normals
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), 
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
             (GLvoid*)offsetof(struct vertex_t, x));
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), 
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
             (GLvoid*)offsetof(struct vertex_t, r));
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), 
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
             (GLvoid*)offsetof(struct vertex_t, nx));
 
     glDrawArrays(GL_TRIANGLES, 0, vertexCount);
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
+
+    assert(GL_NO_ERROR == glGetError());
 }

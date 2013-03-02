@@ -18,8 +18,8 @@ class Mesh {
     int index;
     int vertexCount;
 
-    unsigned int vbo;
-    unsigned int vao;
+    GLuint vbo;
+    GLuint vao;
 
     vertex_t* vertices;
 

@@ -131,10 +131,9 @@ void World::update() {
 }
 
 int World::render() {
-	int blocksRendered = 0;
-	blocksRendered += renderTerrain();
+	renderTerrain();
 	// blocksRendered += sun->render();
-	return blocksRendered;
+	return 0;
 }
 
 int World::renderTerrain() {
@@ -143,12 +142,8 @@ int World::renderTerrain() {
 	for (size_t x=0; x < chunks->numRows(); x++) {
 		for (size_t y=0; y < chunks->numColumns(); y++) {
 			Chunk *chunk = chunks->get(x, y);
-			renderedBlocksCount += this->renderChunk(chunk);
+			renderedBlocksCount += chunk->render();
 		}
 	}
 	return renderedBlocksCount;
-}
-
-int World::renderChunk(Chunk *chunk) {
-    return chunk->render();
 }

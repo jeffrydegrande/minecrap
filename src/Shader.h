@@ -9,8 +9,8 @@
 class Shader {
     GLuint program;
 
-    GLint perspectiveMatrixUniform;
-    GLint cameraMatrixUniform;
+    GLint cameraToClipMatrix;
+    GLint modelToCameraMatrix;
     GLint directionToLight;
     GLint normalModelToCameraMatrix;
 
@@ -18,15 +18,16 @@ class Shader {
 
     public:
         Shader();
+        ~Shader();
 
         void addVertexShader(const char *path);
         void addFragmentShader(const char *path);
         void done();
 
-        void setPerspectiveMatrix(Matrix4 &m);
-        void setCameraMatrix(Matrix4 &m);
+        void setCameraToClipMatrix(Matrix4 &m);
+        void setModelToCameraMatrix(Matrix4 &m);
+        void setNormalModelToCameraMatrix(Matrix3 &m);
         void setDirectionToLight(Vec4 &v);
-        void setNormalToCameraMatrix(Matrix3 &m);
 
         void use();
         void dontUse();
@@ -35,6 +36,23 @@ class Shader {
         GLuint addShader(GLenum type, const char *path);
         void checkCompileStatus(GLuint shader);
 
+};
+
+class UseShader {
+    Shader & shader;
+
+    public:
+        UseShader(Shader &shader): shader(shader) {
+            shader.use();
+        }
+
+        ~UseShader() {
+            shader.dontUse();
+        }
+
+    private:
+        UseShader(const Shader &shader);
+        UseShader &operator=(const Shader &shader);
 };
 
 #endif

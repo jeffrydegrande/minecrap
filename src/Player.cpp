@@ -84,7 +84,7 @@ void Player::render() {
 	v[14] =  angle.dotProduct(position);
 	v[15] =  1.0f;
 
-	glMultMatrixf(v);
+    camera = v;
 }
 
 void Player::look(int x, int y) {
@@ -108,7 +108,6 @@ void Player::look(int x, int y) {
     camera.rotate((float)y * mouse_sense, u);
     camera.transformVector(angle);
     camera.transformVector(up);
-
 
   // TODO: how to clamp rotations on X&Z & how to not rotate on Z at all
   // rotate on the y-axis
@@ -176,4 +175,8 @@ void Player::setPosition(const Vec3 &position) {
     this->right = Vec3(1.0f, 0.0f, 0.0f);
     this->velocity = 0;
     this->onGround = true;
+}
+
+const Matrix4 & Player::getCameraMatrix() {
+    return camera;
 }

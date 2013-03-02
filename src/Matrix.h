@@ -14,12 +14,14 @@ class Matrix4 {
         Matrix4();
         Matrix4(float v[16]);
 
-        static Matrix4 load(GLenum matrix);
+        static Matrix4 Load(GLenum matrix);
+        static Matrix4 Perspective(float fovy, float ratio, float zNear, float zFar);
 
         float & operator()(int row, int column);
 
         static Matrix4 Multiply(const Matrix4 &am, const Matrix4 &bm);
 	    Matrix4 operator *(const Matrix4 &m);
+        Matrix4 operator *=(const Matrix4 &m);
         Vec4 operator *(const Vec4 &m);
 
         void multiply(const Matrix4 &);
@@ -50,6 +52,8 @@ class Matrix3 {
         void identity();
 
         float *value_ptr();
+
+        void print();
 };
 
 #endif

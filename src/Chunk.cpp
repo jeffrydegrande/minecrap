@@ -64,7 +64,7 @@ void Chunk::setBlock(int x, int y, int z, GLubyte type)
 }
 
 void Chunk::generate() {
-    printf( "Generating chunk \n" );
+    // printf( "Generating chunk \n" );
     foreach_xyz {
         B(x,y,z) = 0;
     } endforeach;
@@ -213,26 +213,5 @@ int Chunk::render() {
     }
 	return 1;
 }
-
-#if 0
-int Chunk::renderBlock(int x, int y, int z) {
-
-    int ret = 0;
-    GLubyte block = B(x,y,z);
-
-    if (block == AIR)
-        return 0;
-
-    Vec3 world = inWorld(x, y, z);
-    glPushMatrix();
-    glTranslatef(world.x, world.y, world.z);
-    if (graphics->withinFrustum(world.x, world.y, world.z, 1.0f)) {
-        Block::render(block);
-        ret = 1;
-    }
-    glPopMatrix();
-    return ret;
-}
-#endif
 
 #undef B

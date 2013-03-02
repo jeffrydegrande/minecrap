@@ -14,6 +14,9 @@
 #include <assert.h>
 
 Crosshair::Crosshair(int screenWidth, int screenHeight) {
+    (void)screenWidth;
+    (void)screenHeight;
+    /*
 	this->centerX = (float)screenWidth / 2;
 	this->centerY = (float)screenHeight / 2;
 
@@ -22,14 +25,15 @@ Crosshair::Crosshair(int screenWidth, int screenHeight) {
     glNewList(this->crosshair, GL_COMPILE);
 	this->draw();
 	glEndList();
+    */
 }
 
 Crosshair::~Crosshair() {
-	glDeleteLists(this->crosshair, 1);
+	// glDeleteLists(this->crosshair, 1);
 }
 
 void Crosshair::render() {
-	glCallList(this->crosshair);
+	// glCallList(this->crosshair);
 }
 
 void Crosshair::draw() {

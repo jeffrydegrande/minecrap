@@ -31,7 +31,13 @@ World::World(int seed): chunks(NULL) {
 
 World::~World() {
 	delete sun;
-	sun = NULL;
+	for (size_t x=0; x < chunks->numRows(); x++) {
+		for (size_t y=0; y < chunks->numColumns(); y++) {
+            Chunk *chunk = chunks->get(x, y);
+            delete chunk;
+        }
+    }
+    delete chunks;
 }
 
 void World::init(int seed) {

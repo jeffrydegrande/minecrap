@@ -21,8 +21,7 @@ public:
 
 	size_t numColumns() const;
 
-	size_t actualSize() const;
-
+	size_t size() const;
     size_t count() const;
 
 private:
@@ -86,7 +85,7 @@ size_t Grid<T>::numColumns() const
 }
 
 template <class T>
-size_t Grid<T>::actualSize() const
+size_t Grid<T>::size() const
 {
 	return mData.size();
 }

@@ -1,5 +1,6 @@
 #include "minecrap.h"
 
+#ifdef GLCONSOLE_SUPPORT
 #define MAX_MSG_LEN 1024
 
 #include <vector>
@@ -107,3 +108,4 @@ void ConsoleLog (const char* message, ...)
 	}
 	con.EnterLogLine (msg_text, LINEPROP_LOG, true);
 }
+#endif

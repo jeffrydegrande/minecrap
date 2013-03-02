@@ -215,10 +215,11 @@ void Engine::run() {
 
 void Engine::update() {
     this->collectInput();
+#ifdef SUPPORT_GLCONSOLE
     ConsoleUpdate ();
+#endif
     world->update();
     player->update();
-
 }
 
 void Engine::collectInput() {
@@ -236,26 +237,30 @@ void Engine::collectInput() {
             break;
 
         case SDL_KEYDOWN:
+#ifdef GLCONSOLE_SUPPORT
             if (ConsoleIsOpen ()) {
                 ConsoleInput (event.key.keysym.sym, event.key.keysym.unicode);
                 break;
-            } else {
-                switch (event.key.keysym.sym) {
-                    case SDLK_ESCAPE:
-                        stop();
-                        break;
-                    case SDLK_BACKQUOTE:
-                        ConsoleToggle();
-                        break;
-                    case SDLK_F2:
-                        toggleLights();
-                        break;
-                    case SDLK_F3:
-                        toggleRenderingAsWireframe();
-                        break;
-                    default:
-                        Input::keyPressed(event.key.keysym.sym);
-                }
+            }
+#endif
+
+            switch (event.key.keysym.sym) {
+                case SDLK_ESCAPE:
+                    stop();
+                    break;
+#ifdef GLCONSOLE_SUPPORT
+                case SDLK_BACKQUOTE:
+                    ConsoleToggle();
+                    break;
+#endif
+                case SDLK_F2:
+                    toggleOptionLighting();
+                    break;
+                case SDLK_F3:
+                    toggleOptionRenderWireframe();
+                    break;
+                default:
+                    Input::keyPressed(event.key.keysym.sym);
             }
             break;
         case SDL_JOYAXISMOTION:
@@ -269,9 +274,12 @@ void Engine::collectInput() {
 
               if (event.motion.x < 20 || event.motion.x > w - 20 ||
                   event.motion.y < 20 || event.motion.y > h - 20) {
-                if (!ConsoleIsOpen()) {
-                  SDL_WarpMouse(w / 2, h / 2);
-                }
+
+#ifdef GLCONSOLE_SUPPORT
+                if (ConsoleIsOpen())
+                    break;
+#endif
+                SDL_WarpMouse(w / 2, h / 2);
               } else {
                 player->look(event.motion.yrel, event.motion.xrel);
               }
@@ -375,7 +383,9 @@ void Engine::render2D() {
 
     crosshair->render();
     renderOnScreenDisplay();
+#ifdef GLCONSOLE_SUPPORT
     ConsoleRender();
+#endif
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);

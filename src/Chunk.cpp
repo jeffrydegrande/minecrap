@@ -131,9 +131,6 @@ void Chunk::summarize() {
 		}
 		blockCount++;
 	} endforeach
-
-	ConsoleLog("Chunk %d, %d: %d blocks (%d rock, %d dirt, %d air, %d water, %d test, %d empty)", 
-               this->worldX, this->worldZ, blockCount, rock, dirt, air, water, test, empty);
 }
 
 

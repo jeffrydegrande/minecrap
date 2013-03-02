@@ -51,6 +51,8 @@ Engine::~Engine() {
     delete this->world;
     delete this->player;
     delete this->crosshair;
+
+    SDL_Quit();
 }
 
 void Engine::init() {
@@ -222,6 +224,7 @@ void Engine::update() {
 void Engine::collectInput() {
     SDL_Event event;
     long now;
+    last_update = 0;
 
     while (SDL_PollEvent(&event)) {
         switch(event.type) {

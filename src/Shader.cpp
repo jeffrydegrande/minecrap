@@ -43,20 +43,17 @@ void Shader::dontUse() {
 }
 
 void Shader::done() {
-
     program = glCreateProgram();
-    for (size_t i=0; i<shaders.size(); i++)
-    {
+    for (size_t i=0; i<shaders.size(); i++) {
         glAttachShader(program, shaders[i]);
     }
-   glLinkProgram(program);
 
+    glLinkProgram(program);
     //Note the different functions here: glGetProgram* instead of glGetShader*.
     GLint isLinked = 0;
     glGetProgramiv(program, GL_LINK_STATUS, (int *)&isLinked);
 
-    if(isLinked == GL_FALSE)
-    {
+    if(isLinked == GL_FALSE) {
         printf("Can not link shader program\n");
         exit(1);
     }
@@ -66,14 +63,13 @@ void Shader::done() {
     }
 
     cameraToClipMatrix        = glGetUniformLocation(program, "cameraToClipMatrix");
+    assert(cameraToClipMatrix != -1);
     directionToLight          = glGetUniformLocation(program, "directionToLight");
+    assert(directionToLight != -1);
     modelToCameraMatrix       = glGetUniformLocation(program, "modelToCameraMatrix");
+    assert(modelToCameraMatrix != -1);
     normalModelToCameraMatrix = glGetUniformLocation(program, "normalModelToCameraMatrix");
-
-    printf("%d\n", cameraToClipMatrix);
-    printf("%d\n", directionToLight);
-    printf("%d\n", modelToCameraMatrix);
-    printf("%d\n", normalModelToCameraMatrix);
+    assert(normalModelToCameraMatrix != -1);
 
     ASSERT_NO_GL_ERROR;
 }

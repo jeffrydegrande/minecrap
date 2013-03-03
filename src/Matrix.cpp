@@ -94,6 +94,16 @@ void Matrix4::transformVector(Vec3 &to) {
     to.z = m[8] * x + m[9] * y + m[10] * z;
 }
 
+void Matrix4::translate(float x, float y, float z) {
+	m[12] += x;
+	m[13] += y;
+	m[14] += z;
+}
+
+void Matrix4::translate(const Vec3 &v) {
+	translate(v.x, v.y, v.z);
+}
+
 void Matrix4::rotate( const float &angle, Vec3 &axis )
 {
     float s = sin(DEGREES_TO_RADIANS * angle);

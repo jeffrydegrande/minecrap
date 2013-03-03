@@ -29,6 +29,9 @@ class Matrix4 {
         void identity();
         void invertPt(const Vec3 & from, Vec3 &to);
         void transformVector(Vec3 &to);
+        void translate(float x, float y, float z);
+        void translate(const Vec3 &v);
+
         void rotate(const float &angle, Vec3 &axis);
         void rotateX(float degs);
         void rotateY(float degs);

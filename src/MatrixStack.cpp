@@ -1,6 +1,7 @@
 #include "MatrixStack.h"
 #include "minecrap.h"
 #include "Matrix.h"
+#include "Camera.h"
 
 #include <cmath>
 
@@ -14,9 +15,14 @@ MatrixStack::MatrixStack(const Matrix4 & matrix)
 {
 }
 
+void MatrixStack::set(const Matrix4 &matrix)
+{
+    currentMatrix = matrix;
+}
+
 void MatrixStack::Perspective(float fovy, float aspect, float zNear, float zFar)
 {
-    currentMatrix *= Matrix4::Perspective(fovy, aspect, zNear, zFar);
+    currentMatrix *= Camera::Perspective(fovy, aspect, zNear, zFar);
 }
 
 void MatrixStack::apply(const Matrix4 &matrix) {
@@ -38,8 +44,6 @@ const Matrix4 &MatrixStack::top() const
 {
     return currentMatrix;
 }
-
-
 
 PushStack::PushStack(MatrixStack &stack):
     stack(stack)

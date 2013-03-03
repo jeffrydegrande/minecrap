@@ -8,17 +8,13 @@
 
 #include "Vec.h"
 #include "Matrix.h"
+#include "Camera.h"
 
 class World;
 class Player
 {
-	Vec3 position;
-	Vec3 angle;
-    Vec3 up;
-    Vec3 right;
-
-    Matrix4 camera;
-
+    Vec3 direction;
+    Camera camera;
     World *world;
 
     float velocity;
@@ -28,14 +24,7 @@ public:
 	Player(World *world, const Vec3 & position);
 	~Player(void);
 
-	void moveForward();
-	void moveBackward();
-	void strafeLeft();
-	void strafeRight();
-
-	void update();
-	void render();
-
+	void update(float elapsed);
 	void look(int x, int y);
 
 	void setPosition(const Vec3 &);

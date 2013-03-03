@@ -104,36 +104,49 @@ void Matrix4::translate(const Vec3 &v) {
 	translate(v.x, v.y, v.z);
 }
 
-void Matrix4::rotate( const float &angle, Vec3 &axis )
+void Matrix4::rotate(const Vec3 &axis, float degrees)
 {
-    float s = sin(DEGREES_TO_RADIANS * angle);
-    float c = cos(DEGREES_TO_RADIANS * angle);
+    // Creates a rotation matrix about the specified axis.
+    // The axis must be a unit vector. The angle must be in degrees.
+    //
+    // Let u = axis of rotation = (x, y, z)
+    //
+    //             | x^2(1 - c) + c  xy(1 - c) + zs  xz(1 - c) - ys   0 |
+    // Ru(angle) = | yx(1 - c) - zs  y^2(1 - c) + c  yz(1 - c) + xs   0 |
+    //             | zx(1 - c) - ys  zy(1 - c) - xs  z^2(1 - c) + c   0 |
+    //             |      0              0                0           1 |
+    //
+    // where,
+    //	c = cos(angle)
+    //  s = sin(angle)
 
-    axis.normalize();
+    degrees *= DEGREES_TO_RADIANS;
 
-    float ux = axis.x;
-    float uy = axis.y;
-    float uz = axis.z;
+    float x = axis.x;
+    float y = axis.y;
+    float z = axis.z;
+    float c = cosf(degrees);
+    float s = sinf(degrees);
 
-    m[0]  = c + (1-c) * ux;
-    m[1]  = (1-c) * ux*uy + s*uz;
-    m[2]  = (1-c) * ux*uz - s*uy;
-    m[3]  = 0;
+    m[0] = (x * x) * (1.0f - c) + c;
+    m[1] = (x * y) * (1.0f - c) + (z * s);
+    m[2] = (x * z) * (1.0f - c) - (y * s);
+    m[3] = 0.0f;
 
-    m[4]  = (1-c) * uy*ux - s*uz;
-    m[5]  = c + (1-c) * pow(uy,2);
-    m[6]  = (1-c) * uy*uz + s*ux;
-    m[7]  = 0;
+    m[4] = (y * x) * (1.0f - c) - (z * s);
+    m[5] = (y * y) * (1.0f - c) + c;
+    m[6] = (y * z) * (1.0f - c) + (x * s);
+    m[7] = 0.0f;
 
-    m[8]  = (1-c) * uz*ux + s*uy;
-    m[9]  = (1-c) * uz*uz - s*ux;
-    m[10]  = c + (1-c) * pow(uz,2);
-    m[11]  = 0;
+    m[8] = (z * x) * (1.0f - c) + (y * s);
+    m[9] = (z * y) * (1.0f - c) - (x * s);
+    m[10] = (z * z) * (1.0f - c) + c;
+    m[11] = 0.0f;
 
-    m[12] = 0;
-    m[13] = 0;
-    m[14] = 0;
-    m[15] = 1;
+    m[12] = 0.0f;
+    m[13] = 0.0f;
+    m[14] = 0.0f;
+    m[15] = 1.0f;
 }
 
 void Matrix4::rotateX(float degs) {
@@ -216,7 +229,7 @@ float & Matrix4::operator()(int row, int column) {
 }
 
 
-static void 
+static void
 lubksb(Matrix4 & a, int *indx, double *b)
 {
 	int		i, j, ii=-1, ip;
@@ -251,7 +264,7 @@ lubksb(Matrix4 & a, int *indx, double *b)
 **-----------------------------------------------------------------------------
 */
 
-static void 
+static void
 ludcmp(Matrix4 & a, int *indx, double *d)
 {
 	double	vv[4];               /* implicit scale for each row */
@@ -327,15 +340,15 @@ void Matrix4::inverse(const Matrix4 &m)
 	n = m;
 	ludcmp(n, indx, &d);
 
-	for (j=0; j<4; j++) 
+	for (j=0; j<4; j++)
     {
-		for (i=0; i<4; i++) 
+		for (i=0; i<4; i++)
         {
 			col[i] = 0.0;
 		}
 		col[j] = 1.0;
 		lubksb(n, indx, col);
-		for (i=0; i<4; i++) 
+		for (i=0; i<4; i++)
         {
 			(*this)(i, j) = col[i];
 		}

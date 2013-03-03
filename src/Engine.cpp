@@ -25,7 +25,7 @@
 #define FPS_INTERVAL     1.0f
 #define ASSERT_NO_GL_ERROR assert(GL_NO_ERROR == glGetError())
 
-static float elapsed_seconds = 0.0f;
+// static float elapsed_seconds = 0.0f;
 
 static void displayOpenGLInfo() {
     printf ("vendor: %s\n",  (const unsigned char *)glGetString(GL_VENDOR));
@@ -174,22 +174,17 @@ inline long Engine::tick() {
 }
 
 void Engine::run() {
-    long stop;
-    long remaining;
-
     unsigned int fps_lasttime = tick(); //the last recorded time.
     unsigned fps_frames = 0; // frames passed since the last recorded fps.
 
+    long last_update = 0;
+    long now = 0;
+
     while(!quit) {
-        stop = tick() + 15;
-        update();
+        now = tick();
+        update((float)last_update);
         render();
-
-        remaining = stop - tick();
-        if (remaining > 0) {
-            sleep(remaining);
-        }
-
+        last_update = tick() - now;
         fps_frames++;
         if (fps_lasttime < tick() - FPS_INTERVAL*1000)
         {
@@ -204,19 +199,19 @@ void Engine::run() {
 // Advancing the simulation
 //////////////////////////////////////////////////////
 
-void Engine::update() {
+void Engine::update(float elapsed) {
+    float elapsedInSeconds = elapsed / 1000.f;
+
     this->collectInput();
 #ifdef SUPPORT_GLCONSOLE
     ConsoleUpdate ();
 #endif
+    player->update(elapsedInSeconds);
     world->update();
-    player->update();
 }
 
 void Engine::collectInput() {
     SDL_Event event;
-    long now;
-    last_update = 0;
 
     while (SDL_PollEvent(&event)) {
         switch(event.type) {
@@ -265,14 +260,13 @@ void Engine::collectInput() {
 
               if (event.motion.x < 20 || event.motion.x > w - 20 ||
                   event.motion.y < 20 || event.motion.y > h - 20) {
-
 #ifdef SUPPORT_GLCONSOLE
                 if (ConsoleIsOpen())
                     break;
 #endif
                 SDL_WarpMouse(w / 2, h / 2);
               } else {
-                player->look(event.motion.yrel, event.motion.xrel);
+                player->look(event.motion.xrel, event.motion.yrel);
               }
             }
             break;
@@ -284,14 +278,6 @@ void Engine::collectInput() {
             break;
         }
     }
-
-    now = this->tick();
-    elapsed = now - last_update;
-
-    if (elapsed > 0) {
-        elapsed_seconds = (float)elapsed / 1000.0f;
-    }
-    last_update = now;
 }
 
 
@@ -311,7 +297,7 @@ void Engine::render() {
 
 	while (GL_NO_ERROR != (error=glGetError())) {
 		std::string s = reinterpret_cast<const char *>(gluErrorString(error));
-		printf( "Error: %s\n", s.c_str());
+		fprintf(stderr, "Error: %s\n", s.c_str());
         exit(1);
 	}
 }
@@ -328,32 +314,19 @@ void Engine::render3D() {
 	UseShader use(*shader);
 
 	Matrix4 cameraToClipMatrix = projection.top();
-    shader->setCameraToClipMatrix(cameraToClipMatrix);
 
     MatrixStack model;
-    player->render();
-
     Matrix4 camera = player->getCameraMatrix();
     model.apply(camera);
 
     Vec4 lightDirectionCameraSpace = camera * Vec4(0.866f, 1.0f, 0.0f, 0.0f);
-    shader->setDirectionToLight(lightDirectionCameraSpace);
-    {
-        PushStack push(model);
-        {
-            PushStack push(model);
-            shader->setModelToCameraMatrix(camera);
-            Matrix3 normal(camera);
-            shader->setNormalModelToCameraMatrix(normal);
-        }
-        glShadeModel(GL_SMOOTH);
+    Matrix3 normal(camera);
 
-        {
-            PushStack push(model);
-            world->render();
-        }
-    }
-    shader->dontUse();
+    shader->setCameraToClipMatrix(cameraToClipMatrix);
+    shader->setNormalModelToCameraMatrix(normal);
+    shader->setDirectionToLight(lightDirectionCameraSpace);
+    shader->setModelToCameraMatrix(camera);
+    world->render();
 
     ASSERT_NO_GL_ERROR;
 }
@@ -373,6 +346,7 @@ void Engine::render2D() {
 
     crosshair->render();
     renderOnScreenDisplay();
+
 #ifdef SUPPORT_GLCONSOLE
     ConsoleRender();
 #endif
@@ -403,10 +377,6 @@ void Engine::renderOnScreenDisplay() {
     osd->reset();
 }
 
-
-float Engine::elapsedSeconds() {
-    return elapsed_seconds;
-}
 
 int Engine::viewWidth() const {
     return width;

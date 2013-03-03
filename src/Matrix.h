@@ -6,9 +6,9 @@
 
 class Plane;
 class Matrix4 {
+    // friend Vec3 operator*(const Vec3 &lhs, const Matrix4 &rhs);
 
     float m[16];
-
 
     public:
         Matrix4();
@@ -24,6 +24,9 @@ class Matrix4 {
         Matrix4 operator *=(const Matrix4 &m);
         Vec4 operator *(const Vec4 &m);
 
+        const float &operator[](size_t i) const;
+        float &operator[](size_t i);
+
         void multiply(const Matrix4 &);
 
         void identity();
@@ -32,7 +35,7 @@ class Matrix4 {
         void translate(float x, float y, float z);
         void translate(const Vec3 &v);
 
-        void rotate(const float &angle, Vec3 &axis);
+        void rotate(const Vec3 &axis, float angle);
         void rotateX(float degs);
         void rotateY(float degs);
         void rotateZ(float degs);
@@ -57,5 +60,24 @@ class Matrix3 {
 
         void print();
 };
+
+//////////////////////////////////////////////////////////////////
+// Matrix4 inline operations
+//////////////////////////////////////////////////////////////////
+
+inline Vec3 operator*(const Vec3 &lhs, const Matrix4 &rhs) {
+    return Vec3((lhs.x * rhs[0]) + (lhs.y * rhs[4]) + (lhs.z * rhs[8]),
+                (lhs.x * rhs[1]) + (lhs.y * rhs[5]) + (lhs.z * rhs[9]),
+                (lhs.x * rhs[2]) + (lhs.y * rhs[6]) + (lhs.z * rhs[10]));
+}
+
+
+inline const float &Matrix4::operator[](size_t i) const {
+    return m[i];
+}
+
+inline float &Matrix4::operator[](size_t i) {
+    return m[i];
+}
 
 #endif

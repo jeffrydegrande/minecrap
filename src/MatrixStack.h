@@ -17,6 +17,7 @@ class MatrixStack {
         const Matrix4 &top() const;
 
         void apply(const Matrix4 &matrix);
+        void set(const Matrix4 &matrix);
 
     private:
 

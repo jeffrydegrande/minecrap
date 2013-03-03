@@ -16,7 +16,6 @@ public:
 	Vec2 operator -(const Vec2 &);
 	Vec2 & operator -=(const Vec2 &);
 
-
 	Vec2 normalize();
 	static Vec2 normalize(const Vec2 &);
 
@@ -27,6 +26,7 @@ public:
 
 class Vec3
 {
+	friend Vec3 operator -(const Vec3 &);
 
 public:
 
@@ -38,14 +38,15 @@ public:
     Vec3(const Vec3 &v);
 	Vec3(float x, float y, float z);
 
-	Vec3 operator +(const Vec3 &);
 	Vec3 & operator +=(const Vec3 &);
-	Vec3 operator -(const Vec3 &);
 	Vec3 & operator -=(const Vec3 &);
-	Vec3 operator *(float scalar);
 	Vec3 & operator *=(float scalar);
-	Vec3 operator *(int scalar);
 	Vec3 & operator *=(int scalar);
+
+	Vec3 operator +(const Vec3 &) const;
+	Vec3 operator -(const Vec3 &) const;
+	Vec3 operator *(float scalar) const;
+	Vec3 operator *(int scalar) const;
 
 	float dotProduct(const Vec3 &);
 	static float dotProduct(const Vec3 &, const Vec3 &);
@@ -60,9 +61,17 @@ public:
     void set(float x, float y, float z);
 
 	float length() const;
+    float lengthSq() const;
 
     void print() const;
 };
+
+
+inline Vec3 operator-(const Vec3 &v)
+{
+    return Vec3(-v.x, -v.y, -v.z);
+}
+
 
 class Vec4
 {

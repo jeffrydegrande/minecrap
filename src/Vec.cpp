@@ -88,9 +88,26 @@ void Vec3::print() const {
     printf("%0.2f, %0.2f, %0.2f\n", x, y, z);
 }
 
-Vec3 Vec3::operator+(const Vec3 &vector) {
+Vec3 Vec3::operator+(const Vec3 &vector) const {
 	return Vec3(x + vector.x, y + vector.y, z + vector.z);
 }
+
+Vec3 Vec3::operator -(const Vec3 &vector) const {
+    Vec3 res;
+    res.x = x - vector.x;
+    res.y = y - vector.y;
+    res.z = z - vector.z;
+	return res;
+}
+
+Vec3 Vec3::operator *(float scalar) const {
+	return Vec3(x * scalar, y * scalar, z * scalar);
+}
+
+Vec3 Vec3::operator *(int scalar) const {
+	return Vec3(x * scalar, y * scalar, z * scalar);
+}
+
 
 Vec3 & Vec3::operator +=(const Vec3 &vector) {
 	x += vector.x;
@@ -98,14 +115,6 @@ Vec3 & Vec3::operator +=(const Vec3 &vector) {
 	z += vector.z;
 
 	return *this;
-}
-
-Vec3 Vec3::operator -(const Vec3 &vector) {
-    Vec3 res;
-    res.x = x - vector.x;
-    res.y = y - vector.y;
-    res.z = z - vector.z;
-	return res;
 }
 
 Vec3 & Vec3::operator -=(const Vec3 &vector) {
@@ -116,19 +125,11 @@ Vec3 & Vec3::operator -=(const Vec3 &vector) {
 	return *this;
 }
 
-Vec3 Vec3::operator *(float scalar) {
-	return Vec3(x * scalar, y * scalar, z * scalar);
-}
-
 Vec3 & Vec3::operator *=(float scalar) {
 	x *= scalar;
 	y *= scalar;
 	z *= scalar;
 	return *this;
-}
-
-Vec3 Vec3::operator *(int scalar) {
-	return Vec3(x * scalar, y * scalar, z * scalar);
 }
 
 Vec3 & Vec3::operator *=(int scalar) {
@@ -140,7 +141,11 @@ Vec3 & Vec3::operator *=(int scalar) {
 
 
 float Vec3::length() const {
-	return sqrt(x*x + y*y + z*z);
+	return sqrtf(x*x + y*y + z*z);
+}
+
+float Vec3::lengthSq() const {
+	return x*x + y*y + z*z;
 }
 
 float Vec3::dotProduct(const Vec3 &other) {

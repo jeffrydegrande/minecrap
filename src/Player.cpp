@@ -4,6 +4,7 @@
 #include "Engine.h"
 #include "World.h"
 #include "Text.h"
+#include "OSD.h"
 
 #include "Vec.h"
 #include <math.h>
@@ -14,9 +15,15 @@
 #define JUMP_SPEED      5.5f
 #define SPEED		    8.0f
 
+#define ACCELERATION Vec3(8.0f, 8.0f, 8.0f)
+#define VELOCITY Vec3(8.0f, 8.0f, 8.0f)
+
 Player::Player(World *world, const Vec3 & position) {
     this->world = world;
 	this->setPosition(position);
+
+    camera.setAcceleration(ACCELERATION);
+    camera.setVelocity(VELOCITY);
 }
 
 Player::~Player(void)
@@ -24,15 +31,15 @@ Player::~Player(void)
 }
 
 const Vec3 Player::getPosition() const {
-    return position;
+	return camera.getPosition();
 }
 
 const Vec3 Player::getDirection() const {
-    return angle;
+	return camera.getViewDirection();
 }
 
 const char *Player::getDirectionAsString() {
-    float angle = this->angle.y;
+    float angle = this->getDirection().x;
 
     if (angle < 22.5f || angle >= 337.5f)
         return "N";
@@ -54,97 +61,101 @@ const char *Player::getDirectionAsString() {
     return "Unknown";
 }
 
-void Player::render() {
-	angle.normalize();
-	right = angle * up;
-	right.normalize();
-
-	up = right * angle;
-	up.normalize();
-
-    float v[16];
-
-	v[0] =  right.x;
-	v[1] =  up.x;
-	v[2] = -angle.x;
-	v[3] =  0.0f;
-
-	v[4] =  right.y;
-	v[5] =  up.y;
-	v[6] = -angle.y;
-	v[7] =  0.0f;
-
-	v[8]  =  right.z;
-	v[9]  =  up.z;
-	v[10] = -angle.z;
-	v[11] =  0.0f;
-
-	v[12] = -right.dotProduct(position);
-	v[13] = -up.dotProduct(position);
-	v[14] =  angle.dotProduct(position);
-	v[15] =  1.0f;
-
-    camera = v;
-}
-
 void Player::look(int x, int y) {
-    float mouse_sense = 0.3f;
+    bool flying = CVarUtils::GetCVar<bool>("flying");
+    float mouse_sense = 0.5f;
 
-    // avoid getting the very first update throwing
-    // the player completely off
-    if (abs(x) > 200 || abs(y) > 200)
-      return;
+	if (flying) {
+		float heading = -direction.x * 100.0f * 0.05f;
+		float pitch  = -y * mouse_sense;
+		float roll = -x * mouse_sense;
 
-    // Matrix4 camera;
-    camera.identity();
-
-    // rotate on the x-axis
-    camera.rotate((float)x * mouse_sense, right);
-    camera.transformVector(angle);
-    camera.transformVector(up);
-
-    // rotate on the y-axis
-    Vec3 u(0.0f, 1.0f, 0.0f);
-    camera.rotate((float)y * mouse_sense, u);
-    camera.transformVector(angle);
-    camera.transformVector(up);
-
-  // TODO: how to clamp rotations on X&Z & how to not rotate on Z at all
-  // rotate on the y-axis
-  /*
-  x = - x;
-  mouse_sense = 0.8f;
-  angle.x -= (float)x * mouse_sense;
-  angle.x = clamp (angle.x, -90.0f, 90.0f);
-
-  angle.y -= (float)y * mouse_sense;
-  if (angle.y < -180.0f)
-	  angle.y += 360.0f;
-  if (angle.y > 180.0f)
-	  angle.y -= 360.0f;
-  */
-
+		camera.rotate(heading, pitch, roll);
+	} else {
+		float heading = -x * mouse_sense;
+		float pitch   = -y * mouse_sense;
+		camera.rotate(heading, pitch, 0.0f);
+	}
 }
 
-void Player::update()
+void Player::update(float elapsed)
 {
-    float elapsed = (std::min)(Engine::elapsedSeconds(), 0.25f);
     bool flying = CVarUtils::GetCVar<bool>("flying");
 
+	static bool movingForward  = false;
+	static bool movingBackward = false;
+	static bool movingLeft     = false;
+	static bool movingRight    = false;
+	static bool movingUp	   = false;
+	static bool movingDown     = false;
+
+    direction.set(0.0f, 0.0f, 0.0f);
+    Vec3 cameraVelocity = camera.getCurrentVelocity();
+
     // update movement
-    if (Input::isKeyPressed(SDLK_w)) { 
-        position += angle * SPEED * elapsed;
-    }
+    if (Input::isKeyPressed(SDLK_w)) {
+		if (!movingForward) {
+			movingForward = true;
+			camera.setCurrentVelocity(cameraVelocity.x, cameraVelocity.y, 0.0f);
+		}
+        direction.z += 1.0f;
+    } else {
+		movingForward = false;
+	}
 
     if (Input::isKeyPressed(SDLK_s)) { 
-        position -= angle * SPEED * elapsed;
-    }
-    if (Input::isKeyPressed(SDLK_a)) { 
-        position -= right * SPEED * elapsed;
-    }
+		if (!movingBackward) {
+			movingBackward = true;
+			camera.setCurrentVelocity(cameraVelocity.x, cameraVelocity.y, 0.0f);
+		}
+		direction.z -= 1.0f;
+    } else {
+		movingBackward = false;
+	}
+
     if (Input::isKeyPressed(SDLK_d)) { 
-        position += right * SPEED * elapsed;
-    }
+		if (!movingRight) {
+			movingRight = true;
+			camera.setCurrentVelocity(0.0f, cameraVelocity.y, cameraVelocity.z);
+		}
+        direction.x += 1.0f;
+    } else {
+		movingRight = false;
+	}
+
+    if (Input::isKeyPressed(SDLK_a)) { 
+		if (!movingLeft) {
+			movingLeft = true;
+			camera.setCurrentVelocity(0.0f, cameraVelocity.y, cameraVelocity.z);
+		}
+        direction.x -= 1.0f;
+    } else {
+		movingLeft = false;
+	}
+
+    if(CVarUtils::GetCVar<bool>("flying")) {
+		if (Input::isKeyPressed(SDLK_q)) {
+			if (!movingUp) {
+				movingUp = true;
+				camera.setCurrentVelocity(cameraVelocity.x, 0.0f, cameraVelocity.z);
+			}
+			direction.y += 1.0f;
+		} else{
+			movingUp = false;
+		}
+
+		if (Input::isKeyPressed(SDLK_e)) {
+			if (!movingDown) {
+				movingDown = true;
+				camera.setCurrentVelocity(cameraVelocity.x, 0.0f, cameraVelocity.z);
+			}
+			direction.y -= 1.0f;
+		} else {
+			movingDown = false;
+		}
+	}
+
+    camera.updatePosition(direction, elapsed);
 
     // jumping
     if (Input::isKeyPressed(SDLK_SPACE) && onGround) {
@@ -152,8 +163,10 @@ void Player::update()
         onGround = false;
     }
 
+
     // apply gravity
     if (!flying) {
+#if 0
         float ground = position.y;
         velocity   -= GRAVITY * elapsed;
         position.y += velocity * elapsed;
@@ -165,18 +178,16 @@ void Player::update()
         } else {
             onGround = false;
         }
+#endif
     }
 }
 
 void Player::setPosition(const Vec3 &position) {
-	this->position = position;
-	this->angle = Vec3(-13.0f, 180.0f, 0.0f );
-    this->up    = Vec3(0.0f, 1.0f, 0.0f);
-    this->right = Vec3(1.0f, 0.0f, 0.0f);
-    this->velocity = 0;
     this->onGround = true;
+    camera.setViewDirection(Vec3(0.0, 0.0f, -1.0f));
+    camera.setPosition(position);
 }
 
 const Matrix4 & Player::getCameraMatrix() {
-    return camera;
+    return camera.getViewMatrix();
 }

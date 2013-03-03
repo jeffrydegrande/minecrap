@@ -21,9 +21,6 @@ class Engine
 	int width;
 	int height;
 
-    Vec3 cameraPosition;
-    Vec3 cameraDirection;
-
     Frustum frustum;
 
 	bool quit;
@@ -33,6 +30,9 @@ class Engine
 	Crosshair *crosshair;
 
     Shader *shader;
+
+    Vec3 cameraPosition;
+    Vec3 cameraDirection;
 
     bool optionRenderWireframe;
     bool optionLighting;
@@ -63,7 +63,7 @@ private:
     void compileShaders();
     void setupProjectionMatrix();
 	
-	void update();
+	void update(float elapsed);
 	void collectInput();
 
 	long tick();

@@ -21,6 +21,8 @@ public:
 	static Vec2 normalize(const Vec2 &);
 
 	float length() const;
+
+    void print() const;
 };
 
 class Vec3
@@ -58,6 +60,8 @@ public:
     void set(float x, float y, float z);
 
 	float length() const;
+
+    void print() const;
 };
 
 class Vec4
@@ -98,6 +102,8 @@ public:
 	float length() const;
 
     float *value_ptr();
+
+    void print() const;
 };
 
 #endif

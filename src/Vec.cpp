@@ -1,5 +1,7 @@
 #include "Vec.h"
-#include <math.h>
+
+#include <cstdio>
+#include <cmath>
 
 /////////////////////////////////////////////////////////////////
 /// Vec2 Implementation
@@ -56,16 +58,18 @@ Vec2 Vec2::normalize(const Vec2 &v) {
 	return result;
 }
 
+void Vec2::print() const {
+    printf( "%0.2f, %0.2f\n", x, y);
+}
+
 /////////////////////////////////////////////////////////////////
 /// Vec3 Implementation
 /////////////////////////////////////////////////////////////////
 
-Vec3::Vec3(): x(0), y(0), z(0)
-{
+Vec3::Vec3(): x(0), y(0), z(0) {
 }
 
-Vec3::Vec3(float x, float y, float z): x(x), y(y), z(z)
-{
+Vec3::Vec3(float x, float y, float z): x(x), y(y), z(z) {
 }
 
 Vec3::Vec3(const Vec3 &v) {
@@ -78,6 +82,10 @@ void Vec3::set(float x, float y, float z) {
     this->x = x;
     this->y = y;
     this->z = z;
+}
+
+void Vec3::print() const {
+    printf("%0.2f, %0.2f, %0.2f\n", x, y, z);
 }
 
 Vec3 Vec3::operator+(const Vec3 &vector) {
@@ -299,4 +307,8 @@ void Vec4::copy(const Vec4 &v) {
 
 float * Vec4::value_ptr() {
     return &x;
+}
+
+void Vec4::print() const {
+    printf( "%0.2f, %0.2f, %0.2f %0.2f\n", x, y, z, w);
 }

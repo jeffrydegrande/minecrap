@@ -169,6 +169,7 @@ $RECYCLE.BIN/
 
 *.o
 mc
+libmc.a
 
 # CVars
 cvars.xml

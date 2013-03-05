@@ -17,6 +17,8 @@ class Camera {
     Vec3 currentVelocity;
     Vec3 velocity;
 
+    float distanceTraveled;
+
     Matrix4 viewMatrix;
 
     float accumPitchDegrees;
@@ -50,6 +52,7 @@ class Camera {
         const Vec3 &getVelocity() const;
         const Vec3 &getCurrentVelocity() const;
         const Vec3 &getViewDirection() const;
+        const float &getDistanceTraveled() const;
 
     private:
         void rotateFlight(float headingDegrees, float pitchDegrees, float rollDegrees);
@@ -91,5 +94,8 @@ inline const Vec3 &Camera::getCurrentVelocity() const
 
 inline const Vec3 &Camera::getViewDirection() const
 { return this->viewDirection; }
+
+inline const float &Camera::getDistanceTraveled() const
+{ return this->distanceTraveled; }
 
 #endif

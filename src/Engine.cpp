@@ -368,6 +368,8 @@ void Engine::renderOnScreenDisplay() {
                 pos.x, pos.y, pos.z);
     osd->write("Ang: %0.2f, %0.2f, %0.2f, facing %s",
                 angle.x, angle.y, angle.z, player->getDirectionAsString());
+    osd->write("Distance Traveled: %0.2fm (%0.2f km/h)\n", 
+            player->getDistanceTraveled(), 0);
 
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {

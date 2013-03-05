@@ -28,10 +28,13 @@ public:
 	void look(int x, int y);
 
 	void setPosition(const Vec3 &);
-    const Vec3 getPosition() const;
 
+    const Vec3 getPosition() const;
     const Vec3 getDirection() const;
     const char *getDirectionAsString();
-
+    const float &getDistanceTraveled() const;
     const Matrix4 & getCameraMatrix();
 };
+
+inline const float &Player::getDistanceTraveled() const
+{ return camera.getDistanceTraveled(); }

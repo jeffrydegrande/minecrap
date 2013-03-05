@@ -13,6 +13,7 @@ Camera::Camera()
     zAxis.set(0.0f, 0.0f, 1.0f);
     viewDirection.set(0.0f, 0.0f, -1.0f);
     accumPitchDegrees = 0.0f;
+    distanceTraveled = 0.0f;
     currentVelocity.set(0.0f, 0.0f, 0.0f);
     velocity.set(0.0f, 0.0f, 0.0f);
     acceleration.set(0.0f, 0.0f, 0.0f);
@@ -242,8 +243,19 @@ void Camera::updatePosition(const Vec3 &direction, float elapsed)
         if (direction.z == 0.0f && closeEnough(currentVelocity.z, 0.0f))
             displacement.z = 0.0f;
 
-        move(displacement.x, displacement.y, displacement.z);
+        move(displacement);
+
+        float distance = displacement.length();
+        float speed = (1.0f / (elapsed / 1000.0f)) * distance; // seconds
+
+        if (closeEnough(elapsed/1000.0f, 0.0f)) {
+            speed = 0.0f;
+        }
+
+        distanceTraveled += distance;
     }
+
+
     updateVelocity(direction, elapsed);
 }
 

@@ -33,7 +33,7 @@ Matrix3::Matrix3(Matrix4 &matrix)
 
 void Matrix3::identity() {
     memset(&m, 0, sizeof(float) * 9);
-    m[0] = m[4] = m[9] = 1.0f;
+    m[0] = m[4] = m[8] = 1.0f;
 }
 
 float * Matrix3::value_ptr()

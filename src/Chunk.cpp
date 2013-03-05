@@ -110,9 +110,10 @@ void Chunk::generateTerrain() {
                 ) * 32 + WATER_LEVEL;
 
         assert(maxHeight <= CHUNKY && maxHeight >= 0);
-
-        B(x, (int)maxHeight, z) = ROCK;
-        B(x, (int)maxHeight - 1, z) = ROCK;
+        if (maxHeight < CHUNKY) {
+            B(x, (int)maxHeight, z) = ROCK;
+            B(x, (int)maxHeight - 1, z) = ROCK;
+        }
     } endforeach;
 }
 
@@ -194,8 +195,6 @@ bool Chunk::isExposedToAir(int x, int y, int z) {
 
 inline Vec3 Chunk::inWorld(int x, int y, int z)
 {
-
-
     return Vec3((float)((this->worldX << 4) + x), (float)y, (float)((this->worldZ << 4) + z));
 }
 
@@ -217,14 +216,19 @@ void Chunk::buildMesh() {
         if (block == AIR)
             continue;
 
-        faces = 0;
-        if(B(x  ,y  ,z+1) == AIR) faces |= 1<<0; // front
-        if(B(x+1,y  ,z) == AIR) faces |= 1<<1; // right
-        if(B(x  ,y  ,z-1) == AIR) faces |= 1<<2; // back
-        if(B(x-1,y  ,z) == AIR) faces |= 1<<3; // left
-        if(B(x  ,y+1,z) == AIR) faces |= 1<<4; // top
-        if(B(x  ,y-1,z) == AIR) faces |= 1<<5; // bottom
+        assert(x >=0 && x<=CHUNKX);
+        assert(y >=0 && y<=CHUNKY);
+        assert(z >=0 && z<=CHUNKZ);
 
+        faces = 0;
+        if(z < CHUNKZ && B(x  ,y  ,z+1) == AIR) faces |= (1<<0); // front       
+        if(x < CHUNKX && B(x+1,y  ,z  ) == AIR)   faces |= (1<<1); // right
+        if(z > 0      && B(x  ,y  ,z-1) == AIR) faces |= (1<<2); // back
+        if(x > 0      && B(x-1,y  ,z  ) == AIR)   faces |= (1<<3); // left
+        if(y < CHUNKY && B(x  ,y+1,z  ) == AIR)   faces |= (1<<4); // top
+        if(y > 0      && B(x  ,y-1,z  ) == AIR)   faces |= (1<<5); // bottom
+
+        //assert(faces >= 0 && faces <= 1<<5);
         if (faces != 0)
             mesh->addCube(inWorld(x,y,z), block, faces);
 

@@ -133,27 +133,25 @@ void Player::update(float elapsed)
 		movingLeft = false;
 	}
 
-    if(CVarUtils::GetCVar<bool>("flying")) {
-		if (Input::isKeyPressed(SDLK_q)) {
-			if (!movingUp) {
-				movingUp = true;
-				camera.setCurrentVelocity(cameraVelocity.x, 0.0f, cameraVelocity.z);
-			}
-			direction.y += 1.0f;
-		} else{
-			movingUp = false;
-		}
+    if (Input::isKeyPressed(SDLK_q)) {
+        if (!movingUp) {
+            movingUp = true;
+            camera.setCurrentVelocity(cameraVelocity.x, 0.0f, cameraVelocity.z);
+        }
+        direction.y += 1.0f;
+    } else{
+        movingUp = false;
+    }
 
-		if (Input::isKeyPressed(SDLK_e)) {
-			if (!movingDown) {
-				movingDown = true;
-				camera.setCurrentVelocity(cameraVelocity.x, 0.0f, cameraVelocity.z);
-			}
-			direction.y -= 1.0f;
-		} else {
-			movingDown = false;
-		}
-	}
+    if (Input::isKeyPressed(SDLK_e)) {
+        if (!movingDown) {
+            movingDown = true;
+            camera.setCurrentVelocity(cameraVelocity.x, 0.0f, cameraVelocity.z);
+        }
+        direction.y -= 1.0f;
+    } else {
+        movingDown = false;
+    }
 
     camera.updatePosition(direction, elapsed);
 

@@ -1,19 +1,13 @@
-//
-//  Chunk.h
-//  Minecrap
-//
-//  Created by Jeffry Degrande on 2/4/13.
-//  Copyright (c) 2013 Jeffry Degrande. All rights reserved.
-//
-
+#ifndef MINECRAP_CHUNK_H
+#define MINECRAP_CHUNK_H
 #include "minecrap.h"
 #include "Vec.h"
+#include "Mesh.h"
 
 #define CHUNKX 16
 #define CHUNKY 128
 #define CHUNKZ 16
 
-class Mesh;
 class Chunk
 {
 	GLubyte blocks[CHUNKX][CHUNKY][CHUNKZ];
@@ -42,6 +36,8 @@ public:
 	int X();
 	int Z();
 
+    int vertexCount() const;
+
 private:
 
 	int renderBlock(int x, int y, int z);
@@ -58,3 +54,8 @@ private:
 
     void buildMesh();
 };
+
+inline int Chunk::vertexCount() const
+{ return mesh->count(); }
+
+#endif

@@ -50,15 +50,16 @@ void World::init(int seed) {
 }
 
 void World::generateChunks(int count) {
-
+    int vertexCount = 0;
 	chunks = new Grid<Chunk *>(count, count);
-
 	for (int x=0; x<count; x++) {
 		for (int y=0; y<count; y++) {
 			Chunk *chunk = new Chunk(x, y, this->seed);
 			chunks->set(x, y, chunk);
+            vertexCount += chunk->vertexCount();
 		}
 	}
+    printf("Total vertices: %d\n", vertexCount);
 }
 
 /*

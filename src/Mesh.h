@@ -27,12 +27,19 @@ class Mesh {
         Mesh(int count); // number of vertices
         ~Mesh();
 
-        void addCube(const Vec3 & pos, GLubyte kind);
+        void addCube(const Vec3 & pos, GLubyte kind, GLubyte faces);
         void finish();
 
         void build();
         void render();
 
+        int count() const;
+
+    private:
+        void addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop);
 };
+
+inline int Mesh::count() const
+{ return index; }
 
 #endif

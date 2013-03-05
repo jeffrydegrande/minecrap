@@ -65,10 +65,10 @@ Mesh::~Mesh() {
     glDeleteBuffers(1, &vbo);
 }
 
-void Mesh::addCube(const Vec3 & pos, GLubyte kind) {
+void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
+{
     assert( index <= vertexCount );
-
-    for (int i=0; i<36; i++) {
+    for (int i=start; i<stop; i++) {
         // position
         vertices[index].x  = pos.x + verts[i].x;
         vertices[index].y  = pos.y + verts[i].y;
@@ -112,20 +112,29 @@ void Mesh::addCube(const Vec3 & pos, GLubyte kind) {
     }
 }
 
+void Mesh::addCube(const Vec3 & pos, GLubyte kind, GLubyte faces) {
+    int offset = 0;
+    for (int i=0; i<6; i++) {
+        if (faces & (1<<i)) {
+            offset = i*6;
+            addCubeFace(pos, kind, offset, offset+6);
+        }
+    }
+}
+
 void Mesh::finish() {
-    // printf( "%d vertices added, %d expected.\n", index, vertexCount );
-    assert(index == vertexCount);
+    // assert(index == vertexCount);
 
     glGenVertexArrays(1, &vao );
     glBindVertexArray(vao);
 
     glGenBuffers( 1, &vbo );
-    //printf( "allocating %ld kb, %d cubes\n",
-    //       (vertexCount * sizeof(struct vertex_t)) / 1024, index / 36);
+    printf("Allocating %ld kb, ?? cubes, %d vertices\n",
+        (index * sizeof(struct vertex_t)) / 1024, index);
+
     // upload data into VBO
-    // printf("number of vertices:%d, sizeof vertices: %ld\n", vertexCount, sizeof(struct vertex_t));
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(struct vertex_t),
+    glBufferData(GL_ARRAY_BUFFER, index * sizeof(struct vertex_t),
             vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -151,7 +160,7 @@ void Mesh::render() {
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
             (GLvoid*)offsetof(struct vertex_t, nx));
 
-    glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+    glDrawArrays(GL_TRIANGLES, 0, index);
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);

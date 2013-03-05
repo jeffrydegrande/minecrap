@@ -209,12 +209,27 @@ void Chunk::buildMesh() {
     } endforeach;
 
     mesh = new Mesh(vertexCount);
+    GLubyte block;
+    GLubyte faces;
+
     foreach_xyz {
-        GLubyte block = B(x,y,z);
+        block = B(x,y,z);
         if (block == AIR)
             continue;
-        mesh->addCube(inWorld(x,y,z), block);
+
+        faces = 0;
+        if(B(x  ,y  ,z+1) == AIR) faces |= 1<<0; // front
+        if(B(x+1,y  ,z) == AIR) faces |= 1<<1; // right
+        if(B(x  ,y  ,z-1) == AIR) faces |= 1<<2; // back
+        if(B(x-1,y  ,z) == AIR) faces |= 1<<3; // left
+        if(B(x  ,y+1,z) == AIR) faces |= 1<<4; // top
+        if(B(x  ,y-1,z) == AIR) faces |= 1<<5; // bottom
+
+        if (faces != 0)
+            mesh->addCube(inWorld(x,y,z), block, faces);
+
     } endforeach;
+
     mesh->finish();
 }
 

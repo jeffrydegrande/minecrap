@@ -468,6 +468,7 @@ namespace CVarUtils {
         if( g_pCVarTrie == NULL ){
             InitCVars();
         } 
+        assert(g_pCVarTrie == NULL);
         if( !g_pCVarTrie->Exists( s ) ) {
             throw CVarNonExistant;
         }
@@ -480,6 +481,7 @@ namespace CVarUtils {
         if( g_pCVarTrie == NULL ){
             InitCVars();
         } 
+        assert(g_pCVarTrie == NULL);
         if( !g_pCVarTrie->Exists( s ) ) {
             throw CVarNonExistant;
         }

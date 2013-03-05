@@ -16,8 +16,6 @@
 #include <assert.h>
 #include <string>
 
-#define B(x,y,z)  blocks[x][y][z]
-
 Chunk::Chunk(int x, int z, int seed): mesh(NULL) {
     this->seed = seed;
     this->worldX = x;
@@ -65,9 +63,7 @@ void Chunk::setBlock(int x, int y, int z, GLubyte type)
 
 void Chunk::generate() {
     // printf( "Generating chunk \n" );
-    foreach_xyz {
-        B(x,y,z) = 0;
-    } endforeach;
+	memset(blocks, 0, sizeof(GLubyte)*CHUNKX*CHUNKY*CHUNKZ);
 
     generateTerrain();
     addDirt();
@@ -110,31 +106,12 @@ void Chunk::generateTerrain() {
                 ) * 32 + WATER_LEVEL;
 
         assert(maxHeight <= CHUNKY && maxHeight >= 0);
-        if (maxHeight < CHUNKY) {
-            B(x, (int)maxHeight, z) = ROCK;
-            B(x, (int)maxHeight - 1, z) = ROCK;
-        }
+
+		B(x, (int)maxHeight, z) = ROCK;
+		B(x, (int)maxHeight - 1, z) = ROCK;
+
     } endforeach;
 }
-
-void Chunk::summarize() {
-	int rock =0, dirt=0, air=0, test=0, empty=0, water=0;
-	int blockCount = 0;
-
-	foreach_xyz {
-		switch(B(x,y,z)) {
-            case AIR: air++; break;
-            case RED: test++; break;
-            case ROCK: rock++; break;
-            case DIRT: dirt++; break;
-            case WATER: water++; break;
-            default: 
-                empty++;
-		}
-		blockCount++;
-	} endforeach
-}
-
 
 void Chunk::addMarkersAtBoundaries() {
     B(0, 0, 0) = RED;
@@ -149,12 +126,16 @@ void Chunk::addMarkersAtBoundaries() {
 }
 
 void Chunk::addDirt() {
-    foreach_xyz {
-        if (B(x,y,z) == ROCK && B(x,y+1,z) == AIR) {
-            B(x,y,z) = DIRT;
-            B(x,y,z) = DIRT;
+	for (int y=0; y<CHUNKY; y++) {
+		for (int z=0; z<CHUNKZ; z++) {
+			for (int x=0; x<CHUNKX; x++) {
+				if (B(x,y,z) == ROCK && B(x,y+1,z) == AIR) {
+					B(x,y,z) = DIRT;
+					B(x,y,z) = DIRT;
+				}
+			}
         }
-    } endforeach
+    }
 }
 
 void Chunk::addBedrock() {
@@ -168,7 +149,7 @@ void Chunk::addSand() {
     foreach_xz {
         GLubyte block = B(x,WATER_LEVEL,z);
         if (block != WATER && block != AIR)
-            B(x,WATER_LEVEL,z) = SAND;
+            B(x, WATER_LEVEL, z) = SAND;
     } endforeach;
 }
 
@@ -202,38 +183,45 @@ void Chunk::buildMesh() {
 	int vertexCount = 0;
 
     // calculate the number of vertices need
-    foreach_xyz {
-        if (B(x,y,z) == AIR) continue;
-        vertexCount += 36; // 6 faces, 2 triangles/face, 3verts/trangle
-    } endforeach;
+	for (int y=0; y<CHUNKY; y++) {
+		for (int z=0; z<CHUNKZ; z++) {
+			for (int x=0; x<CHUNKX; x++) {
+				if (B(x,y,z) == AIR) continue;
+				vertexCount += 36; // 6 faces, 2 triangles/face, 3verts/trangle
+			}
+		}
+	}
 
     mesh = new Mesh(vertexCount);
     GLubyte block;
     GLubyte faces;
 
-    foreach_xyz {
-        block = B(x,y,z);
-        if (block == AIR)
-            continue;
+	for (int y=0; y<CHUNKY; y++) {
+		for (int z=0; z<CHUNKZ; z++) {
+			for (int x=0; x<CHUNKX; x++) {
+				block = B(x,y,z);
+				if (block == AIR)
+					continue;
 
-        assert(x >=0 && x<=CHUNKX);
-        assert(y >=0 && y<=CHUNKY);
-        assert(z >=0 && z<=CHUNKZ);
+				assert(x >=0 && x<CHUNKX);
+				assert(y >=0 && y<CHUNKY);
+				assert(z >=0 && z<CHUNKZ);
 
-        faces = 0;
-        if(z < CHUNKZ-1 && B(x  ,y  ,z+1) == AIR) faces |= (1<<0); // front       
-        if(x < CHUNKX-1 && B(x+1,y  ,z  ) == AIR)   faces |= (1<<1); // right
-        if(z > 0      && B(x  ,y  ,z-1) == AIR) faces |= (1<<2); // back
-        if(x > 0      && B(x-1,y  ,z  ) == AIR)   faces |= (1<<3); // left
-        if(y < CHUNKY-1 && B(x  ,y+1,z  ) == AIR)   faces |= (1<<4); // top
-        if(y > 0      && B(x  ,y-1,z  ) == AIR)   faces |= (1<<5); // bottom
+				faces = 0;
+				if(z < CHUNKZ-1 && B(x  ,y  ,z+1) == AIR) faces |= (1<<0); // front       
+				if(x < CHUNKX-1 && B(x+1,y  ,z  ) == AIR) faces |= (1<<1); // right
+				if(z > 0        && B(x  ,y  ,z-1) == AIR) faces |= (1<<2); // back
+				if(x > 0        && B(x-1,y  ,z  ) == AIR) faces |= (1<<3); // left
+				if(y < CHUNKY-1 && B(x  ,y+1,z  ) == AIR) faces |= (1<<4); // top
+				if(y > 0        && B(x  ,y-1,z  ) == AIR) faces |= (1<<5); // bottom
 
-        //assert(faces >= 0 && faces <= 1<<5);
-        if (faces != 0)
-            mesh->addCube(inWorld(x,y,z), block, faces);
 
-    } endforeach;
-
+				if (faces != 0) {
+					mesh->addCube(inWorld(x,y,z), block, faces);
+                }
+			}
+		}
+	}
     mesh->finish();
 }
 

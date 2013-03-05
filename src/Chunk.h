@@ -8,6 +8,8 @@
 #define CHUNKY 128
 #define CHUNKZ 16
 
+#define B(x, y, z) blocks[x][y][z]
+
 class Chunk
 {
 	GLubyte blocks[CHUNKX][CHUNKY][CHUNKZ];

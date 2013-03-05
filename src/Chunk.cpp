@@ -221,11 +221,11 @@ void Chunk::buildMesh() {
         assert(z >=0 && z<=CHUNKZ);
 
         faces = 0;
-        if(z < CHUNKZ && B(x  ,y  ,z+1) == AIR) faces |= (1<<0); // front       
-        if(x < CHUNKX && B(x+1,y  ,z  ) == AIR)   faces |= (1<<1); // right
+        if(z < CHUNKZ-1 && B(x  ,y  ,z+1) == AIR) faces |= (1<<0); // front       
+        if(x < CHUNKX-1 && B(x+1,y  ,z  ) == AIR)   faces |= (1<<1); // right
         if(z > 0      && B(x  ,y  ,z-1) == AIR) faces |= (1<<2); // back
         if(x > 0      && B(x-1,y  ,z  ) == AIR)   faces |= (1<<3); // left
-        if(y < CHUNKY && B(x  ,y+1,z  ) == AIR)   faces |= (1<<4); // top
+        if(y < CHUNKY-1 && B(x  ,y+1,z  ) == AIR)   faces |= (1<<4); // top
         if(y > 0      && B(x  ,y-1,z  ) == AIR)   faces |= (1<<5); // bottom
 
         //assert(faces >= 0 && faces <= 1<<5);

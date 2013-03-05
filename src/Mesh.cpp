@@ -113,14 +113,12 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
 }
 
 void Mesh::addCube(const Vec3 & pos, GLubyte kind, GLubyte faces) {
-    /*
     if (faces & (1<<0)) addCubeFace(pos, kind, 0, 6);
     if (faces & (1<<1)) addCubeFace(pos, kind, 6, 12);
     if (faces & (1<<2)) addCubeFace(pos, kind, 12, 18);
     if (faces & (1<<3)) addCubeFace(pos, kind, 18, 24);
     if (faces & (1<<4)) addCubeFace(pos, kind, 24, 30);
     if (faces & (1<<5)) addCubeFace(pos, kind, 30, 36);
-    */
 }
 
 void Mesh::finish() {

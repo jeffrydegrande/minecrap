@@ -113,12 +113,18 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
 }
 
 void Mesh::addCube(const Vec3 & pos, GLubyte kind, GLubyte faces) {
-    if (faces & (1<<0)) addCubeFace(pos, kind, 0, 6);
-    if (faces & (1<<1)) addCubeFace(pos, kind, 6, 12);
-    if (faces & (1<<2)) addCubeFace(pos, kind, 12, 18);
-    if (faces & (1<<3)) addCubeFace(pos, kind, 18, 24);
-    if (faces & (1<<4)) addCubeFace(pos, kind, 24, 30);
-    if (faces & (1<<5)) addCubeFace(pos, kind, 30, 36);
+    if (faces & (1<<0))
+        addCubeFace(pos, kind, 0, 6);
+    if (faces & (1<<1))
+        addCubeFace(pos, kind, 6, 12);
+    if (faces & (1<<2))
+        addCubeFace(pos, kind, 12, 18);
+    if (faces & (1<<3))
+        addCubeFace(pos, kind, 18, 24);
+    if (faces & (1<<4))
+        addCubeFace(pos, kind, 24, 30);
+    if (faces & (1<<5))
+        addCubeFace(pos, kind, 30, 36);
 }
 
 void Mesh::finish() {
@@ -128,13 +134,12 @@ void Mesh::finish() {
     glBindVertexArray(vao);
 
     glGenBuffers( 1, &vbo );
-    printf("Allocating %ld kb, ?? cubes, %d vertices\n",
-        (index * sizeof(struct vertex_t)) / 1024, index);
+    printf("Allocating %ld kb, ?? cubes, %d vertices, expected %d\n",
+        (index * sizeof(struct vertex_t)) / 1024, index, vertexCount);
 
     // upload data into VBO
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, index * sizeof(struct vertex_t),
-            vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, index * sizeof(struct vertex_t), vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     assert(GL_NO_ERROR == glGetError());
@@ -160,6 +165,7 @@ void Mesh::render() {
             (GLvoid*)offsetof(struct vertex_t, nx));
 
     glDrawArrays(GL_TRIANGLES, 0, index);
+    
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);

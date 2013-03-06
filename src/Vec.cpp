@@ -186,6 +186,10 @@ void Vec3::copy(const Vec3 &v) {
     z = v.z;
 }
 
+float * Vec3::value_ptr() {
+    return &x;
+}
+
 
 /////////////////////////////////////////////////////////////////
 // Vec4 Implementation

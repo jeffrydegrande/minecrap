@@ -62,6 +62,8 @@ public:
 
 	float length() const;
     float lengthSq() const;
+    
+    float *value_ptr();
 
     void print() const;
 };

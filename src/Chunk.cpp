@@ -208,15 +208,40 @@ void Chunk::buildMesh() {
 				assert(z >=0 && z<CHUNKZ);
 
 				faces = 0;
-				if(z < CHUNKZ-1 && B(x  ,y  ,z+1) == AIR) faces |= (1<<0); // front       
-				if(x < CHUNKX-1 && B(x+1,y  ,z  ) == AIR) faces |= (1<<1); // right
-				if(z > 0        && B(x  ,y  ,z-1) == AIR) faces |= (1<<2); // back
-				if(x > 0        && B(x-1,y  ,z  ) == AIR) faces |= (1<<3); // left
-				if(y < CHUNKY-1 && B(x  ,y+1,z  ) == AIR) faces |= (1<<4); // top
-				if(y > 0        && B(x  ,y-1,z  ) == AIR) faces |= (1<<5); // bottom
+
+                
+                // front face
+				if(z == CHUNKZ-1 || (z < CHUNKZ-1 && B(x  ,y  ,z+1) == AIR)) {
+                    faces |= (1<<0);
+                }
+
+                // right face
+                if(x == CHUNKX-1 || (x < CHUNKX-1 && B(x+1,y  ,z  ) == AIR)) {
+                    faces |= (1<<1);
+                }
+
+                // back
+                if(z == 0 || (z > 0 && B(x  ,y  ,z-1) == AIR)) {
+                    faces |= (1<<2);
+                }
+				
+                // left
+                if(x == 0 || (x > 0 && B(x-1,y  ,z  ) == AIR)) {
+                    faces |= (1<<3); // left
+                }
+
+				// top
+                if(y == CHUNKY-1 || (y < CHUNKY-1 && B(x  ,y+1,z  ) == AIR)) {
+                    faces |= (1<<4); // top
+                }
+				
+                // bottom
+                if(y == 0 || (y > 0 && B(x  ,y-1,z  ) == AIR)) {
+                    faces |= (1<<5);
+                }
 
 
-				if (faces != 0) {
+                if (faces>0) {
 					mesh->addCube(inWorld(x,y,z), block, faces);
                 }
 			}

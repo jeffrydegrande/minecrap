@@ -1,4 +1,5 @@
 #include "Vec.h"
+#include "minecrap.h"
 
 #include <cstdio>
 #include <cmath>
@@ -39,7 +40,13 @@ Vec2 & Vec2::operator -=(const Vec2 &vector) {
 	return *this;
 }
 
+float Vec2::dotProduct(const Vec2 &other) {
+	return Vec2::dotProduct(*this, other);
+}
 
+float Vec2::dotProduct(const Vec2 &v1, const Vec2 &v2) {
+	return v1.x * v2.x + v1.y * v2.y;
+}
 
 float Vec2::length() const {
 	return sqrt(x*x + y*y);
@@ -60,6 +67,12 @@ Vec2 Vec2::normalize(const Vec2 &v) {
 
 void Vec2::print() const {
     printf( "%0.2f, %0.2f\n", x, y);
+}
+
+float Vec2::angle(const Vec2 &a, const Vec2 &b) {
+    // angle(v1, v2) = acos( (v1x * v2x + v1y * v2y) / (sqrt(v1x^2+v1y^2) * sqrt(v2x^2+v2y^2)) )
+
+    return RADIANS_TO_DEGREES * (atan2(a.y, a.x) - atan2(b.y, b.x));
 }
 
 /////////////////////////////////////////////////////////////////

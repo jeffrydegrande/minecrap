@@ -1,4 +1,3 @@
-* avoid rendering planes that are invisibel
 * implement sun with meshes
 * use uniform blocks to pass in matrices into shaders
 * AABB collision with world

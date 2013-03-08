@@ -230,6 +230,8 @@ bool closeEnough(float a, float b) {
 
 void Camera::updatePosition(const Vec3 &direction, float elapsed)
 {
+    float distance = 0.0f;
+
     if (currentVelocity.lengthSq() != 0.0f) {
         Vec3 displacement = (currentVelocity * elapsed) +
             (acceleration * 0.5f * elapsed * elapsed);
@@ -245,18 +247,15 @@ void Camera::updatePosition(const Vec3 &direction, float elapsed)
 
         move(displacement);
 
-        float distance = displacement.length();
-        /*
-        float speed = (1.0f / (elapsed / 1000.0f)) * distance; // seconds
-
-        if (closeEnough(elapsed/1000.0f, 0.0f)) {
-            speed = 0.0f;
-        }
-        */
+        distance = displacement.length();
 
         distanceTraveled += distance;
     }
 
+    speed = (1.0f / (elapsed / 1000.0f)) * distance; // seconds
+    if (closeEnough(elapsed/1000.0f, 0.0f)) {
+        speed = 0.0f;
+    }
 
     updateVelocity(direction, elapsed);
 }
@@ -353,4 +352,16 @@ void Camera::updateVelocity(const Vec3 &direction, float elapsed)
                 currentVelocity.z = 0.0f;
         }
     }
+}
+
+float Camera::getViewDirectionInDegrees() const {
+    float angle = Vec2::angle(
+                    Vec2(viewDirection.x, viewDirection.z),
+                    Vec2(0.0f, 1.0f));
+    if (angle < 0)
+        angle += 360.0f;
+    if (angle > 360.0f)
+        angle -= 360.0f;
+
+    return angle;
 }

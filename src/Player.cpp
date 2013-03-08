@@ -39,24 +39,24 @@ const Vec3 Player::getDirection() const {
 }
 
 const char *Player::getDirectionAsString() {
-    float angle = this->getDirection().x;
+    float angle = camera.getViewDirectionInDegrees();
 
     if (angle < 22.5f || angle >= 337.5f)
-        return "N";
-    else if (angle < 67.5f)
-        return "NE";
-    else if (angle < 112.5f)
-        return "E";
-    else if (angle < 157.5f)
-        return "SE";
-    else if (angle < 202.5f)
         return "S";
-    else if (angle < 247.5f)
+    else if (angle < 67.5f)
         return "SW";
-    else if (angle < 292.5f)
+    else if (angle < 112.5f)
         return "W";
-    else if (angle < 337.5f)
+    else if (angle < 157.5f)
         return "NW";
+    else if (angle < 202.5f)
+        return "N";
+    else if (angle < 247.5f)
+        return "NE";
+    else if (angle < 292.5f)
+        return "E";
+    else if (angle < 337.5f)
+        return "SE";
 
     return "Unknown";
 }

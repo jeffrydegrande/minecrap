@@ -32,9 +32,18 @@ public:
     const Vec3 getPosition() const;
     const Vec3 getDirection() const;
     const char *getDirectionAsString();
+    float getDirectionInDegrees() const;
     const float &getDistanceTraveled() const;
     const Matrix4 & getCameraMatrix();
+
+    const float &getSpeed() const;
 };
 
 inline const float &Player::getDistanceTraveled() const
 { return camera.getDistanceTraveled(); }
+
+inline float Player::getDirectionInDegrees() const
+{ return camera.getViewDirectionInDegrees(); }
+
+inline const float &Player::getSpeed() const
+{ return camera.getSpeed(); }

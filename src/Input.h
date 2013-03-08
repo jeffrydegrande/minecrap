@@ -9,8 +9,16 @@ public:
     static void keyReleased(int key);
     static bool isKeyPressed(int key);
 
-    static void JoystickSet(int axis, int value);
-    static float JoystickGet(int axis);
+    static void joystickSet(int axis, int value);
+    static float joystickGet(int axis);
+
+    static bool isMovingForward();
+    static bool isMovingBackward();
+    static bool isStrafingLeft();
+    static bool isStrafingRight();
+    static bool isAscending();
+    static bool isDescending();
+
 };
 
 #endif

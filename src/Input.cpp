@@ -1,6 +1,7 @@
 #include "Input.h"
 #include <cstdio>
 #include <cstdlib>
+#include "minecrap.h"
 
 #define MAX_KEYS 512
 #define MAX_AXIS 6
@@ -28,7 +29,7 @@ bool Input::isKeyPressed(int key) {
     return down[key];
 }
 
-void Input::JoystickSet(int axis, int value)
+void Input::joystickSet(int axis, int value)
 {
     if (axis > MAX_AXIS)
         printf( "extra axis!\n");
@@ -41,7 +42,7 @@ void Input::JoystickSet(int axis, int value)
         joystick[axis] = 0.0f;
 }
 
-float Input::JoystickGet(int axis) 
+float Input::joystickGet(int axis)
 {
     if (axis < 0 || axis >= MAX_AXIS)
         return 0.0f;
@@ -49,3 +50,32 @@ float Input::JoystickGet(int axis)
     return joystick[axis];
 }
 
+bool Input::isMovingForward()
+{
+    return (isKeyPressed(SDLK_w) || joystickGet(1) < -20000);
+}
+
+bool Input::isMovingBackward()
+{
+    return (isKeyPressed(SDLK_s) || joystickGet(1) > 20000);
+}
+
+bool Input::isStrafingLeft()
+{
+    return (isKeyPressed(SDLK_a) || joystickGet(0) < -20000);
+}
+
+bool Input::isStrafingRight()
+{
+    return (isKeyPressed(SDLK_d) || joystickGet(0) > 20000);
+}
+
+bool Input::isAscending()
+{
+    return (isKeyPressed(SDLK_q) || joystickGet(2) > 20000);
+}
+
+bool Input::isDescending()
+{
+    return (isKeyPressed(SDLK_e) || joystickGet(5) > 20000);
+}

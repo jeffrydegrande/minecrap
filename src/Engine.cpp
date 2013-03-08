@@ -250,10 +250,10 @@ void Engine::collectInput() {
             }
             break;
         case SDL_JOYAXISMOTION:
-            Input::JoystickSet(event.jaxis.axis, event.jaxis.value);
+            Input::joystickSet(event.jaxis.axis, event.jaxis.value);
             {
-                float x = Input::JoystickGet(3) / (3 * 3276.8f);
-                float y = Input::JoystickGet(4) / (3 * 3276.8f);
+                float x = Input::joystickGet(3) / (3 * 3276.8f);
+                float y = Input::joystickGet(4) / (3 * 3276.8f);
                 player->look(x, y);
             }
             break;

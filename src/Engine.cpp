@@ -59,7 +59,6 @@ Engine::~Engine() {
 void Engine::init() {
     int flags;
 
-
     if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_JOYSTICK) != 0) {
         return;
     }
@@ -100,6 +99,7 @@ void Engine::init() {
     SDL_ShowCursor (false);
 
     for (int i = 0; i < SDL_NumJoysticks(); i++) {
+        printf("Joystick found: %s\n", SDL_JoystickName(i));
         SDL_JoystickEventState(SDL_ENABLE);
         SDL_JoystickOpen(i);
     }
@@ -250,6 +250,12 @@ void Engine::collectInput() {
             }
             break;
         case SDL_JOYAXISMOTION:
+            Input::JoystickSet(event.jaxis.axis, event.jaxis.value);
+            {
+                float x = Input::JoystickGet(3) / (3 * 3276.8f);
+                float y = Input::JoystickGet(4) / (3 * 3276.8f);
+                player->look(x, y);
+            }
             break;
         case SDL_JOYBUTTONDOWN:
             break;

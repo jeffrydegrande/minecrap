@@ -92,8 +92,8 @@ void Player::update(float elapsed)
     direction.set(0.0f, 0.0f, 0.0f);
     Vec3 cameraVelocity = camera.getCurrentVelocity();
 
-    // update movement
-    if (Input::isKeyPressed(SDLK_w)) {
+    // update movement from keyboard
+    if (Input::isKeyPressed(SDLK_w) || Input::JoystickGet(1) < -20000) {
 		if (!movingForward) {
 			movingForward = true;
 			camera.setCurrentVelocity(cameraVelocity.x, cameraVelocity.y, 0.0f);
@@ -103,7 +103,7 @@ void Player::update(float elapsed)
 		movingForward = false;
 	}
 
-    if (Input::isKeyPressed(SDLK_s)) { 
+    if (Input::isKeyPressed(SDLK_s) || Input::JoystickGet(1) > 20000) { 
 		if (!movingBackward) {
 			movingBackward = true;
 			camera.setCurrentVelocity(cameraVelocity.x, cameraVelocity.y, 0.0f);
@@ -113,7 +113,7 @@ void Player::update(float elapsed)
 		movingBackward = false;
 	}
 
-    if (Input::isKeyPressed(SDLK_d)) { 
+    if (Input::isKeyPressed(SDLK_d) || Input::JoystickGet(0) > 20000) { 
 		if (!movingRight) {
 			movingRight = true;
 			camera.setCurrentVelocity(0.0f, cameraVelocity.y, cameraVelocity.z);
@@ -123,7 +123,7 @@ void Player::update(float elapsed)
 		movingRight = false;
 	}
 
-    if (Input::isKeyPressed(SDLK_a)) { 
+    if (Input::isKeyPressed(SDLK_a) || Input::JoystickGet(0) < -20000) { 
 		if (!movingLeft) {
 			movingLeft = true;
 			camera.setCurrentVelocity(0.0f, cameraVelocity.y, cameraVelocity.z);
@@ -133,7 +133,7 @@ void Player::update(float elapsed)
 		movingLeft = false;
 	}
 
-    if (Input::isKeyPressed(SDLK_q)) {
+    if (Input::isKeyPressed(SDLK_q) || Input::JoystickGet(2) > 20000) {
         if (!movingUp) {
             movingUp = true;
             camera.setCurrentVelocity(cameraVelocity.x, 0.0f, cameraVelocity.z);
@@ -143,7 +143,7 @@ void Player::update(float elapsed)
         movingUp = false;
     }
 
-    if (Input::isKeyPressed(SDLK_e)) {
+    if (Input::isKeyPressed(SDLK_e) || Input::JoystickGet(5) > 20000) {
         if (!movingDown) {
             movingDown = true;
             camera.setCurrentVelocity(cameraVelocity.x, 0.0f, cameraVelocity.z);

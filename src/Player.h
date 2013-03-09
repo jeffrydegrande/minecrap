@@ -55,7 +55,7 @@ public:
     const Vec3 &getVelocity() const;
 
 private:
-    bool canMove(Vec3 &direction, float elapsed);
+    bool checkCollision(const Vec3 &position);
     void calculateMovementDirection(float elapsed);
     void move(const Vec3 &direction, float elapsed);
     void updateVelocity(const Vec3 &direction, float elapsed);

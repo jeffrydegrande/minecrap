@@ -102,13 +102,8 @@ Player * World::spawnPlayer() {
     }
 
 	playerSpawnLocation.x = (float)x;
-	playerSpawnLocation.y = (float)ground;
+	playerSpawnLocation.y = (float)ground + 2;
 	playerSpawnLocation.z = (float)y;
-
-    /*
-    chunk->setBlock(x, ground, y, RED);
-    chunk->buildMesh();
-    */
 
 #ifdef SUPPORT_GLCONSOLE
     ConsoleLog("Spawn location: %0.2f, %0.2f, %0.2f\n",

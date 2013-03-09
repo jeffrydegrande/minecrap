@@ -78,6 +78,8 @@ Player * World::spawnPlayer() {
     int x=0, y=0;
     int ground=0;
 
+    Chunk *chunk = NULL;
+
 	// pick a random spot in real world coordinates
 	Vec2 size = this->getSize();
 
@@ -88,7 +90,7 @@ Player * World::spawnPlayer() {
         y = rand() % (int)size.y;
 
         // find the block for this coordinate
-        Chunk *chunk = chunks->get( x / CHUNKX, y / CHUNKZ);
+        chunk = chunks->get( x / CHUNKX, y / CHUNKZ);
 
         // and translate the real world coordinates into chunk coordinates
         // y in 2d => z in 3d
@@ -100,8 +102,13 @@ Player * World::spawnPlayer() {
     }
 
 	playerSpawnLocation.x = (float)x;
-	playerSpawnLocation.y = (float)ground + 1;
+	playerSpawnLocation.y = (float)ground;
 	playerSpawnLocation.z = (float)y;
+
+    /*
+    chunk->setBlock(x, ground, y, RED);
+    chunk->buildMesh();
+    */
 
 #ifdef SUPPORT_GLCONSOLE
     ConsoleLog("Spawn location: %0.2f, %0.2f, %0.2f\n",

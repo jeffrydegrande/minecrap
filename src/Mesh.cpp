@@ -101,6 +101,10 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
             vertices[index].g  = 0.5f;
             vertices[index].b  = 0.0f;
             break;
+        case RED:
+            vertices[index].r  = 1.0f;
+            vertices[index].g  = 0.0f;
+            vertices[index].b  = 0.0f;
         }
         vertices[index].a  = 1.0f;
 

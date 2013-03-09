@@ -40,6 +40,8 @@ public:
 
     int vertexCount() const;
 
+    void buildMesh();
+
 private:
 
 	int renderBlock(int x, int y, int z);
@@ -54,7 +56,6 @@ private:
 	bool isExposedToAir(int x, int y, int z);
 	bool isBorderBlock(int x, int y, int z);
 
-    void buildMesh();
 };
 
 inline int Chunk::vertexCount() const

@@ -188,9 +188,11 @@ Vec3 Vec3::crossProduct(const Vec3 &v1, const Vec3 &v2) {
 
 void Vec3::normalize() {
     float l = this->length();
-    this->x = x / l;
-    this->y = y / l;
-    this->z = z / l;
+    if (l != 0.0f) {
+        this->x /= l;
+        this->y /= l;
+        this->z /= l;
+    }
 }
 
 void Vec3::copy(const Vec3 &v) {

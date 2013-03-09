@@ -72,7 +72,6 @@ private:
 	void render();
     void render3D();
     void render2D();
-    void renderOnScreenDisplay();
 };
 
 #endif

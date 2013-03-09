@@ -70,6 +70,23 @@ void Player::update(float elapsed)
         // velocity = JUMP_SPEED;
         onGround = false;
     }
+
+    Vec3 pos  =  getPosition();
+    Vec3 angle = getDirection();
+
+    osd->write("Loc: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
+    osd->write("Ang: %0.2f, %0.2f, %0.2f, facing %s (%0.2f)",
+                angle.x, angle.y, angle.z,
+                getDirectionAsString(),
+                getDirectionInDegrees());
+    osd->write("Distance Traveled: %0.2fm (%0.2f km/h)\n", 
+            getDistanceTraveled(), getSpeed() / 1000);
+
+    if (onGround)
+        osd->write("On Ground: yes");
+    else
+        osd->write("On Ground: no");
+
 }
 
 

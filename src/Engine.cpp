@@ -208,6 +208,7 @@ void Engine::update(float elapsed) {
 #endif
     player->update(elapsedInSeconds);
     world->update();
+    osd->write("FPS: %d", fps_current);
 }
 
 void Engine::collectInput() {
@@ -351,7 +352,7 @@ void Engine::render2D() {
     glDisable(GL_DEPTH_TEST);
 
     crosshair->render();
-    renderOnScreenDisplay();
+    osd->render();
 
 #ifdef SUPPORT_GLCONSOLE
     ConsoleRender();
@@ -364,27 +365,6 @@ void Engine::render2D() {
     glMatrixMode(GL_MODELVIEW);
     ASSERT_NO_GL_ERROR;
 }
-
-void Engine::renderOnScreenDisplay() {
-    Vec3 pos   = player->getPosition();
-    Vec3 angle = player->getDirection();
-
-    osd->write("FPS: %d", fps_current);
-    osd->write("Loc: %0.2f, %0.2f, %0.2f",
-                pos.x, pos.y, pos.z);
-    osd->write("Ang: %0.2f, %0.2f, %0.2f, facing %s (%0.2f)",
-                angle.x, angle.y, angle.z, player->getDirectionAsString(), player->getDirectionInDegrees());
-    osd->write("Distance Traveled: %0.2fm (%0.2f km/h)\n", 
-            player->getDistanceTraveled(), player->getSpeed() / 1000);
-
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        osd->write("OpenGL error: %s\n", gluErrorString(error));
-    }
-
-    osd->reset();
-}
-
 
 int Engine::viewWidth() const {
     return width;

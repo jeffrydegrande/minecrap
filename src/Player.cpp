@@ -11,7 +11,7 @@
 #include <CVars/CVar.h>
 
 #define GRAVITY         9.2f
-#define JUMP_SPEED      5.5f
+#define JUMP_SPEED      6.0f
 #define SPEED		    4.0f
 #define EYE_HEIGHT      1.75f
 
@@ -27,6 +27,7 @@ bool closeEnough(float a, float b) {
 Player::Player(World *world, const Vec3 & position) {
     this->world = world;
 	this->setPosition(position);
+    this->onGround = true;
 
     distanceTraveled = 0.0f;
     speed = 0;
@@ -40,19 +41,37 @@ Player::~Player(void)
 {
 }
 
-void Player::update(float elapsed)
-{
-    bool flying = CVarUtils::GetCVar<bool>("flying");
+void Player::setPosition(const Vec3 &position) {
+    currentPosition = position;
 
-    calculateMovementDirection();
-    move(direction, elapsed);
+    Vec3 cameraPosition(currentPosition);
+    cameraPosition.y += EYE_HEIGHT;
 
-    // apply gravity
-    if (!flying) {
+    camera.setViewDirection(Vec3(0.0, 0.0f, -1.0f));
+    camera.setPosition(cameraPosition);
+}
+
+bool Player::canMove(Vec3 &direction, float elapsed) {
+    (void)elapsed;
+    (void)direction;
+
+    if (currentVelocity.y != 0.0f) {
         /*
-        float ground = position.y;
-        velocity   -= GRAVITY * elapsed;
-        position.y += velocity * elapsed;
+        Vec3 newPosition = currentPosition - direction;
+        if (world->isGround(newPosition)) {
+            return false;
+        }
+        */
+
+
+        /*
+        if (closeEnough(currentPosition.y, WATER_LEVEL) || currentPosition.y < 0) {
+            onGround = true;
+            currentVelocity.y = 0.0f;
+        } else {
+            if (currentVelocity.y > -54.0f)
+                currentVelocity.y -= GRAVITY * acceleration.y * elapsed;
+        }
 
         if (position.y < 0 || world->isGround((int)position.x, (int)position.y - 1, (int)position.z)) {
             position.y = ground;
@@ -63,13 +82,17 @@ void Player::update(float elapsed)
         }
         */
     }
+    return true;
+}
 
+void Player::update(float elapsed)
+{
 
-    // jumping
-    if (Input::isKeyPressed(SDLK_SPACE) && onGround) {
-        // velocity = JUMP_SPEED;
-        onGround = false;
-    }
+    calculateMovementDirection(elapsed);
+
+    if (canMove(direction, elapsed))
+        move(direction, elapsed);
+
 
     Vec3 pos  =  getPosition();
     Vec3 angle = getDirection();
@@ -107,7 +130,7 @@ void Player::look(int x, int y) {
 	}
 }
 
-void Player::calculateMovementDirection()
+void Player::calculateMovementDirection(float elapsed)
 {
 	static bool movingForward  = false;
 	static bool movingBackward = false;
@@ -116,6 +139,7 @@ void Player::calculateMovementDirection()
 	static bool movingUp	   = false;
 	static bool movingDown     = false;
 
+    (void)elapsed;
     direction.set(0.0f, 0.0f, 0.0f);
 
     // update movement from keyboard
@@ -159,40 +183,40 @@ void Player::calculateMovementDirection()
 		movingLeft = false;
 	}
 
-    if (Input::isAscending()) {
-        if (!movingUp) {
-            movingUp = true;
-            setCurrentVelocity(currentVelocity.x, 0.0f, currentVelocity.z);
+    if (CVarUtils::GetCVar<bool>("flying")) {
+        if (Input::isAscending()) {
+            if (!movingUp) {
+                movingUp = true;
+                setCurrentVelocity(currentVelocity.x, 0.0f, currentVelocity.z);
+            }
+            direction.y += 1.0f;
+        } else{
+            movingUp = false;
         }
-        direction.y += 1.0f;
-    } else{
-        movingUp = false;
-    }
 
-    if (Input::isDescending()) {
-        if (!movingDown) {
-            movingDown = true;
-            setCurrentVelocity(currentVelocity.x, 0.0f, currentVelocity.z);
+        if (Input::isDescending()) {
+            if (!movingDown) {
+                movingDown = true;
+                setCurrentVelocity(currentVelocity.x, 0.0f, currentVelocity.z);
+            }
+            direction.y -= 1.0f;
+        } else {
+            movingDown = false;
         }
-        direction.y -= 1.0f;
     } else {
-        movingDown = false;
+        // jumping
+        if (Input::isKeyPressed(SDLK_SPACE) && onGround) {
+            onGround = false;
+            setCurrentVelocity(currentVelocity.x, JUMP_SPEED, currentVelocity.z);
+            direction.y += 1.0f;
+        }
     }
 }
 
-void Player::setPosition(const Vec3 &position) {
-    Vec3 cameraPosition(position);
-    cameraPosition.y += EYE_HEIGHT;
-
-    this->onGround = true;
-    camera.setViewDirection(Vec3(0.0, 0.0f, -1.0f));
-    camera.setPosition(cameraPosition);
-}
 
 void Player::move(const Vec3 &direction, float elapsed)
 {
     float distance = 0.0f;
-
     if (currentVelocity.lengthSq() != 0.0f) {
         Vec3 displacement = (currentVelocity * elapsed) 
             + (acceleration * 0.5f * elapsed * elapsed);
@@ -207,7 +231,13 @@ void Player::move(const Vec3 &direction, float elapsed)
             displacement.z = 0.0f;
 
         distance = displacement.length();
-        camera.move(displacement);
+
+        Vec3 newPosition = camera.move(displacement);
+
+        camera.setPosition(newPosition);
+        currentPosition = newPosition;
+        currentPosition.y -= EYE_HEIGHT;
+
         distanceTraveled += distance;
     }
 
@@ -217,7 +247,6 @@ void Player::move(const Vec3 &direction, float elapsed)
     if (closeEnough(elapsedInSeconds, 0.0f)) {
         speed = 0.0f;
     }
-
     updateVelocity(direction, elapsed);
 }
 
@@ -256,40 +285,64 @@ void Player::updateVelocity(const Vec3 &direction, float elapsed)
         }
     }
 
-    if (direction.y != 0.0f)
-    {
-        // Camera is moving along the y axis.
-        // Linearly accelerate up to the camera's max speed.
-
-        currentVelocity.y += direction.y * acceleration.y * elapsed;
-
-        if (currentVelocity.y > velocity.y)
-            currentVelocity.y = velocity.y;
-        else if (currentVelocity.y < -velocity.y)
-            currentVelocity.y = -velocity.y;
-    }
-    else
-    {
-        // Camera is no longer moving along the y axis.
-        // Linearly decelerate back to stationary state.
-
-        if (currentVelocity.y > 0.0f)
+    if (CVarUtils::GetCVar<bool>("flying")) {
+        if (direction.y != 0.0f)
         {
-            if ((currentVelocity.y -= acceleration.y * elapsed) < 0.0f)
-                currentVelocity.y = 0.0f;
+            // Camera is moving along the y axis.
+            // Linearly accelerate up to the camera's max speed.
+
+            currentVelocity.y += direction.y * acceleration.y * elapsed;
+
+            if (currentVelocity.y > velocity.y)
+                currentVelocity.y = velocity.y;
+            else if (currentVelocity.y < -velocity.y)
+                currentVelocity.y = -velocity.y;
         }
         else
         {
-            if ((currentVelocity.y += acceleration.y * elapsed) > 0.0f)
-                currentVelocity.y = 0.0f;
+            // Camera is no longer moving along the y axis.
+            // Linearly decelerate back to stationary state.
+
+            if (currentVelocity.y > 0.0f)
+            {
+                if ((currentVelocity.y -= acceleration.y * elapsed) < 0.0f)
+                    currentVelocity.y = 0.0f;
+            }
+            else
+            {
+                if ((currentVelocity.y += acceleration.y * elapsed) > 0.0f)
+                    currentVelocity.y = 0.0f;
+            }
         }
+    } else {
+        onGround = world->isGround(currentPosition);
+
+        if (!onGround) {
+            // according to wikipedia 195km/h is the terminal velocity of a skydiver.
+            if (currentVelocity.y > -195.0f) {
+                currentVelocity.y -= GRAVITY * elapsed;
+            }
+        } else {
+            currentVelocity.y = 0;
+        }
+
+        osd->write("%0.2f = %0.2f * %0.2f * %0.2f * %0.2f",
+                currentVelocity.y, direction.y, GRAVITY, acceleration.y, elapsed);
+        /*
+        if (position.y < 0 || world->isGround((int)position.x, (int)position.y - 1, (int)position.z)) {
+            position.y = ground;
+            velocity = 0.0f;
+            onGround = true;
+        } else {
+            onGround = false;
+        }
+        */
     }
 
     if (direction.z != 0.0f)
     {
         // Camera is moving along the z axis.
         // Linearly accelerate up to the camera's max speed.
-
         currentVelocity.z += direction.z * acceleration.z * elapsed;
 
         if (currentVelocity.z > velocity.z)
@@ -301,7 +354,6 @@ void Player::updateVelocity(const Vec3 &direction, float elapsed)
     {
         // Camera is no longer moving along the z axis.
         // Linearly decelerate back to stationary state.
-
         if (currentVelocity.z > 0.0f)
         {
             if ((currentVelocity.z -= acceleration.z * elapsed) < 0.0f)

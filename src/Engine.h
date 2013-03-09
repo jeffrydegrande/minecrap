@@ -24,6 +24,7 @@ class Engine
     Frustum frustum;
 
 	bool quit;
+    bool paused;
 
 	World *world;
 	Player *player;

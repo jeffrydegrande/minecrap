@@ -38,6 +38,7 @@ static void displayOpenGLInfo() {
 Engine::Engine():
     fps_current(0),
     quit(false),
+    paused(false),
     world(NULL),
     player(NULL),
     crosshair(NULL),
@@ -203,9 +204,14 @@ void Engine::update(float elapsed) {
     float elapsedInSeconds = elapsed / 1000.f;
 
     this->collectInput();
+
 #ifdef SUPPORT_GLCONSOLE
     ConsoleUpdate ();
 #endif
+
+    if (paused)
+        return;
+
     player->update(elapsedInSeconds);
     world->update();
     osd->write("FPS: %d", fps_current);
@@ -245,6 +251,9 @@ void Engine::collectInput() {
                     break;
                 case SDLK_F3:
                     optionRenderWireframe = !optionRenderWireframe;
+                    break;
+                case SDLK_p:
+                    paused = !paused;
                     break;
                 default:
                     Input::keyPressed(event.key.keysym.sym);
@@ -293,6 +302,9 @@ void Engine::collectInput() {
 //////////////////////////////////////////////////////
 
 void Engine::render() {
+    if (paused)
+        return;
+
     glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

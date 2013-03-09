@@ -17,7 +17,8 @@ class Chunk
 	int worldZ;
 	int seed;
 
-    Mesh *mesh;
+    Mesh *opaque;
+    Mesh *transparent;
 
 public:
 
@@ -59,6 +60,6 @@ private:
 };
 
 inline int Chunk::vertexCount() const
-{ return mesh->count(); }
+{ return opaque->count() + transparent->count(); }
 
 #endif

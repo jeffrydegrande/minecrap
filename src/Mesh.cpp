@@ -74,6 +74,8 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
         vertices[index].y  = pos.y + verts[i].y;
         vertices[index].z  = pos.z + verts[i].z;
 
+        vertices[index].a  = 1.0f;
+
         // color
         switch (kind) {
         case GRASS:
@@ -95,6 +97,7 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
             vertices[index].r  = 0.0f;
             vertices[index].g  = 0.0f;
             vertices[index].b  = 0.5f;
+            vertices[index].a  = 0.4f;
             break;
         case SAND:
             vertices[index].r  = 0.5f;
@@ -106,7 +109,6 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
             vertices[index].g  = 0.0f;
             vertices[index].b  = 0.0f;
         }
-        vertices[index].a  = 1.0f;
 
         // normals
         vertices[index].nx = normsArray[i].x;
@@ -153,8 +155,13 @@ void Mesh::finish() {
     vertices = NULL;
 }
 
-void Mesh::render() {
+void Mesh::render(bool transparency) {
     glBindVertexArray(vao);
+    if (transparency) {
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+        glDisable(GL_CULL_FACE);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glEnableVertexAttribArray(0); // vertices
@@ -169,10 +176,34 @@ void Mesh::render() {
             (GLvoid*)offsetof(struct vertex_t, nx));
 
     glDrawArrays(GL_TRIANGLES, 0, index);
-    
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
+
+    if (transparency) {
+        glEnable(GL_BLEND);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glEnableVertexAttribArray(0); // vertices
+    glEnableVertexAttribArray(1); // colors
+    glEnableVertexAttribArray(2); // normals
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
+            (GLvoid*)offsetof(struct vertex_t, x));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
+            (GLvoid*)offsetof(struct vertex_t, r));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
+            (GLvoid*)offsetof(struct vertex_t, nx));
+
+    glDrawArrays(GL_TRIANGLES, 0, index);
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
+
+    if (transparency) {
+        glDisable(GL_BLEND);
+    }
 
     assert(GL_NO_ERROR == glGetError());
 }

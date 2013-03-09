@@ -26,9 +26,8 @@ class Camera {
         static Matrix4 Perspective(float fovy, float aspect, float zNear, float zFar);
         static Matrix4 HorizontalPerspective(float fovx, float aspect, float zNear, float zFar);
 
-        void move(float dx, float dy, float dz);
-        void move(const Vec3 &direction, const Vec3 &amount);
-        void move(const Vec3 &displacement);
+        const Vec3& move(float dx, float dy, float dz);
+        const Vec3& move(const Vec3 &displacement);
 
         void rotate(float headingDegrees, float pitchDegrees, float rollDegrees);
 

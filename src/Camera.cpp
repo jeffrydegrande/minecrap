@@ -21,7 +21,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::move(float dx, float dy, float dz)
+const Vec3 & Camera::move(float dx, float dy, float dz)
 {
     Vec3 eye = this->eye;
     Vec3 forward;
@@ -37,11 +37,12 @@ void Camera::move(float dx, float dy, float dz)
     eye += WORLD_YAXIS * dy;
     eye += forward * dz;
     setPosition(eye);
+    return this->eye;
 }
 
-void Camera::move(const Vec3 &displacement)
+const Vec3 & Camera::move(const Vec3 &displacement)
 {
-    move(displacement.x, displacement.y, displacement.z);
+    return move(displacement.x, displacement.y, displacement.z);
 }
 
 void Camera::setPosition(const Vec3 &position)

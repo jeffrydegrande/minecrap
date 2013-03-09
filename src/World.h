@@ -34,6 +34,7 @@ public:
 	Player * spawnPlayer();
 
     bool isGround(int x, int y, int z);
+    bool isGround(const Vec3 &v);
 
 private:
 	void generateChunks(int count);

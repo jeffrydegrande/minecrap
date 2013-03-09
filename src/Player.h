@@ -16,6 +16,7 @@ class Player
     Camera camera;
     World *world;
 
+    Vec3 currentPosition;
     Vec3 direction;
     Vec3 velocity;
     Vec3 acceleration;
@@ -47,7 +48,6 @@ public:
     const float &getDistanceTraveled() const;
     const float &getSpeed() const;
 
-
     void setAcceleration(const Vec3 &acceleration);
     const Vec3 &getAcceleration() const;
 
@@ -55,7 +55,8 @@ public:
     const Vec3 &getVelocity() const;
 
 private:
-    void calculateMovementDirection();
+    bool canMove(Vec3 &direction, float elapsed);
+    void calculateMovementDirection(float elapsed);
     void move(const Vec3 &direction, float elapsed);
     void updateVelocity(const Vec3 &direction, float elapsed);
 

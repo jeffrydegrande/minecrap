@@ -135,6 +135,10 @@ bool World::isGround(int x, int y, int z) {
     return chunk->isGround(chunkX, y, chunkZ);
 }
 
+bool World::isGround(const Vec3 &v) {
+    return isGround(v.x, v.y, v.z);
+}
+
 void World::update() {
 }
 

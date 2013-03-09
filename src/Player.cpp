@@ -15,8 +15,10 @@
 #define SPEED		    4.0f
 #define EYE_HEIGHT      1.72f
 
-#define ACCELERATION Vec3(8.0f, 8.0f, 8.0f)
-#define VELOCITY     Vec3(4.0f, 4.0f, 4.0f)
+#define ACCELERATION  Vec3(8.0f, 8.0f, 8.0f)
+#define VELOCITY      Vec3(4.0f, 4.0f, 4.0f)
+#define WALKING_SPEED Vec3(4.0f, 4.0f, 4.0f)
+#define RUNNING_SPEED Vec3(12.0f, 12.0f, 12.0f)
 
 #define EPSILON 1e-6f;
 
@@ -58,7 +60,10 @@ bool Player::checkCollision(const Vec3 &pos) {
     GLubyte hb = world->blockAt(head);
     GLubyte hf = world->blockAt(feet);
 
-    return (world->blockAt(head) == AIR && world->blockAt(feet) == AIR);
+    osd->write("head: %d\n", hb);
+    osd->write("feet: %d\n", hf);
+
+    return (hb == AIR && hf == AIR);
 }
 
 void Player::update(float elapsed)
@@ -67,14 +72,8 @@ void Player::update(float elapsed)
     move(direction, elapsed);
 
 
-    Vec3 pos  =  getPosition();
-    Vec3 angle = getDirection();
-
-    osd->write("Loc: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
-    osd->write("Ang: %0.2f, %0.2f, %0.2f, facing %s (%0.2f)",
-                angle.x, angle.y, angle.z,
-                getDirectionAsString(),
-                getDirectionInDegrees());
+    osd->write("LOC: %0.2f, %0.2f, %0.2f", currentPosition.x, currentPosition.y, currentPosition.z);
+    osd->write("Facing %s (%0.2f)", getDirectionAsString(), getDirectionInDegrees());
     osd->write("Distance Traveled: %0.2fm (%0.2f km/h)\n", 
             getDistanceTraveled(), getSpeed() / 1000);
 
@@ -82,7 +81,6 @@ void Player::update(float elapsed)
         osd->write("On Ground: yes");
     else
         osd->write("On Ground: no");
-
 }
 
 
@@ -183,6 +181,12 @@ void Player::calculateMovementDirection(float elapsed)
             setCurrentVelocity(currentVelocity.x, JUMP_SPEED, currentVelocity.z);
             direction.y += 1.0f;
         }
+    }
+
+    if (Input::isKeyPressed(SDLK_LSHIFT)) {
+        setVelocity(RUNNING_SPEED);
+    } else {
+        setVelocity(WALKING_SPEED);
     }
 }
 

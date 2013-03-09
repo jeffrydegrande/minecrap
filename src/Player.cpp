@@ -45,7 +45,7 @@ void Player::update(float elapsed)
     bool flying = CVarUtils::GetCVar<bool>("flying");
 
     calculateMovementDirection();
-    updatePosition(direction, elapsed);
+    move(direction, elapsed);
 
     // apply gravity
     if (!flying) {
@@ -189,12 +189,13 @@ void Player::setPosition(const Vec3 &position) {
     camera.setPosition(cameraPosition);
 }
 
-void Player::updatePosition(const Vec3 &direction, float elapsed)
+void Player::move(const Vec3 &direction, float elapsed)
 {
     float distance = 0.0f;
 
     if (currentVelocity.lengthSq() != 0.0f) {
-        Vec3 displacement = (currentVelocity * elapsed) + (acceleration * 0.5f * elapsed * elapsed);
+        Vec3 displacement = (currentVelocity * elapsed) 
+            + (acceleration * 0.5f * elapsed * elapsed);
 
         if (direction.x == 0.0f && closeEnough(currentVelocity.x, 0.0f))
             displacement.x = 0.0f;
@@ -205,9 +206,8 @@ void Player::updatePosition(const Vec3 &direction, float elapsed)
         if (direction.z == 0.0f && closeEnough(currentVelocity.z, 0.0f))
             displacement.z = 0.0f;
 
-        camera.move(displacement);
-
         distance = displacement.length();
+        camera.move(displacement);
         distanceTraveled += distance;
     }
 
@@ -217,6 +217,7 @@ void Player::updatePosition(const Vec3 &direction, float elapsed)
     if (closeEnough(elapsedInSeconds, 0.0f)) {
         speed = 0.0f;
     }
+
     updateVelocity(direction, elapsed);
 }
 

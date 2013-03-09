@@ -56,7 +56,7 @@ public:
 
 private:
     void calculateMovementDirection();
-    void updatePosition(const Vec3 &direction, float elapsed);
+    void move(const Vec3 &direction, float elapsed);
     void updateVelocity(const Vec3 &direction, float elapsed);
 
 };

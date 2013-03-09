@@ -64,6 +64,11 @@ void Chunk::setBlock(int x, int y, int z, GLubyte type)
     B(x,y,z) = type;
 }
 
+GLubyte Chunk::getBlock(const Vec3 &v) const
+{
+    return B((int)v.x, (int)v.y, (int)v.z);
+}
+
 void Chunk::generate() {
     // printf( "Generating chunk \n" );
 	memset(blocks, 0, sizeof(GLubyte)*CHUNKX*CHUNKY*CHUNKZ);

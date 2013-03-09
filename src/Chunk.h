@@ -27,6 +27,8 @@ public:
 
 	void setBlock(int x, int y, int z, GLubyte type);
 
+    GLubyte getBlock(const Vec3 &v) const;
+
     Vec3 inWorld(int x, int y, int z);
 
 	int groundLevel(int x, int y);

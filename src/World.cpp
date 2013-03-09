@@ -118,18 +118,16 @@ Player * World::spawnPlayer() {
 	return new Player(this, playerSpawnLocation);
 }
 
+
+#define OUTSIDE_WORLD(x, y, z) \
+    ((y < 0 || y > CHUNKY-1) || (x < 0 || x > (int)chunks->numRows() << 4) || (z < 0 || z > (int)chunks->numRows() << 4))
+
 bool World::isGround(int x, int y, int z) {
-    if (y < 0 || y > CHUNKY-1) // below or above the world, so no ground
-        return false;
-
-    if (x < 0 || x > (int)chunks->numRows() << 4)
-        return false;
-
-    if (z < 0 || z > (int)chunks->numColumns() << 4)
+    if (OUTSIDE_WORLD(x,y,z))
         return false;
 
     // get the chunk from the grid
-    Chunk *chunk = chunks->get( x / CHUNKX, z / CHUNKZ);
+    Chunk *chunk = chunks->get(x / CHUNKX, z / CHUNKZ);
     int chunkX = x % CHUNKX;
     int chunkZ = z % CHUNKZ;
     return chunk->isGround(chunkX, y, chunkZ);
@@ -137,6 +135,14 @@ bool World::isGround(int x, int y, int z) {
 
 bool World::isGround(const Vec3 &v) {
     return isGround(v.x, v.y, v.z);
+}
+
+GLubyte World::blockAt(const Vec3 &v) {
+    if (OUTSIDE_WORLD(v.x, v.y, v.z))
+        return AIR;
+
+    Chunk *chunk = chunks->get(v.x / CHUNKX, v.z / CHUNKZ);
+    return chunk->getBlock(Vec3((int)v.x % CHUNKX, v.y, (int)v.z % CHUNKZ));
 }
 
 void World::update() {

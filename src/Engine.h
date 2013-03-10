@@ -33,6 +33,9 @@ class Engine
 
     Vec3 cameraPosition;
     Vec3 cameraDirection;
+ 
+    Vec4 lightIntensity;
+    bool night;
 
     bool optionRenderWireframe;
     bool optionLighting;
@@ -56,6 +59,8 @@ public:
     void flush();
     bool withinFrustum(float x, float y, float z, float radius);
     void updateFrustum();
+
+    void toggleDayNight();
 
 private:
 

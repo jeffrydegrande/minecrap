@@ -10,9 +10,10 @@ uniform mat4 cameraToClipMatrix;
 uniform vec3 directionToLight;
 uniform mat4 modelToCameraMatrix;
 uniform mat3 normalModelToCameraMatrix;
+uniform vec4 lightIntensity;
 
 void main() {
-    vec4 lightIntensity = vec4(1.0, 1.0, 1.0, 1.0);
+   
 
     gl_Position = cameraToClipMatrix * (modelToCameraMatrix * vec4(position, 1.0));
 

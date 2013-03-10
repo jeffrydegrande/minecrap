@@ -43,8 +43,10 @@ Engine::Engine():
     crosshair(NULL),
     shader(NULL),
     optionRenderWireframe(false),
-    optionLighting(true)
-{
+    optionLighting(true),
+    lightIntensity(1.0f, 1.0f, 1.0f, 1.0f),
+    night(false)
+{   
     init();
 }
 
@@ -245,6 +247,9 @@ void Engine::collectInput() {
                 case SDLK_F3:
                     optionRenderWireframe = !optionRenderWireframe;
                     break;
+                case SDLK_F4:
+                    toggleDayNight();
+                    break;
                 default:
                     Input::keyPressed(event.key.keysym.sym);
             }
@@ -286,7 +291,13 @@ void Engine::collectInput() {
 //////////////////////////////////////////////////////
 
 void Engine::render() {
-    glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
+    if (night) {
+        glClearColor(14.0f/255, 0.0f, 51.0f/255.0f, 1.0f);
+        lightIntensity = Vec4(0.3f, 0.3f, 0.3f, 0.3f);
+    } else {
+        glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
+        lightIntensity = Vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     render3D();
@@ -417,5 +428,10 @@ bool Engine::withinFrustum(float x, float y, float z, float radius) {
         return true;
     else
         return false;
+}
+
+void Engine::toggleDayNight()
+{
+    night = !night;
 }
 

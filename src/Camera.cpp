@@ -246,13 +246,7 @@ void Camera::updatePosition(const Vec3 &direction, float elapsed)
         move(displacement);
 
         float distance = displacement.length();
-        /*
-        float speed = (1.0f / (elapsed / 1000.0f)) * distance; // seconds
 
-        if (closeEnough(elapsed/1000.0f, 0.0f)) {
-            speed = 0.0f;
-        }
-        */
 
         distanceTraveled += distance;
     }

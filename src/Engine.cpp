@@ -330,20 +330,22 @@ void Engine::render3D() {
     Matrix4 camera = player->getCameraMatrix();
     model.apply(camera);
 
-    Vec4 lightDirectionCameraSpace = camera * Vec4(0.866f, 1.0f, 0.0f, 0.0f);
+    Vec4 directionToLight = camera * Vec4(0.866f, 1.0f, 0.0f, 0.0f);
     Matrix3 normal(camera);
 
-    shader->setCameraToClipMatrix(cameraToClipMatrix);
-    shader->setNormalModelToCameraMatrix(normal);
-    shader->setDirectionToLight(lightDirectionCameraSpace);
-    shader->setModelToCameraMatrix(camera);
+    shader->setUniformMatrix4("cameraToClipMatrix", cameraToClipMatrix);
+    shader->setUniformMatrix3("normalModelToCameraMatrix", normal);
+    shader->setDirectionToLight(directionToLight);
+    shader->setUniformMatrix4("modelToCameraMatrix", camera);
+    shader->setUniformVec4("lightIntensity", lightIntensity);
+
     world->render();
 
-    ASSERT_NO_GL_ERROR;
+    // ASSERT_NO_GL_ERROR;
 }
 
 void Engine::render2D() {
-    ASSERT_NO_GL_ERROR;
+    // ASSERT_NO_GL_ERROR;
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -367,7 +369,7 @@ void Engine::render2D() {
 
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
-    ASSERT_NO_GL_ERROR;
+    // ASSERT_NO_GL_ERROR;
 }
 
 void Engine::renderOnScreenDisplay() {

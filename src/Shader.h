@@ -9,11 +9,6 @@
 class Shader {
     GLuint program;
 
-    GLint cameraToClipMatrix;
-    GLint modelToCameraMatrix;
-    GLint directionToLight;
-    GLint normalModelToCameraMatrix;
-
     std::vector<GLuint> shaders;
 
     public:
@@ -23,6 +18,11 @@ class Shader {
         void addVertexShader(const char *path);
         void addFragmentShader(const char *path);
         void done();
+
+        void setUniformMatrix3(const char *name, Matrix3 &m);
+        void setUniformMatrix4(const char *name, Matrix4 &m);
+        void setUniformVec3(const char *name, Vec3 &v);
+        void setUniformVec4(const char *name, Vec4 &v);
 
         void setCameraToClipMatrix(Matrix4 &m);
         void setModelToCameraMatrix(Matrix4 &m);

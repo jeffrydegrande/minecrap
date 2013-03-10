@@ -13,25 +13,66 @@ Shader::~Shader() {
     }
 }
 
+
+void Shader::setUniformMatrix3(const char *name, Matrix3 &m)
+{
+    assert(program != -1);
+    GLint u = glGetUniformLocation(program, name);
+    assert(u != -1);
+    glUniformMatrix3fv(u, 1, GL_FALSE, m.value_ptr());
+}
+
+void Shader::setUniformMatrix4(const char *name, Matrix4 &m)
+{
+    assert(program != -1);
+    GLint u = glGetUniformLocation(program, name);
+    assert(u != -1);
+    glUniformMatrix4fv(u, 1, GL_FALSE, m.value_ptr());  
+}
+
+
+void Shader::setUniformVec3(const char *name, Vec3 &v)
+{
+    assert(program != -1);
+    GLint u = glGetUniformLocation(program, name);
+    assert(u != -1);
+    glUniform3fv(u, 1, (GLfloat *)v.value_ptr());
+
+}
+
+void Shader::setUniformVec4(const char *name, Vec4 &v)
+{
+    assert(program != -1);
+    GLint u = glGetUniformLocation(program, name);   
+    assert(u != -1);
+    glUniform4fv(u, 1, (GLfloat *)v.value_ptr());
+}
+
+
 void Shader::setModelToCameraMatrix(Matrix4 &m) {
     assert(program != 0);
+    GLint modelToCameraMatrix       = glGetUniformLocation(program, "modelToCameraMatrix");
     glUniformMatrix4fv(modelToCameraMatrix, 1, GL_FALSE, m.value_ptr());
 }
 
 void Shader::setCameraToClipMatrix(Matrix4 &m) {
-    assert(program != 0);
-    assert(cameraToClipMatrix != -1);
-    glUniformMatrix4fv(cameraToClipMatrix, 1, GL_FALSE, m.value_ptr());
+    assert(program != 0);   
+    GLint v = glGetUniformLocation(program, "cameraToClipMatrix");
+    glUniformMatrix4fv(v, 1, GL_FALSE, m.value_ptr());
 }
+
 
 void Shader::setDirectionToLight(Vec4 &v) {
     assert(program != 0);
-    glUniform3fv(directionToLight, 1, (GLfloat *)v.value_ptr());
+    GLint u          = glGetUniformLocation(program, "directionToLight");
+    glUniform3fv(u, 1, (GLfloat *)v.value_ptr());
 }
 
 void Shader::setNormalModelToCameraMatrix(Matrix3 &m) {
     assert(program != 0);
-    glUniformMatrix3fv(normalModelToCameraMatrix, 1, GL_FALSE, m.value_ptr());
+    GLint v = glGetUniformLocation(program, "normalModelToCameraMatrix");
+
+    glUniformMatrix3fv(v, 1, GL_FALSE, m.value_ptr());
 }
 
 void Shader::use() {
@@ -61,15 +102,6 @@ void Shader::done() {
     for (size_t i=0; i<shaders.size(); i++) {
         glDetachShader(program, shaders[i]);
     }
-
-    cameraToClipMatrix        = glGetUniformLocation(program, "cameraToClipMatrix");
-    assert(cameraToClipMatrix != -1);
-    directionToLight          = glGetUniformLocation(program, "directionToLight");
-    assert(directionToLight != -1);
-    modelToCameraMatrix       = glGetUniformLocation(program, "modelToCameraMatrix");
-    assert(modelToCameraMatrix != -1);
-    normalModelToCameraMatrix = glGetUniformLocation(program, "normalModelToCameraMatrix");
-    assert(normalModelToCameraMatrix != -1);
 
     ASSERT_NO_GL_ERROR;
 }

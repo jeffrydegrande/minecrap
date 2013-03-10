@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "Console.h"
 #include <cmath>
 
 Vec3 WORLD_XAXIS(1.0f, 0.0f, 0.0f);
@@ -88,7 +89,7 @@ void Camera::rotateFlight(float headingDegrees, float pitchDegrees, float rollDe
 void Camera::rotateFirstPerson(float headingDegrees, float pitchDegrees)
 {
     accumPitchDegrees += pitchDegrees;
-
+   
     if (accumPitchDegrees > 90.0f) {
         pitchDegrees = 90.0f - (accumPitchDegrees - pitchDegrees);
         accumPitchDegrees = 90.0f;
@@ -97,6 +98,8 @@ void Camera::rotateFirstPerson(float headingDegrees, float pitchDegrees)
         pitchDegrees = -90.0f - (accumPitchDegrees - pitchDegrees);
         accumPitchDegrees = -90.0f;
     }
+
+    ConsoleLog("pitch: %0.2f\n", accumPitchDegrees);
 
     Matrix4 rotation;
 
@@ -202,133 +205,6 @@ Matrix4 Camera::HorizontalPerspective(float fovx, float aspect, float zNear, flo
     return projection;
 }
 
-<<<<<<< HEAD
-#define EPSILON 1e-6f;
-
-bool closeEnough(float a, float b) {
-    return fabsf((a - b) / ((b == 0.0f) ? 1.0f : b)) < EPSILON;
-}
-
-void Camera::updatePosition(const Vec3 &direction, float elapsed)
-{
-    if (currentVelocity.lengthSq() != 0.0f) {
-        Vec3 displacement = (currentVelocity * elapsed) +
-            (acceleration * 0.5f * elapsed * elapsed);
-
-        if (direction.x == 0.0f && closeEnough(currentVelocity.x, 0.0f))
-            displacement.x = 0.0f;
-
-        if (direction.y == 0.0f && closeEnough(currentVelocity.y, 0.0f))
-            displacement.y = 0.0f;
-
-        if (direction.z == 0.0f && closeEnough(currentVelocity.z, 0.0f))
-            displacement.z = 0.0f;
-
-        move(displacement);
-
-        float distance = displacement.length();
-
-
-        distanceTraveled += distance;
-    }
-
-
-    updateVelocity(direction, elapsed);
-}
-
-void Camera::updateVelocity(const Vec3 &direction, float elapsed)
-{
-    // Updates the camera's velocity based on the supplied movement direction
-    // and the elapsed time (since this method was last called). The movement
-    // direction is in the range [-1,1].
-
-    if (direction.x != 0.0f)
-    {
-        // Camera is moving along the x axis.
-        // Linearly accelerate up to the camera's max speed.
-
-        currentVelocity.x += direction.x * acceleration.x * elapsed;
-
-        if (currentVelocity.x > velocity.x)
-            currentVelocity.x = velocity.x;
-        else if (currentVelocity.x < -velocity.x)
-            currentVelocity.x = -velocity.x;
-    }
-    else
-    {
-        // Camera is no longer moving along the x axis.
-        // Linearly decelerate back to stationary state.
-
-        if (currentVelocity.x > 0.0f)
-        {
-            if ((currentVelocity.x -= acceleration.x * elapsed) < 0.0f)
-                currentVelocity.x = 0.0f;
-        }
-        else
-        {
-            if ((currentVelocity.x += acceleration.x * elapsed) > 0.0f)
-                currentVelocity.x = 0.0f;
-        }
-    }
-
-    if (direction.y != 0.0f)
-    {
-        // Camera is moving along the y axis.
-        // Linearly accelerate up to the camera's max speed.
-
-        currentVelocity.y += direction.y * acceleration.y * elapsed;
-
-        if (currentVelocity.y > velocity.y)
-            currentVelocity.y = velocity.y;
-        else if (currentVelocity.y < -velocity.y)
-            currentVelocity.y = -velocity.y;
-    }
-    else
-    {
-        // Camera is no longer moving along the y axis.
-        // Linearly decelerate back to stationary state.
-
-        if (currentVelocity.y > 0.0f)
-        {
-            if ((currentVelocity.y -= acceleration.y * elapsed) < 0.0f)
-                currentVelocity.y = 0.0f;
-        }
-        else
-        {
-            if ((currentVelocity.y += acceleration.y * elapsed) > 0.0f)
-                currentVelocity.y = 0.0f;
-        }
-    }
-
-    if (direction.z != 0.0f)
-    {
-        // Camera is moving along the z axis.
-        // Linearly accelerate up to the camera's max speed.
-
-        currentVelocity.z += direction.z * acceleration.z * elapsed;
-
-        if (currentVelocity.z > velocity.z)
-            currentVelocity.z = velocity.z;
-        else if (currentVelocity.z < -velocity.z)
-            currentVelocity.z = -velocity.z;
-    }
-    else
-    {
-        // Camera is no longer moving along the z axis.
-        // Linearly decelerate back to stationary state.
-
-        if (currentVelocity.z > 0.0f)
-        {
-            if ((currentVelocity.z -= acceleration.z * elapsed) < 0.0f)
-                currentVelocity.z = 0.0f;
-        }
-        else
-        {
-            if ((currentVelocity.z += acceleration.z * elapsed) > 0.0f)
-                currentVelocity.z = 0.0f;
-        }
-    }
-=======
 float Camera::getViewDirectionInDegrees() const {
     float angle = Vec2::angle( Vec2(viewDirection.x, viewDirection.z),
                                Vec2(0.0f, 1.0f));
@@ -337,5 +213,4 @@ float Camera::getViewDirectionInDegrees() const {
     if (angle > 360.0f)
         angle -= 360.0f;
     return angle;
->>>>>>> 781bab63c945b998f32c8541b2d74cdc9377e98a
 }

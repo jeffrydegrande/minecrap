@@ -16,11 +16,8 @@ void OSD_Destroy()
     osd = NULL;
 }
 
-OSD::OSD():
-    currentLine(1),
-    width(0)
-{
-}
+OSD::OSD(): width(0)
+{ }
 
 OSD::~OSD() {}
 
@@ -38,10 +35,14 @@ void OSD::write(const char *fmt, ...)
     va_start(ap, fmt);
     vsprintf(text, fmt, ap);
     va_end(ap);
-    TextWrite(this->width / 2 - 40, currentLine * 13, text);
-    currentLine++;
+    lines.push_back(text);
 }
 
-void OSD::reset() {
-    currentLine = 1;
+void OSD::render() {
+    int line = 1;
+    for(size_t i=0; i<lines.size(); i++) {
+        TextWrite(this->width / 2 - 40, line * 13, lines[i].c_str());
+        line++;
+    }
+    lines.clear();
 }

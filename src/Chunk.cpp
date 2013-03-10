@@ -16,7 +16,10 @@
 #include <assert.h>
 #include <string>
 
-Chunk::Chunk(int x, int z, int seed): mesh(NULL) {
+Chunk::Chunk(int x, int z, int seed): 
+    opaque(NULL),
+    transparent(NULL)
+{
     this->seed = seed;
     this->worldX = x;
     this->worldZ = z;
@@ -24,10 +27,10 @@ Chunk::Chunk(int x, int z, int seed): mesh(NULL) {
 }
 
 Chunk::~Chunk() {
-    if (mesh != NULL) {
-        delete mesh;
-        mesh = NULL;
-    }
+    delete opaque;
+    opaque = NULL;
+    delete transparent;
+    transparent = NULL;
 }
 
 int Chunk::X() {
@@ -59,6 +62,11 @@ int Chunk::groundLevel(int x, int z) {
 void Chunk::setBlock(int x, int y, int z, GLubyte type)
 {
     B(x,y,z) = type;
+}
+
+GLubyte Chunk::getBlock(const Vec3 &v) const
+{
+    return B((int)v.x, (int)v.y, (int)v.z);
 }
 
 void Chunk::generate() {
@@ -180,19 +188,27 @@ inline Vec3 Chunk::inWorld(int x, int y, int z)
 }
 
 void Chunk::buildMesh() {
-	int vertexCount = 0;
+    int numberOfTransparentVertices=0;
+    int numberOfOpaqueVertices=0;
 
     // calculate the number of vertices need
 	for (int y=0; y<CHUNKY; y++) {
 		for (int z=0; z<CHUNKZ; z++) {
 			for (int x=0; x<CHUNKX; x++) {
-				if (B(x,y,z) == AIR) continue;
-				vertexCount += 36; // 6 faces, 2 triangles/face, 3verts/trangle
+                GLuint block = B(x,y,z);
+				if (block == AIR) continue;
+                // 6 faces,2 triangles/face, 3verts/trangle
+                if (block == WATER)
+                    numberOfTransparentVertices += 36;
+                else
+				    numberOfOpaqueVertices += 36;
 			}
 		}
 	}
 
-    mesh = new Mesh(vertexCount);
+    opaque = new Mesh(numberOfOpaqueVertices);
+    transparent = new Mesh(numberOfTransparentVertices);
+
     GLubyte block;
     GLubyte faces;
 
@@ -209,7 +225,6 @@ void Chunk::buildMesh() {
 
 				faces = 0;
 
-                
                 // front face
 				if(z == CHUNKZ-1 || (z < CHUNKZ-1 && B(x  ,y  ,z+1) == AIR)) {
                     faces |= (1<<0);
@@ -240,19 +255,26 @@ void Chunk::buildMesh() {
                     faces |= (1<<5);
                 }
 
-
                 if (faces>0) {
-					mesh->addCube(inWorld(x,y,z), block, faces);
+                    if (block == WATER)
+					    transparent->addCube(inWorld(x,y,z), block, faces);
+                    else
+                        opaque->addCube(inWorld(x,y,z), block, faces);
                 }
 			}
 		}
 	}
-    mesh->finish();
+
+    opaque->finish();
+    transparent->finish();
 }
 
 int Chunk::render() {
-    if (mesh != NULL) {
-        mesh->render();
+    if (opaque != NULL) {
+        opaque->render(false);
+    }
+    if (transparent != NULL) {
+        transparent->render(true);
     }
 	return 1;
 }

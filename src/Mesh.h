@@ -31,7 +31,7 @@ class Mesh {
         void finish();
 
         void build();
-        void render();
+        void render(bool transparency);
 
         int count() const;
 

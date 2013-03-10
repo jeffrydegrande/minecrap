@@ -78,6 +78,8 @@ Player * World::spawnPlayer() {
     int x=0, y=0;
     int ground=0;
 
+    Chunk *chunk = NULL;
+
 	// pick a random spot in real world coordinates
 	Vec2 size = this->getSize();
 
@@ -88,7 +90,7 @@ Player * World::spawnPlayer() {
         y = rand() % (int)size.y;
 
         // find the block for this coordinate
-        Chunk *chunk = chunks->get( x / CHUNKX, y / CHUNKZ);
+        chunk = chunks->get( x / CHUNKX, y / CHUNKZ);
 
         // and translate the real world coordinates into chunk coordinates
         // y in 2d => z in 3d
@@ -100,7 +102,7 @@ Player * World::spawnPlayer() {
     }
 
 	playerSpawnLocation.x = (float)x;
-	playerSpawnLocation.y = (float)ground + 1;
+	playerSpawnLocation.y = (float)ground + 2;
 	playerSpawnLocation.z = (float)y;
 
 #ifdef SUPPORT_GLCONSOLE
@@ -111,21 +113,31 @@ Player * World::spawnPlayer() {
 	return new Player(this, playerSpawnLocation);
 }
 
+
+#define OUTSIDE_WORLD(x, y, z) \
+    ((y < 0 || y > CHUNKY-1) || (x < 0 || x > (int)chunks->numRows() << 4) || (z < 0 || z > (int)chunks->numRows() << 4))
+
 bool World::isGround(int x, int y, int z) {
-    if (y < 0 || y > CHUNKY-1) // below or above the world, so no ground
-        return false;
-
-    if (x < 0 || x > (int)chunks->numRows() << 4)
-        return false;
-
-    if (z < 0 || z > (int)chunks->numColumns() << 4)
+    if (OUTSIDE_WORLD(x,y,z))
         return false;
 
     // get the chunk from the grid
-    Chunk *chunk = chunks->get( x / CHUNKX, z / CHUNKZ);
+    Chunk *chunk = chunks->get(x / CHUNKX, z / CHUNKZ);
     int chunkX = x % CHUNKX;
     int chunkZ = z % CHUNKZ;
     return chunk->isGround(chunkX, y, chunkZ);
+}
+
+bool World::isGround(const Vec3 &v) {
+    return isGround(v.x, v.y, v.z);
+}
+
+GLubyte World::blockAt(const Vec3 &v) {
+    if (OUTSIDE_WORLD(v.x, v.y, v.z))
+        return AIR;
+
+    Chunk *chunk = chunks->get(v.x / CHUNKX, v.z / CHUNKZ);
+    return chunk->getBlock(Vec3((int)v.x % CHUNKX, v.y, (int)v.z % CHUNKZ));
 }
 
 void World::update() {

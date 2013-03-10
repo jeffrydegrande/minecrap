@@ -5,18 +5,15 @@ Vec3 WORLD_XAXIS(1.0f, 0.0f, 0.0f);
 Vec3 WORLD_YAXIS(0.0f, 1.0f, 0.0f);
 Vec3 WORLD_ZAXIS(0.0f, 0.0f, 1.0f);
 
+
 Camera::Camera()
 {
+    accumPitchDegrees = 0.0f;
     eye.set(0.0f, 0.0f, 0.0f);
     xAxis.set(1.0f, 0.0f, 0.0f);
     yAxis.set(0.0f, 1.0f, 0.0f);
     zAxis.set(0.0f, 0.0f, 1.0f);
     viewDirection.set(0.0f, 0.0f, -1.0f);
-    accumPitchDegrees = 0.0f;
-    distanceTraveled = 0.0f;
-    currentVelocity.set(0.0f, 0.0f, 0.0f);
-    velocity.set(0.0f, 0.0f, 0.0f);
-    acceleration.set(0.0f, 0.0f, 0.0f);
     viewMatrix.identity();
 }
 
@@ -24,7 +21,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::move(float dx, float dy, float dz)
+Vec3 Camera::move(float dx, float dy, float dz) const
 {
     Vec3 eye = this->eye;
     Vec3 forward;
@@ -39,22 +36,12 @@ void Camera::move(float dx, float dy, float dz)
     eye += xAxis * dx;
     eye += WORLD_YAXIS * dy;
     eye += forward * dz;
-
-    setPosition(eye);
+    return eye;
 }
 
-void Camera::move(const Vec3 &displacement)
+Vec3 Camera::move(const Vec3 &displacement) const
 {
-    move(displacement.x, displacement.y, displacement.z);
-}
-
-void Camera::move(const Vec3 &direction, const Vec3 &amount)
-{
-    eye.x += direction.x * amount.x;
-    eye.y += direction.y * amount.y;
-    eye.z += direction.z * amount.z;
-
-    updateViewMatrix(false);
+    return move(displacement.x, displacement.y, displacement.z);
 }
 
 void Camera::setPosition(const Vec3 &position)
@@ -212,16 +199,10 @@ Matrix4 Camera::HorizontalPerspective(float fovx, float aspect, float zNear, flo
     projection[14] = -1.0f;
     projection[15] = 0.0f;
 
-    /*
-    m_fovx = fovx;
-    m_aspectRatio = aspect;
-    m_znear = znear;
-    m_zfar = zfar;
-    */
-
     return projection;
 }
 
+<<<<<<< HEAD
 #define EPSILON 1e-6f;
 
 bool closeEnough(float a, float b) {
@@ -347,4 +328,14 @@ void Camera::updateVelocity(const Vec3 &direction, float elapsed)
                 currentVelocity.z = 0.0f;
         }
     }
+=======
+float Camera::getViewDirectionInDegrees() const {
+    float angle = Vec2::angle( Vec2(viewDirection.x, viewDirection.z),
+                               Vec2(0.0f, 1.0f));
+    if (angle < 0)
+        angle += 360.0f;
+    if (angle > 360.0f)
+        angle -= 360.0f;
+    return angle;
+>>>>>>> 781bab63c945b998f32c8541b2d74cdc9377e98a
 }

@@ -38,6 +38,7 @@ static void displayOpenGLInfo() {
 Engine::Engine():
     fps_current(0),
     quit(false),
+    paused(false),
     world(NULL),
     player(NULL),
     crosshair(NULL),
@@ -60,7 +61,6 @@ Engine::~Engine() {
 
 void Engine::init() {
     int flags;
-
 
     if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_JOYSTICK) != 0) {
         return;
@@ -102,6 +102,7 @@ void Engine::init() {
     SDL_ShowCursor (false);
 
     for (int i = 0; i < SDL_NumJoysticks(); i++) {
+        printf("Joystick found: %s\n", SDL_JoystickName(i));
         SDL_JoystickEventState(SDL_ENABLE);
         SDL_JoystickOpen(i);
     }
@@ -205,11 +206,17 @@ void Engine::update(float elapsed) {
     float elapsedInSeconds = elapsed / 1000.f;
 
     this->collectInput();
+
 #ifdef SUPPORT_GLCONSOLE
     ConsoleUpdate ();
 #endif
+
+    if (paused)
+        return;
+
     player->update(elapsedInSeconds);
     world->update();
+    osd->write("FPS: %d", fps_current);
 }
 
 void Engine::collectInput() {
@@ -250,11 +257,20 @@ void Engine::collectInput() {
                 case SDLK_F4:
                     toggleDayNight();
                     break;
+                case SDLK_p:
+                    paused = !paused;
+                    break;
                 default:
                     Input::keyPressed(event.key.keysym.sym);
             }
             break;
         case SDL_JOYAXISMOTION:
+            Input::joystickSet(event.jaxis.axis, event.jaxis.value);
+            {
+                float x = Input::joystickGet(3) / (3 * 3276.8f);
+                float y = Input::joystickGet(4) / (3 * 3276.8f);
+                player->look(x, y);
+            }
             break;
         case SDL_JOYBUTTONDOWN:
             break;
@@ -291,6 +307,9 @@ void Engine::collectInput() {
 //////////////////////////////////////////////////////
 
 void Engine::render() {
+    if (paused)
+        return;
+
     if (night) {
         glClearColor(14.0f/255, 0.0f, 51.0f/255.0f, 1.0f);
         lightIntensity = Vec4(0.3f, 0.3f, 0.3f, 0.3f);
@@ -298,6 +317,8 @@ void Engine::render() {
         glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
         lightIntensity = Vec4(1.0f, 1.0f, 1.0f, 1.0f);
     }
+
+    glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     render3D();
@@ -358,7 +379,7 @@ void Engine::render2D() {
     glDisable(GL_DEPTH_TEST);
 
     crosshair->render();
-    renderOnScreenDisplay();
+    osd->render();
 
 #ifdef SUPPORT_GLCONSOLE
     ConsoleRender();
@@ -371,27 +392,6 @@ void Engine::render2D() {
     glMatrixMode(GL_MODELVIEW);
     // ASSERT_NO_GL_ERROR;
 }
-
-void Engine::renderOnScreenDisplay() {
-    Vec3 pos   = player->getPosition();
-    Vec3 angle = player->getDirection();
-
-    osd->write("FPS: %d", fps_current);
-    osd->write("Loc: %0.2f, %0.2f, %0.2f",
-                pos.x, pos.y, pos.z);
-    osd->write("Ang: %0.2f, %0.2f, %0.2f, facing %s",
-                angle.x, angle.y, angle.z, player->getDirectionAsString());
-    osd->write("Distance Traveled: %0.2fm (%0.2f km/h)\n", 
-            player->getDistanceTraveled(), 0);
-
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        osd->write("OpenGL error: %s\n", gluErrorString(error));
-    }
-
-    osd->reset();
-}
-
 
 int Engine::viewWidth() const {
     return width;

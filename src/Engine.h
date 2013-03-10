@@ -24,6 +24,7 @@ class Engine
     Frustum frustum;
 
 	bool quit;
+    bool paused;
 
 	World *world;
 	Player *player;
@@ -77,7 +78,6 @@ private:
 	void render();
     void render3D();
     void render2D();
-    void renderOnScreenDisplay();
 };
 
 #endif

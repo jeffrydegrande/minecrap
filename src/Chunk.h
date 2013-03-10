@@ -17,7 +17,8 @@ class Chunk
 	int worldZ;
 	int seed;
 
-    Mesh *mesh;
+    Mesh *opaque;
+    Mesh *transparent;
 
 public:
 
@@ -25,6 +26,8 @@ public:
 	~Chunk();
 
 	void setBlock(int x, int y, int z, GLubyte type);
+
+    GLubyte getBlock(const Vec3 &v) const;
 
     Vec3 inWorld(int x, int y, int z);
 
@@ -40,6 +43,8 @@ public:
 
     int vertexCount() const;
 
+    void buildMesh();
+
 private:
 
 	int renderBlock(int x, int y, int z);
@@ -54,10 +59,9 @@ private:
 	bool isExposedToAir(int x, int y, int z);
 	bool isBorderBlock(int x, int y, int z);
 
-    void buildMesh();
 };
 
 inline int Chunk::vertexCount() const
-{ return mesh->count(); }
+{ return opaque->count() + transparent->count(); }
 
 #endif

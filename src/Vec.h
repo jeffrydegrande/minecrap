@@ -16,8 +16,12 @@ public:
 	Vec2 operator -(const Vec2 &);
 	Vec2 & operator -=(const Vec2 &);
 
+    float dotProduct(const Vec2 &other);
+    float dotProduct(const Vec2 &v1, const Vec2 &v2);
+
 	Vec2 normalize();
 	static Vec2 normalize(const Vec2 &);
+    static float angle(const Vec2 &, const Vec2 &);
 
 	float length() const;
 

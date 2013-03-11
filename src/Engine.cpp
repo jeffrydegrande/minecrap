@@ -43,11 +43,11 @@ Engine::Engine():
     player(NULL),
     crosshair(NULL),
     shader(NULL),
+    lightIntensity(0.8f, 0.8f, 0.8f, 0.8f),
+    night(false),
     optionRenderWireframe(false),
-    optionLighting(true),
-    lightIntensity(1.0f, 1.0f, 1.0f, 1.0f),
-    night(false)
-{   
+    optionLighting(true)
+{
     init();
 }
 

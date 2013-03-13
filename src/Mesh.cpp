@@ -2,9 +2,14 @@
 #include "Mesh.h"
 #include "Vec.h"
 #include "Color.h"
+#include "Image.h"
 #include <cassert>
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
+
+#define TEXTURE_WIDTH 16
+#define TEXTURE_HEIGHT 16
+#define TEXTURE_NUM 1
 
 // data used to construct a 1x1 cube used by addCube
 const Vec3 cubeVerts[] =
@@ -76,11 +81,39 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
 
         vertices[index].a  = 1.0f;
 
+        switch (i % 6) {
+            case 0:
+                vertices[index].s = 0.0f;
+                vertices[index].t = 0.0f;
+                break;
+            case 1:
+                vertices[index].s = 1.0f;
+                vertices[index].t = 0.0f;
+                break;
+            case 2:
+                vertices[index].s = 1.0f;
+                vertices[index].t = 1.0f;
+                break;
+            case 3:
+                vertices[index].s = 0.0f;
+                vertices[index].t = 0.0f;
+                break;
+            case 4:
+                vertices[index].s = 0.0f;
+                vertices[index].t = 1.0f;
+                break;
+            case 5:
+                vertices[index].s = 1.0f;
+                vertices[index].t = 1.0f;
+                break;
+        }
+
+        vertices[index].p = (float)kind;
         // color
         switch (kind) {
         case GRASS:
-            vertices[index].r  = 0.0f;
-            vertices[index].g  = 0.5f;
+            vertices[index].r  = 0.1f;
+            vertices[index].g  = 0.6f;
             vertices[index].b  = 0.0f;
             break;
         case ROCK:
@@ -89,9 +122,9 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
             vertices[index].b  = 0.25f;
             break;
         case DIRT:
-            vertices[index].r = 102.0f/510;
-            vertices[index].g = 69.0f/510;
-            vertices[index].b = 35.0f/510;
+            vertices[index].r = 233.0f/510;
+            vertices[index].g = 107.0f/510;
+            vertices[index].b = 0.0f;
             break;
         case WATER:
             vertices[index].r  = 0.0f;
@@ -140,8 +173,8 @@ void Mesh::finish() {
     glBindVertexArray(vao);
 
     glGenBuffers( 1, &vbo );
-    printf("Allocating %ld kb, ?? cubes, %d vertices, expected %d\n",
-        (index * sizeof(struct vertex_t)) / 1024, index, vertexCount);
+    /* printf("Allocating %ld kb, ?? cubes, %d vertices, expected %d\n", */
+    /*     (index * sizeof(struct vertex_t)) / 1024, index, vertexCount); */
 
     // upload data into VBO
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -157,6 +190,7 @@ void Mesh::finish() {
 
 void Mesh::render(bool transparency) {
     glBindVertexArray(vao);
+
     if (transparency) {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
@@ -164,9 +198,11 @@ void Mesh::render(bool transparency) {
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
     glEnableVertexAttribArray(0); // vertices
     glEnableVertexAttribArray(1); // colors
     glEnableVertexAttribArray(2); // normals
+    glEnableVertexAttribArray(3); // textures
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
             (GLvoid*)offsetof(struct vertex_t, x));
@@ -174,11 +210,15 @@ void Mesh::render(bool transparency) {
             (GLvoid*)offsetof(struct vertex_t, r));
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
             (GLvoid*)offsetof(struct vertex_t, nx));
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
+            (GLvoid*)offsetof(struct vertex_t, s));
 
     glDrawArrays(GL_TRIANGLES, 0, index);
+
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
+    glDisableVertexAttribArray(3);
 
     if (transparency) {
         glEnable(GL_BLEND);
@@ -188,6 +228,7 @@ void Mesh::render(bool transparency) {
     glEnableVertexAttribArray(0); // vertices
     glEnableVertexAttribArray(1); // colors
     glEnableVertexAttribArray(2); // normals
+    glEnableVertexAttribArray(3); // textures
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
             (GLvoid*)offsetof(struct vertex_t, x));
@@ -195,11 +236,15 @@ void Mesh::render(bool transparency) {
             (GLvoid*)offsetof(struct vertex_t, r));
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
             (GLvoid*)offsetof(struct vertex_t, nx));
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
+            (GLvoid*)offsetof(struct vertex_t, s));
 
     glDrawArrays(GL_TRIANGLES, 0, index);
+
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
+    glDisableVertexAttribArray(3);
 
     if (transparency) {
         glDisable(GL_BLEND);

@@ -13,6 +13,7 @@
 #include "Mesh.h"
 
 #include "simplex.h"
+#include <cmath>
 #include <assert.h>
 #include <string>
 
@@ -104,7 +105,6 @@ float terrainNoise(float x, float z, float frequency, float amplitude) {
 }
 
 void Chunk::generateTerrain() {
-
     foreach_xz {
         float maxHeight = terrainNoise(
                 (float)(x + seed + (worldX << 4)),

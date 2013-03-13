@@ -81,8 +81,9 @@
 #define LAVA  5
 #define WATER 6
 #define SAND  7
+#define BEDROCK 8
 
-#define RED   8
+#define RED   9
 
 typedef struct Point3D_ {
     GLfloat x, y, z;
@@ -103,5 +104,16 @@ typedef struct Point3D_ {
 
 #include <algorithm>
 #define clamp(value, upper, lower)		(std::max)((std::min)(value, (lower)), (upper))
+
+
+#define CHECK_OPENGL_ERRORS \
+    { \
+        GLenum error; \
+        while (GL_NO_ERROR != (error=glGetError())) { \
+            std::string s = reinterpret_cast<const char *>(gluErrorString(error)); \
+            fprintf(stderr, "Error: %s\n", s.c_str()); \
+            exit(1); \
+        } \
+    }
 
 #endif

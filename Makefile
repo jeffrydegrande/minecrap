@@ -17,7 +17,7 @@ LIB_CVARS=./vendor/lib/osx/libcvars.a
 LDFLAGS =-L/usr/local/lib -lSDLmain -lSDL -Wl,-framework,Cocoa -framework OpenGL
 else
 LIB_CVARS?=./vendor/lib/linux/libcvars.a
-LDFLAGS=-lSDL -lGL -lGLU
+LDFLAGS=-lSDL -lGL -lGLU -lIL -lILU
 endif
 
 all: mc tests
@@ -47,7 +47,8 @@ LIB_MINECRAP_SOURCES= src/AABox.cpp \
 		      src/Text.cpp \
 		      src/Vec.cpp \
 		      src/World.cpp \
-		      src/simplex.cpp
+		      src/simplex.cpp \
+			  src/Image.cpp
 
 LIB_MINECRAP_OBJS?=$(addprefix , $(LIB_MINECRAP_SOURCES:.cpp=.o))
 

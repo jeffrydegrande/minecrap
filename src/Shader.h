@@ -19,14 +19,14 @@ class Shader {
         void addFragmentShader(const char *path);
         void done();
 
-        void setUniformMatrix3(const char *name, Matrix3 &m);
-        void setUniformMatrix4(const char *name, Matrix4 &m);
-        void setUniformVec3(const char *name, Vec3 &v);
-        void setUniformVec4(const char *name, Vec4 &v);
+        GLint getUniformLocation(const char *name) const;
 
-        void setCameraToClipMatrix(Matrix4 &m);
-        void setModelToCameraMatrix(Matrix4 &m);
-        void setNormalModelToCameraMatrix(Matrix3 &m);
+        void setUniformMatrix3(GLint uniformLocation, Matrix3 &m);
+        void setUniformMatrix4(GLint uniformLocation, Matrix4 &m);
+        void setUniformVec3   (GLint uniformLocation, Vec3 &v);
+        void setUniformVec4   (GLint uniformLocation, Vec4 &v);
+        void setUniform1i(GLint uniformLocation, int i);
+
         void setDirectionToLight(Vec4 &v);
 
         void use();

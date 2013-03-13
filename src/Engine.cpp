@@ -8,6 +8,7 @@
 #include "Input.h"
 #include "Shader.h"
 #include "MatrixStack.h"
+#include "Image.h"
 
 #include <sstream>
 
@@ -27,6 +28,20 @@
 
 // static float elapsed_seconds = 0.0f;
 
+struct ProgramData {
+    GLuint cameraToClipMatrix;
+    GLuint directionToLight;
+    GLuint modelToCameraMatrix;
+    GLuint normalModelToCameraMatrix;
+    GLuint lightIntensity;
+    GLuint ambientLightIntensity;
+    GLuint materials;
+};
+
+ProgramData basicShader;
+
+Vec4 directionToLight(0.866f, 1.0f, 0.0f, 0.0f);
+
 static void displayOpenGLInfo() {
     printf ("vendor: %s\n",  (const unsigned char *)glGetString(GL_VENDOR));
     printf ("renderer: %s\n", (const unsigned char *)glGetString(GL_RENDERER));
@@ -44,9 +59,11 @@ Engine::Engine():
     crosshair(NULL),
     shader(NULL),
     lightIntensity(0.8f, 0.8f, 0.8f, 0.8f),
+    ambientLightIntensity(0.2f, 0.2f, 0.2f, 0.2f),
     night(false),
     optionRenderWireframe(false),
-    optionLighting(true)
+    optionLighting(true),
+    optionDrawRayToLightSource(false)
 {
     init();
 }
@@ -91,6 +108,7 @@ void Engine::init() {
     displayOpenGLInfo();
 
     compileShaders();
+    loadTextures();
 
     resizeWindow(width, height);
 
@@ -160,6 +178,17 @@ void Engine::compileShaders()
         shader->addFragmentShader("shaders/hello_world.frag");
 #endif
         shader->done();
+
+
+        // set program data
+
+        basicShader.cameraToClipMatrix        = shader->getUniformLocation("cameraToClipMatrix");
+        basicShader.directionToLight          = shader->getUniformLocation("directionToLight");
+        basicShader.modelToCameraMatrix       = shader->getUniformLocation("modelToCameraMatrix");
+        basicShader.normalModelToCameraMatrix = shader->getUniformLocation("normalModelToCameraMatrix");
+        basicShader.lightIntensity            = shader->getUniformLocation("lightIntensity");
+        basicShader.ambientLightIntensity     = shader->getUniformLocation("ambientLightIntensity");
+        basicShader.materials                 = shader->getUniformLocation("materials");
     }
 }
 
@@ -257,6 +286,9 @@ void Engine::collectInput() {
                 case SDLK_F4:
                     toggleDayNight();
                     break;
+                case SDLK_F5:
+                    optionDrawRayToLightSource = !optionDrawRayToLightSource;
+                    break;
                 case SDLK_p:
                     paused = !paused;
                     break;
@@ -317,8 +349,6 @@ void Engine::render() {
         glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
         lightIntensity = Vec4(1.0f, 1.0f, 1.0f, 1.0f);
     }
-
-    glClearColor(0.52f, 0.74f, 0.84f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     render3D();
@@ -334,33 +364,94 @@ void Engine::render() {
 	}
 }
 
+void Engine::loadTextures()
+{
+    printf("Loading textures\n");
+    // Image *grass = new Image("./textures/grass.png");
+    Image *grassDirt = new Image("./textures/grass_dirt.png");
+
+    glGenTextures(1, &blockTextureArray);
+
+    glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MIN_FILTER,GL_LINEAR); //Always set reasonable texture parameters
+    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+
+    glTexImage3D(GL_TEXTURE_2D_ARRAY,
+                 0,
+                 GL_RGBA8,
+                 grassDirt->width(),
+                 grassDirt->height(),
+                 1, // level count?
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 grassDirt->data_ptr());
+
+    /*
+    glTexImage3D(GL_TEXTURE_2D_ARRAY,
+                 0,
+                 GL_RGBA8,
+                 grassDirt->width(),
+                 grassDirt->height(),
+                 1, // level count?
+                 1,
+                 GL_RGB,
+                 GL_UNSIGNED_BYTE,
+                 grassDirt->data_ptr());
+                 */
+
+	CHECK_OPENGL_ERRORS
+}
+
+
 void Engine::render3D() {
     ASSERT_NO_GL_ERROR;
 
     glPolygonMode( GL_FRONT_AND_BACK, optionRenderWireframe ? GL_LINE : GL_FILL );
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc (GL_LEQUAL);
+
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_TRUE);
+    glDepthRange(0.0f, 1.0f);
+    glEnable(GL_DEPTH_CLAMP);
+
+    glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
 
 	UseShader use(*shader);
 
 	Matrix4 cameraToClipMatrix = projection.top();
-
     MatrixStack model;
     Matrix4 camera = player->getCameraMatrix();
     model.apply(camera);
 
-    Vec4 directionToLight = camera * Vec4(0.866f, 1.0f, 0.0f, 0.0f);
+    Vec4 cameraDirectionToLight = camera * directionToLight;
     Matrix3 normal(camera);
 
-    shader->setUniformMatrix4("cameraToClipMatrix", cameraToClipMatrix);
-    shader->setUniformMatrix3("normalModelToCameraMatrix", normal);
-    shader->setDirectionToLight(directionToLight);
-    shader->setUniformMatrix4("modelToCameraMatrix", camera);
-    shader->setUniformVec4("lightIntensity", lightIntensity);
+    shader->setUniformMatrix4(basicShader.cameraToClipMatrix, cameraToClipMatrix);
+    shader->setUniformMatrix3(basicShader.normalModelToCameraMatrix, normal);
+    shader->setDirectionToLight(cameraDirectionToLight);
+    shader->setUniformMatrix4(basicShader.modelToCameraMatrix, camera);
+    shader->setUniformVec4(basicShader.lightIntensity, lightIntensity);
+    shader->setUniformVec4(basicShader.ambientLightIntensity, ambientLightIntensity);
+    shader->setUniform1i(basicShader.materials, 0);
 
     world->render();
+
+    if (optionDrawRayToLightSource) {
+        Vec4 point = Vec4(0.0f, 0.0f, 0.0f, 0.f) + (directionToLight * 10000);
+        glLineWidth(3.0f);
+        glColor3f(1.0, 0.0, 0.0);
+        glBegin(GL_LINES);
+        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(point.x, point.y, point.z);
+        glEnd();
+        glColor3f(1.0, 1.0, 1.0);
+    }
 
     // ASSERT_NO_GL_ERROR;
 }

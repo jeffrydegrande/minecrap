@@ -34,14 +34,18 @@ class Engine
 
     Vec3 cameraPosition;
     Vec3 cameraDirection;
- 
     Vec4 lightIntensity;
+    Vec4 ambientLightIntensity;
     bool night;
 
     bool optionRenderWireframe;
     bool optionLighting;
+    bool optionDrawRayToLightSource;
 
     MatrixStack projection;
+
+    // Textures
+    GLuint blockTextureArray;
 
 public:
 	Engine();
@@ -67,6 +71,7 @@ private:
 
 	void init();
     void compileShaders();
+    void loadTextures();
     void setupProjectionMatrix();
 	
 	void update(float elapsed);

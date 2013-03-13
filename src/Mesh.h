@@ -9,7 +9,8 @@
 struct vertex_t {
     float x, y, z,     // position
           r, g, b, a,  // color
-          nx, ny, nz;  // normal
+          nx, ny, nz,  // normal
+          s, t, p;   // textures
 };
 
 
@@ -32,10 +33,10 @@ class Mesh {
 
         void build();
         void render(bool transparency);
-
         int count() const;
 
     private:
+        void loadTextures();
         void addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop);
 };
 

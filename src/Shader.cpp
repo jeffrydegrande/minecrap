@@ -13,66 +13,43 @@ Shader::~Shader() {
     }
 }
 
+GLint Shader::getUniformLocation(const char *name) const {
+    assert(program != 0);
+    return glGetUniformLocation(program, name);
+}
 
-void Shader::setUniformMatrix3(const char *name, Matrix3 &m)
+void Shader::setUniformMatrix3(GLint u, Matrix3 &m)
 {
-    assert(program != -1);
-    GLint u = glGetUniformLocation(program, name);
-    assert(u != -1);
     glUniformMatrix3fv(u, 1, GL_FALSE, m.value_ptr());
 }
 
-void Shader::setUniformMatrix4(const char *name, Matrix4 &m)
+void Shader::setUniformMatrix4(GLint u, Matrix4 &m)
 {
-    assert(program != -1);
-    GLint u = glGetUniformLocation(program, name);
-    assert(u != -1);
     glUniformMatrix4fv(u, 1, GL_FALSE, m.value_ptr());  
 }
 
 
-void Shader::setUniformVec3(const char *name, Vec3 &v)
+void Shader::setUniformVec3(GLint u, Vec3 &v)
 {
-    assert(program != -1);
-    GLint u = glGetUniformLocation(program, name);
-    assert(u != -1);
     glUniform3fv(u, 1, (GLfloat *)v.value_ptr());
 
 }
 
-void Shader::setUniformVec4(const char *name, Vec4 &v)
+void Shader::setUniformVec4(GLint u, Vec4 &v)
 {
-    assert(program != -1);
-    GLint u = glGetUniformLocation(program, name);   
-    assert(u != -1);
     glUniform4fv(u, 1, (GLfloat *)v.value_ptr());
 }
 
 
-void Shader::setModelToCameraMatrix(Matrix4 &m) {
-    assert(program != 0);
-    GLint modelToCameraMatrix       = glGetUniformLocation(program, "modelToCameraMatrix");
-    glUniformMatrix4fv(modelToCameraMatrix, 1, GL_FALSE, m.value_ptr());
+void Shader::setUniform1i(GLint u, int i)
+{
+    glUniform1i(u, i);
 }
-
-void Shader::setCameraToClipMatrix(Matrix4 &m) {
-    assert(program != 0);   
-    GLint v = glGetUniformLocation(program, "cameraToClipMatrix");
-    glUniformMatrix4fv(v, 1, GL_FALSE, m.value_ptr());
-}
-
 
 void Shader::setDirectionToLight(Vec4 &v) {
     assert(program != 0);
     GLint u          = glGetUniformLocation(program, "directionToLight");
     glUniform3fv(u, 1, (GLfloat *)v.value_ptr());
-}
-
-void Shader::setNormalModelToCameraMatrix(Matrix3 &m) {
-    assert(program != 0);
-    GLint v = glGetUniformLocation(program, "normalModelToCameraMatrix");
-
-    glUniformMatrix3fv(v, 1, GL_FALSE, m.value_ptr());
 }
 
 void Shader::use() {

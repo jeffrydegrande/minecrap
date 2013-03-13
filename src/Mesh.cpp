@@ -27,17 +27,22 @@ const Vec3 cubeVerts[] =
 const Vec3 verts[] = //36 vertices total
 {
   cubeVerts[0], cubeVerts[4], cubeVerts[6],  //front
-  cubeVerts[0], cubeVerts[6], cubeVerts[2],
+  /*cubeVerts[0], cubeVerts[6],*/ cubeVerts[2],
+
   cubeVerts[1], cubeVerts[0], cubeVerts[2],  //right
-  cubeVerts[1], cubeVerts[2], cubeVerts[3],
+  /*cubeVerts[1], cubeVerts[2],*/ cubeVerts[3],
+
   cubeVerts[5], cubeVerts[1], cubeVerts[3],  //back
-  cubeVerts[5], cubeVerts[3], cubeVerts[7],
+  /*cubeVerts[5], cubeVerts[3],*/ cubeVerts[7],
+
   cubeVerts[4], cubeVerts[5], cubeVerts[7],  //left
-  cubeVerts[4], cubeVerts[7], cubeVerts[6],
+  /*cubeVerts[4], cubeVerts[7],*/ cubeVerts[6],
+
   cubeVerts[4], cubeVerts[0], cubeVerts[1],  //top
-  cubeVerts[4], cubeVerts[1], cubeVerts[5],
+  /*cubeVerts[4], cubeVerts[1],*/ cubeVerts[5],
+
   cubeVerts[6], cubeVerts[7], cubeVerts[3],  //bottom
-  cubeVerts[6], cubeVerts[3], cubeVerts[2],
+  /*cubeVerts[6], cubeVerts[3],*/ cubeVerts[2],
 };
 
 const Vec3 right(1.0f, 0.0f, 0.0f);
@@ -49,12 +54,12 @@ const Vec3 back(0.0f, 0.0f, -1.0f);
 
 const Vec3 normsArray[] =
 {
-  front, front, front, front, front, front,
-  right, right, right, right, right, right,
-  back, back, back, back, back, back,
-  left, left, left, left, left, left,
-  top, top, top, top, top, top,
-  bottom, bottom, bottom, bottom, bottom, bottom
+  front, front, front, front, /*front, front,*/
+  right, right, right, right, /*right, right,*/
+  back, back, back, back, /*back, back,*/
+  left, left, left, left, /*left, left,*/
+  top, top, top, top, /*top, top,*/
+  bottom, bottom, bottom, bottom /*,bottom, bottom*/
 };
 
 #include <iostream>
@@ -81,7 +86,7 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
 
         vertices[index].a  = 1.0f;
 
-        switch (i % 6) {
+        switch (i % 4) {
             case 0:
                 vertices[index].s = 0.0f;
                 vertices[index].t = 0.0f;
@@ -96,51 +101,60 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
                 break;
             case 3:
                 vertices[index].s = 0.0f;
-                vertices[index].t = 0.0f;
-                break;
-            case 4:
-                vertices[index].s = 0.0f;
-                vertices[index].t = 1.0f;
-                break;
-            case 5:
-                vertices[index].s = 1.0f;
                 vertices[index].t = 1.0f;
                 break;
         }
 
-        vertices[index].p = (float)kind;
+        vertices[index].p = 0.0f;
+
         // color
         switch (kind) {
+
         case GRASS:
             vertices[index].r  = 0.1f;
             vertices[index].g  = 0.6f;
             vertices[index].b  = 0.0f;
+            if (start == 16)
+                vertices[index].p = 0.0f;
+            else
+                vertices[index].p = 1.0f;
             break;
         case ROCK:
             vertices[index].r  = 0.25f;
             vertices[index].g  = 0.25f;
             vertices[index].b  = 0.25f;
+            vertices[index].p  = 4.0f;
             break;
         case DIRT:
             vertices[index].r = 233.0f/510;
             vertices[index].g = 107.0f/510;
             vertices[index].b = 0.0f;
+            if (start == 16)
+                vertices[index].p = 1.0f;
+            else
+                vertices[index].p = 0.0f;
             break;
         case WATER:
             vertices[index].r  = 0.0f;
             vertices[index].g  = 0.0f;
             vertices[index].b  = 0.5f;
             vertices[index].a  = 0.4f;
+            vertices[index].p = 2.0f;
             break;
         case SAND:
             vertices[index].r  = 0.5f;
             vertices[index].g  = 0.5f;
             vertices[index].b  = 0.0f;
+            vertices[index].p = 3.0f;
             break;
         case RED:
             vertices[index].r  = 1.0f;
             vertices[index].g  = 0.0f;
             vertices[index].b  = 0.0f;
+            break;
+        case BEDROCK:
+            vertices[index].p = 5.0f;
+            break;
         }
 
         // normals
@@ -153,17 +167,17 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
 
 void Mesh::addCube(const Vec3 & pos, GLubyte kind, GLubyte faces) {
     if (faces & (1<<0))
-        addCubeFace(pos, kind, 0, 6);
+        addCubeFace(pos, kind, 0, 4);
     if (faces & (1<<1))
-        addCubeFace(pos, kind, 6, 12);
+        addCubeFace(pos, kind, 4, 8);
     if (faces & (1<<2))
-        addCubeFace(pos, kind, 12, 18);
+        addCubeFace(pos, kind, 8, 12);
     if (faces & (1<<3))
-        addCubeFace(pos, kind, 18, 24);
+        addCubeFace(pos, kind, 12, 16);
     if (faces & (1<<4))
-        addCubeFace(pos, kind, 24, 30);
+        addCubeFace(pos, kind, 16, 20);
     if (faces & (1<<5))
-        addCubeFace(pos, kind, 30, 36);
+        addCubeFace(pos, kind, 20, 24);
 }
 
 void Mesh::finish() {
@@ -213,7 +227,7 @@ void Mesh::render(bool transparency) {
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
             (GLvoid*)offsetof(struct vertex_t, s));
 
-    glDrawArrays(GL_TRIANGLES, 0, index);
+    glDrawArrays(GL_QUADS, 0, index);
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
@@ -239,7 +253,7 @@ void Mesh::render(bool transparency) {
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
             (GLvoid*)offsetof(struct vertex_t, s));
 
-    glDrawArrays(GL_TRIANGLES, 0, index);
+    glDrawArrays(GL_QUADS, 0, index);
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);

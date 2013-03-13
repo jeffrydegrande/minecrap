@@ -148,7 +148,7 @@ void Chunk::addDirt() {
 
 void Chunk::addBedrock() {
     foreach_xz {
-        B(x,0,z) = ROCK;
+        B(x,0,z) = BEDROCK;
     } endforeach;
 }
 

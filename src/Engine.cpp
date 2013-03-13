@@ -21,7 +21,7 @@
 
 #define WINDOW_WIDTH  1024
 #define WINDOW_HEIGHT 768
-#define FULLSCREEN false
+#define FULLSCREEN true
 
 #define FPS_INTERVAL     1.0f
 #define ASSERT_NO_GL_ERROR assert(GL_NO_ERROR == glGetError())
@@ -59,7 +59,7 @@ Engine::Engine():
     crosshair(NULL),
     shader(NULL),
     lightIntensity(0.8f, 0.8f, 0.8f, 0.8f),
-    ambientLightIntensity(0.2f, 0.2f, 0.2f, 0.2f),
+    ambientLightIntensity(0.5f, 0.5f, 0.5f, 0.5f),
     night(false),
     optionRenderWireframe(false),
     optionLighting(true),
@@ -178,7 +178,6 @@ void Engine::compileShaders()
         shader->addFragmentShader("shaders/hello_world.frag");
 #endif
         shader->done();
-
 
         // set program data
 
@@ -367,42 +366,44 @@ void Engine::render() {
 void Engine::loadTextures()
 {
     printf("Loading textures\n");
-    // Image *grass = new Image("./textures/grass.png");
-    Image *grassDirt = new Image("./textures/grass_dirt.png");
+
+    Image_Init();
+
+    std::vector<Image *> images;
+
+    images.push_back(new Image("./bricks/grass_side.jpg"));
+    images.push_back(new Image("./bricks/grass_top.jpg"));
+    images.push_back(new Image("./bricks/water.jpg"));
+    images.push_back(new Image("./bricks/sand.jpg"));
+    images.push_back(new Image("./bricks/stone.jpg"));
+    images.push_back(new Image("./bricks/bedrock.jpg"));
 
     glGenTextures(1, &blockTextureArray);
-
     glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MIN_FILTER,GL_LINEAR); //Always set reasonable texture parameters
-    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST); //Always set reasonable texture parameters
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT  /*GL_CLAMP_TO_EDGE*/);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT /*GL_CLAMP_TO_EDGE*/);
 
-    glTexImage3D(GL_TEXTURE_2D_ARRAY,
-                 0,
-                 GL_RGBA8,
-                 grassDirt->width(),
-                 grassDirt->height(),
-                 1, // level count?
-                 0,
-                 GL_RGBA,
-                 GL_UNSIGNED_BYTE,
-                 grassDirt->data_ptr());
+    // create 
 
-    /*
-    glTexImage3D(GL_TEXTURE_2D_ARRAY,
-                 0,
-                 GL_RGBA8,
-                 grassDirt->width(),
-                 grassDirt->height(),
-                 1, // level count?
-                 1,
-                 GL_RGB,
-                 GL_UNSIGNED_BYTE,
-                 grassDirt->data_ptr());
-                 */
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, 128, 128, images.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    ASSERT_NO_GL_ERROR;
 
+    for (size_t i=0; i<images.size(); i++)
+    {
+        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 128, 128, 1,
+                GL_RGBA, GL_UNSIGNED_BYTE, images[i]->data_ptr());
+
+        ASSERT_NO_GL_ERROR;
+    }
+
+    // glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 	CHECK_OPENGL_ERRORS
+
+    for (size_t i=0; i<images.size(); i++) {
+        delete images[i];
+    }
 }
 
 

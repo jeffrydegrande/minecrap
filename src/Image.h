@@ -4,10 +4,12 @@
 #include "Vec.h"
 #include <string>
 #include <cstdio>
+#include <IL/il.h>
 
 class Image {
     char *buffer;
     Vec2 size;
+    ILuint image;
 
     public:
         Image(const char *filename);
@@ -17,13 +19,14 @@ class Image {
 
         int width() const;
         int height() const;
-        
         void print() const;
 
     private:
 
         void loadImage(const char *filename);
 };
+
+void Image_Init();
 
 inline int Image::width() const {
     return (int)size.x;

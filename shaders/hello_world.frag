@@ -1,14 +1,18 @@
 #version 330
-#extension GL_EXT_gpu_shader4 : enable
 
 smooth in vec4 interpColor;
 smooth in vec3 textureCoordinates;
+in float cosAngIncidence;
 
 uniform sampler2DArray material;
+uniform vec4 lightIntensity;
+uniform vec4 ambientLightIntensity;
 
 out vec4 outputColor;
 
 void main()
 {
-    outputColor = texture(material, textureCoordinates.rgb);
+    vec4 color = texture(material, textureCoordinates.rgb);
+    outputColor = (lightIntensity * color * cosAngIncidence) +
+                        (color * ambientLightIntensity);
 }

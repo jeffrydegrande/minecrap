@@ -11,6 +11,7 @@
 #include "Chunk.h"
 #include "Vec.h"
 #include "Mesh.h"
+#include "Terrain.h"
 
 #include "simplex.h"
 #include <cmath>
@@ -34,13 +35,6 @@ Chunk::~Chunk() {
     transparent = NULL;
 }
 
-int Chunk::X() {
-    return worldX;
-}
-
-int Chunk::Z() {
-    return worldZ;
-}
 
 bool Chunk::isGround(int x, int y, int z)
 {
@@ -70,106 +64,16 @@ GLubyte Chunk::getBlock(const Vec3 &v) const
     return B((int)v.x, (int)v.y, (int)v.z);
 }
 
+GLubyte Chunk::getBlock(int x, int y, int z) const
+{
+    return B(x,y,z);
+}
+
 void Chunk::generate() {
-    // printf( "Generating chunk \n" );
 	memset(blocks, 0, sizeof(GLubyte)*CHUNKX*CHUNKY*CHUNKZ);
-
-    generateTerrain();
-    addDirt();
-    addWaterLevel();
-    addSand(); // need to do this after adding water
-    addBedrock();
-    // addMarkersAtBoundaries();
+    SimpleTerrain terrain;
+    terrain.generate(*this);
     buildMesh();
-}
-
-float terrainNoise(float x, float z, float frequency, float amplitude) {
-    float result = 0;
-    float amp = 1;
-    float freq = 1;
-    float max = 0;
-
-    x*= 1/64.0f;
-    z*= 1/64.0f;
-
-    for (int i = 0; i < 8; i++) {
-        result += noise2D(x * freq, z*freq) * amp;
-        max += amp;
-        freq *= frequency;
-        amp *= amplitude;
-    }
-
-    result /= max;
-
-    return result;
-}
-
-void Chunk::generateTerrain() {
-    foreach_xz {
-        float maxHeight = terrainNoise(
-                (float)(x + seed + (worldX << 4)),
-                (float)(z + seed + (worldZ << 4)),
-                0.5f,
-                0.5f
-                ) * 32 + WATER_LEVEL;
-
-        assert(maxHeight <= CHUNKY && maxHeight >= 0);
-
-		B(x, (int)maxHeight, z) = ROCK;
-		B(x, (int)maxHeight - 1, z) = ROCK;
-
-    } endforeach;
-}
-
-void Chunk::addMarkersAtBoundaries() {
-    B(0, 0, 0) = RED;
-    B(0, 0, CHUNKZ-1) = RED;
-    B(CHUNKX-1, 0, 0) = RED;
-    B(CHUNKX-1, 0, CHUNKZ-1) = RED;
-
-    B(0, CHUNKY-1, 0) = RED;
-    B(0, CHUNKY-1, CHUNKZ-1) = RED;
-    B(CHUNKX-1, CHUNKY-1, 0) = RED;
-    B(CHUNKX-1, CHUNKY-1, CHUNKZ-1) = RED;
-}
-
-void Chunk::addDirt() {
-	for (int y=0; y<CHUNKY; y++) {
-		for (int z=0; z<CHUNKZ; z++) {
-			for (int x=0; x<CHUNKX; x++) {
-				if (B(x,y,z) == ROCK && B(x,y+1,z) == AIR) {
-					B(x,y,z) = DIRT;
-					B(x,y,z) = DIRT;
-				}
-			}
-        }
-    }
-}
-
-void Chunk::addBedrock() {
-    foreach_xz {
-        B(x,0,z) = BEDROCK;
-    } endforeach;
-}
-
-void Chunk::addSand() {
-    // everything on WATER_LEVEL that is not WATER or AIR
-    foreach_xz {
-        GLubyte block = B(x,WATER_LEVEL,z);
-        if (block != WATER && block != AIR)
-            B(x, WATER_LEVEL, z) = SAND;
-    } endforeach;
-}
-
-void Chunk::addWaterLevel() {
-    foreach_xz {
-        int y = CHUNKY - 1;
-        while (y > 0 && B(x,y,z) == AIR) {
-            if (y <= WATER_LEVEL)
-                B(x,y,z) = WATER;
-            y--;
-        }
-    } endforeach;
 }
 
 bool Chunk::isBorderBlock(int x, int y, int z) {
@@ -184,13 +88,13 @@ bool Chunk::isExposedToAir(int x, int y, int z) {
 
 inline Vec3 Chunk::inWorld(int x, int y, int z)
 {
-    return Vec3((float)((this->worldX << 4) + x), (float)y, (float)((this->worldZ << 4) + z));
+    return Vec3((float)((this->worldX << 4) + x),
+               (float)y,
+               (float)((this->worldZ << 4) + z));
 }
 
-void Chunk::buildMesh() {
-    int numberOfTransparentVertices=0;
-    int numberOfOpaqueVertices=0;
-
+void Chunk::countNumberOfVertices(int *transparent, int *opaque)
+{
     // calculate the number of vertices need
 	for (int y=0; y<CHUNKY; y++) {
 		for (int z=0; z<CHUNKZ; z++) {
@@ -199,13 +103,19 @@ void Chunk::buildMesh() {
 				if (block == AIR) continue;
                 // 6 faces,2 triangles/face, 3verts/trangle
                 if (block == WATER)
-                    numberOfTransparentVertices += 36;
+                    *transparent += 36;
                 else
-				    numberOfOpaqueVertices += 36;
+				    *opaque += 36;
 			}
 		}
 	}
+}
 
+void Chunk::buildMesh() {
+    int numberOfTransparentVertices=0;
+    int numberOfOpaqueVertices=0;
+
+    countNumberOfVertices(&numberOfTransparentVertices, &numberOfOpaqueVertices);
     opaque = new Mesh(numberOfOpaqueVertices);
     transparent = new Mesh(numberOfTransparentVertices);
 
@@ -226,32 +136,32 @@ void Chunk::buildMesh() {
 				faces = 0;
 
                 // front face
-				if(z == CHUNKZ-1 || (z < CHUNKZ-1 && B(x  ,y  ,z+1) == AIR)) {
+				if(z == CHUNKZ-1 || (z < CHUNKZ-1 && B(x  ,y  ,z+1) == AIR)) { // front
                     faces |= (1<<0);
                 }
 
                 // right face
-                if(x == CHUNKX-1 || (x < CHUNKX-1 && B(x+1,y  ,z  ) == AIR)) {
+                if(x == CHUNKX-1 || (x < CHUNKX-1 && B(x+1,y  ,z  ) == AIR)) { // right
                     faces |= (1<<1);
                 }
 
                 // back
-                if(z == 0 || (z > 0 && B(x  ,y  ,z-1) == AIR)) {
+                if(z == 0 || (z > 0 && B(x  ,y  ,z-1) == AIR)) { // back
                     faces |= (1<<2);
                 }
 				
                 // left
-                if(x == 0 || (x > 0 && B(x-1,y  ,z  ) == AIR)) {
+                if(x == 0 || (x > 0 && B(x-1,y  ,z  ) == AIR)) { // left
                     faces |= (1<<3); // left
                 }
 
 				// top
-                if(y == CHUNKY-1 || (y < CHUNKY-1 && B(x  ,y+1,z  ) == AIR)) {
+                if(y == CHUNKY-1 || (y < CHUNKY-1 && B(x  ,y+1,z  ) == AIR)) { // top
                     faces |= (1<<4); // top
                 }
 				
                 // bottom
-                if(y == 0 || (y > 0 && B(x  ,y-1,z  ) == AIR)) {
+                if(y == 0 || (y > 0 && B(x  ,y-1,z  ) == AIR)) { // bottom
                     faces |= (1<<5);
                 }
 

@@ -48,7 +48,8 @@ LIB_MINECRAP_SOURCES= src/AABox.cpp \
 		      src/Vec.cpp \
 		      src/World.cpp \
 		      src/simplex.cpp \
-			  src/Image.cpp
+		      src/Image.cpp \
+			  src/Terrain.cpp
 
 LIB_MINECRAP_OBJS?=$(addprefix , $(LIB_MINECRAP_SOURCES:.cpp=.o))
 

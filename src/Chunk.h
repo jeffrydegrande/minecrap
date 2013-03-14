@@ -28,6 +28,7 @@ public:
 	void setBlock(int x, int y, int z, GLubyte type);
 
     GLubyte getBlock(const Vec3 &v) const;
+    GLubyte getBlock(int x, int y, int z) const;
 
     Vec3 inWorld(int x, int y, int z);
 
@@ -38,8 +39,9 @@ public:
 	void generate();
 	void summarize();
 
-	int X();
-	int Z();
+    int getSeed() const;
+	int getWorldX() const;
+	int getWorldZ() const;
 
     int vertexCount() const;
 
@@ -59,9 +61,20 @@ private:
 	bool isExposedToAir(int x, int y, int z);
 	bool isBorderBlock(int x, int y, int z);
 
+    void countNumberOfVertices(int *transparent, int *opaque);
+
 };
+
+inline int Chunk::getSeed() const
+{ return seed; }
 
 inline int Chunk::vertexCount() const
 { return opaque->count() + transparent->count(); }
+
+inline int Chunk::getWorldX() const
+{ return worldX; }
+
+inline int Chunk::getWorldZ() const
+{ return worldZ; }
 
 #endif

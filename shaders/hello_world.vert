@@ -9,6 +9,7 @@ layout(location = 3) in vec3 texture;
 smooth out vec3 textureCoordinates;
 
 out float cosAngIncidence;
+out float depth;
 
 uniform mat4 cameraToClipMatrix;
 uniform vec3 directionToLight;
@@ -17,6 +18,10 @@ uniform mat3 normalModelToCameraMatrix;
 
 void main() {
     gl_Position = cameraToClipMatrix * (modelToCameraMatrix * vec4(position, 1.0));
+
+
+    depth = length((modelToCameraMatrix * vec4(position, 1.0)).xyz);
+
     vec3 normCamSpace = normalize(normalModelToCameraMatrix * normal);
     cosAngIncidence = dot(normCamSpace, directionToLight);
     cosAngIncidence = clamp(cosAngIncidence, 0, 1);

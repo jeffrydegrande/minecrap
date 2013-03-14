@@ -235,33 +235,8 @@ void Mesh::render(bool transparency) {
     glDisableVertexAttribArray(3);
 
     if (transparency) {
-        glEnable(GL_BLEND);
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glEnableVertexAttribArray(0); // vertices
-    glEnableVertexAttribArray(1); // colors
-    glEnableVertexAttribArray(2); // normals
-    glEnableVertexAttribArray(3); // textures
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
-            (GLvoid*)offsetof(struct vertex_t, x));
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
-            (GLvoid*)offsetof(struct vertex_t, r));
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
-            (GLvoid*)offsetof(struct vertex_t, nx));
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
-            (GLvoid*)offsetof(struct vertex_t, s));
-
-    glDrawArrays(GL_QUADS, 0, index);
-
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
-    glDisableVertexAttribArray(2);
-    glDisableVertexAttribArray(3);
-
-    if (transparency) {
         glDisable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
     }
 
     assert(GL_NO_ERROR == glGetError());

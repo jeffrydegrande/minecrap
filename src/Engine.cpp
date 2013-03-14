@@ -21,7 +21,7 @@
 
 #define WINDOW_WIDTH  1024
 #define WINDOW_HEIGHT 768
-#define FULLSCREEN true
+#define FULLSCREEN false
 
 #define FPS_INTERVAL     1.0f
 #define ASSERT_NO_GL_ERROR assert(GL_NO_ERROR == glGetError())

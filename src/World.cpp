@@ -77,6 +77,7 @@ Player * World::spawnPlayer() {
 
     int x=0, y=0;
     int ground=0;
+    int retries = 0;
 
     Chunk *chunk = NULL;
 
@@ -85,7 +86,7 @@ Player * World::spawnPlayer() {
 
     // If we get to the water level and we haven't encountered
     // terrain yet, we can't use this to spawn.
-    while (ground <= WATER_LEVEL) {
+    while (ground <= WATER_LEVEL && retries < 5) {
         x = rand() % (int)size.x;
         y = rand() % (int)size.y;
 
@@ -99,6 +100,7 @@ Player * World::spawnPlayer() {
 
         // find the ground level
         ground = chunk->groundLevel(chunkX, chunkY);
+        retries++;
     }
 
 	playerSpawnLocation.x = (float)x;

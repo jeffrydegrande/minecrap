@@ -117,12 +117,27 @@ bool World::isGround(const Vec3 &v) {
     return isGround(v.x, v.y, v.z);
 }
 
-GLubyte World::blockAt(const Vec3 &v) {
-    if (OUTSIDE_WORLD(v.x, v.y, v.z))
+GLubyte World::blockAt(int x, int y, int z) {
+    if (OUTSIDE_WORLD(x, y, z))
         return AIR;
 
-    Chunk *chunk = chunks->get(v.x / CHUNKX, v.z / CHUNKZ);
-    return chunk->getBlock(Vec3((int)v.x % CHUNKX, v.y, (int)v.z % CHUNKZ));
+    Chunk *chunk = chunks->get(x / CHUNKX, z / CHUNKZ);
+    return chunk->getBlock(Vec3((int)x % CHUNKX, y, (int)z % CHUNKZ));
+}
+
+GLubyte World::blockAt(const Vec3 &v) {
+    return blockAt(v.x, v.y, v.z);
+}
+
+void World::changeBlock(const Vec3 &pos, GLubyte type)
+{
+    if (OUTSIDE_WORLD(pos.x, pos.y, pos.z))
+        return;
+
+    Chunk *chunk = CHUNK_FROM_WORLD_COORDINATES(pos.x, pos.z);
+    Vec3 bp((int)pos.x % CHUNKX, pos.y, (int)pos.z % CHUNKZ);
+    chunk->setBlock(bp.x, bp.y, bp.z, type);
+    chunk->buildMesh();
 }
 
 void World::update() {
@@ -132,6 +147,11 @@ int World::render() {
 	renderTerrain();
 	// blocksRendered += sun->render();
 	return 0;
+}
+
+bool World::outsideWorld(const Vec3 &pos)
+{
+    return (OUTSIDE_WORLD(pos.x, pos.y, pos.z));
 }
 
 int World::renderTerrain() {
@@ -144,4 +164,64 @@ int World::renderTerrain() {
 		}
 	}
 	return renderedBlocksCount;
+}
+
+void World::addBlock(Player *player)
+{
+	float maxDistance = 8.0;
+    float distance = 0.0;
+
+    Vec3 eye = player->getPosition();
+	Vec3 ray, pos;
+	GLubyte block = 0;
+
+	// increase ray in increments of 0.1f until hitting a 
+	// block or going beyond maximum distance
+	while (distance < maxDistance) {
+		distance += 0.1f;
+
+		if (distance > maxDistance)
+			return;
+
+		ray = eye + (player->getDirection() * distance);
+		pos = Vec3(floor(ray.x+0.5f), floor(ray.y+0.5f), floor(ray.z+0.5f));
+
+		block = blockAt(pos);
+		if (block != AIR) {
+			break;
+		}
+	}
+
+    pos.y += 1.0f;
+	if (blockAt(pos) == AIR) {
+        ConsoleLog("Adding Block: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
+	    changeBlock(pos, ROCK);
+	}
+}
+
+void World::removeBlock(Player *player)
+{
+	float maxDistance = 4.0;
+    float distance = 0.0;
+
+    Vec3 eye = player->getPosition();
+	Vec3 ray;
+
+	// increase ray in increments of 0.1f until hitting 
+    // a block or going beyond maximum distance
+	while (true) {
+		ray = eye + (player->getDirection() * distance);
+
+		if (distance > maxDistance)
+			return;
+
+		Vec3 pos(floor(ray.x+0.5f), floor(ray.y+0.5f), floor(ray.z+0.5f));
+		GLubyte block = blockAt(pos);
+		if (block != AIR && block != RED) {
+            ConsoleLog("removing block: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
+			changeBlock(pos, AIR);
+			return;
+		}
+		distance += 0.1f;
+	}
 }

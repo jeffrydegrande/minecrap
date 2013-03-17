@@ -322,6 +322,19 @@ void Engine::collectInput() {
               }
             }
             break;
+        case SDL_MOUSEBUTTONDOWN:
+            printf("Mouse button %d pressed at (%d,%d)\n",
+                event.button.button, event.button.x, event.button.y);
+			switch(event.button.button)
+			{
+				case 1:
+					world->addBlock(player);
+					break;
+				case 3:
+					world->removeBlock(player);
+					break;
+			}
+            break;
         case SDL_VIDEORESIZE:
             resizeWindow(event.resize.w, event.resize.h);
             break;

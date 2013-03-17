@@ -36,8 +36,15 @@ public:
     bool isGround(int x, int y, int z);
     bool isGround(const Vec3 &v);
 
+    GLubyte blockAt(int x, int y, int z);
     GLubyte blockAt(const Vec3 &v);
 
+    void changeBlock(const Vec3 &pos, GLubyte type);
+
+    bool outsideWorld(const Vec3 &pos);
+
+    void addBlock(Player *player);
+    void removeBlock(Player *player);
 private:
 	void generateChunks(int count);
 	int renderTerrain();

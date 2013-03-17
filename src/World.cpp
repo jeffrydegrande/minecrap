@@ -195,7 +195,6 @@ void World::addBlock(Player *player)
 
     pos.y += 1.0f;
 	if (blockAt(pos) == AIR) {
-        ConsoleLog("Adding Block: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
 	    changeBlock(pos, ROCK);
 	}
 }
@@ -219,7 +218,6 @@ void World::removeBlock(Player *player)
 		Vec3 pos(floor(ray.x+0.5f), floor(ray.y+0.5f), floor(ray.z+0.5f));
 		GLubyte block = blockAt(pos);
 		if (block != AIR && block != RED) {
-            ConsoleLog("removing block: %0.2f, %0.2f, %0.2f", pos.x, pos.y, pos.z);
 			changeBlock(pos, AIR);
 			return;
 		}

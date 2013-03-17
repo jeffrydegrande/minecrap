@@ -99,8 +99,6 @@ void Camera::rotateFirstPerson(float headingDegrees, float pitchDegrees)
         accumPitchDegrees = -90.0f;
     }
 
-    ConsoleLog("pitch: %0.2f\n", accumPitchDegrees);
-
     Matrix4 rotation;
 
     // rotate around Y axis

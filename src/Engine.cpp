@@ -244,6 +244,11 @@ void Engine::update(float elapsed) {
 
     player->update(elapsedInSeconds);
     world->update();
+
+    osd->write("Current block: %s (%d)",
+            player->getInventory()->getCurrentBlockName(),
+            player->getInventory()->getCurrentBlock());
+
     osd->write("FPS: %d", fps_current);
 }
 
@@ -322,17 +327,24 @@ void Engine::collectInput() {
               }
             }
             break;
+
         case SDL_MOUSEBUTTONDOWN:
-            printf("Mouse button %d pressed at (%d,%d)\n",
-                event.button.button, event.button.x, event.button.y);
-			switch(event.button.button)
-			{
+            /* printf("Mouse button %d pressed at (%d,%d)\n", */
+            /*     event.button.button, event.button.x, event.button.y); */
+            printf( "Mouse button down\n");
+			switch(event.button.button) {
 				case 1:
 					world->addBlock(player);
 					break;
 				case 3:
 					world->removeBlock(player);
 					break;
+                case 4:
+                    player->getInventory()->setNextBlock();
+                    break;
+                case 5:
+                    player->getInventory()->setPreviousBlock();
+                    break;
 			}
             break;
         case SDL_VIDEORESIZE:
@@ -391,6 +403,7 @@ void Engine::loadTextures()
     images.push_back(new Image("./bricks/stone.jpg"));
     images.push_back(new Image("./bricks/bedrock.jpg"));
     images.push_back(new Image("./bricks/redstone_ore.jpg"));
+    images.push_back(new Image("./bricks/lava.jpg"));
 
     glGenTextures(1, &blockTextureArray);
     glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);

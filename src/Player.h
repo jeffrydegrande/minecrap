@@ -9,12 +9,14 @@
 #include "Vec.h"
 #include "Matrix.h"
 #include "Camera.h"
+#include "Inventory.h"
 
 class World;
 class Player
 {
     Camera camera;
     World *world;
+    Inventory *inventory;
 
     Vec3 currentPosition;
     Vec3 direction;
@@ -54,7 +56,10 @@ public:
     void setVelocity(const Vec3 &velocity);
     const Vec3 &getVelocity() const;
 
+    Inventory *getInventory();
+
 private:
+
     bool checkCollision(const Vec3 &position);
     void calculateMovementDirection(float elapsed);
     void move(const Vec3 &direction, float elapsed);
@@ -102,3 +107,6 @@ inline const Vec3 &Player::getVelocity() const
 inline const Matrix4 & Player::getCameraMatrix() const
 { return camera.getViewMatrix(); }
 
+
+inline Inventory * Player::getInventory()
+{ return inventory; }

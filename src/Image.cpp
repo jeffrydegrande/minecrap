@@ -5,7 +5,6 @@
 #include <IL/il.h>
 #include <IL/ilu.h>
 
-
 #define CHECK_IL_ERROR(func) \
     { \
         ILenum error; \
@@ -19,7 +18,6 @@ void Image_Init()
 {
     ilInit();
 }
-
 
 Image::Image(const char *filename)
     : buffer(NULL)

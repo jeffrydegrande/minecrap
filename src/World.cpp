@@ -17,6 +17,7 @@
 #include "Sun.h"
 #include "Console.h"
 #include "Player.h"
+#include "Block.h"
 
 #include "Vec.h"
 
@@ -195,7 +196,7 @@ void World::addBlock(Player *player)
 
     pos.y += 1.0f;
 	if (blockAt(pos) == AIR) {
-	    changeBlock(pos, ROCK);
+	    changeBlock(pos, player->getInventory().getCurrentBlock());
 	}
 }
 

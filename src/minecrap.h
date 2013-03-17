@@ -73,18 +73,6 @@
 
 #define WATER_LEVEL 64
 
-#define AIR   0
-#define ROCK  1
-#define GEMS  2
-#define DIRT  3
-#define GRASS 4
-#define LAVA  5
-#define WATER 6
-#define SAND  7
-#define BEDROCK 8
-
-#define RED   9
-
 typedef struct Point3D_ {
     GLfloat x, y, z;
 } Point3D;

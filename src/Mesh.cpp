@@ -3,6 +3,7 @@
 #include "Vec.h"
 #include "Color.h"
 #include "Image.h"
+#include "Block.h"
 #include <cassert>
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -147,14 +148,18 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
             vertices[index].b  = 0.0f;
             vertices[index].p = 3.0f;
             break;
+        case BEDROCK:
+            vertices[index].p = 5.0f;
+            break;
+
         case RED:
             vertices[index].r  = 1.0f;
             vertices[index].g  = 0.0f;
             vertices[index].b  = 0.0f;
             vertices[index].p = 6.0f;
             break;
-        case BEDROCK:
-            vertices[index].p = 5.0f;
+        case LAVA:
+            vertices[index].p = 7.0f;
             break;
         }
 

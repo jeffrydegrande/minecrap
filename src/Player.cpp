@@ -30,6 +30,7 @@ Player::Player(World *world, const Vec3 & position) {
     this->world = world;
 	this->setPosition(position);
     this->onGround = true;
+    this->inventory = new Inventory();
 
     distanceTraveled = 0.0f;
     speed = 0;

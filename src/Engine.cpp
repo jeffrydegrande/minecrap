@@ -390,6 +390,7 @@ void Engine::loadTextures()
     images.push_back(new Image("./bricks/sand.jpg"));
     images.push_back(new Image("./bricks/stone.jpg"));
     images.push_back(new Image("./bricks/bedrock.jpg"));
+    images.push_back(new Image("./bricks/redstone_ore.jpg"));
 
     glGenTextures(1, &blockTextureArray);
     glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);

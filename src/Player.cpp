@@ -54,6 +54,9 @@ void Player::setPosition(const Vec3 &position) {
 
 bool Player::checkCollision(const Vec3 &pos) {
 
+    if (CVarUtils::GetCVar<bool>("noclip"))
+        return true;
+
     Vec3 head(pos.x, (int)pos.y+1, pos.z);
     Vec3 feet(pos.x, (int)pos.y, pos.z);
 

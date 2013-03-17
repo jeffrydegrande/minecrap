@@ -19,6 +19,7 @@ int main(int argc, char **argv)
     CVarUtils::CreateCVar("player.info", true, "Show player info");
     CVarUtils::CreateCVar("player.jumpspeed", 5.0f, "Player jump speed");
     CVarUtils::CreateCVar("flying", false, "Player can fly?");
+    CVarUtils::CreateCVar("noclip", false, "No Clipping");
     CVarUtils::CreateCVar("seed", 300, "Game seed (changing requires restart)");
     printf( "Loading %s\n", CONFIG_FILE);
     CVarUtils::Load(CONFIG_FILE);

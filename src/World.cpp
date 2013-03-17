@@ -9,6 +9,7 @@
 #include <time.h>
 #include <cstdlib>
 #include <cassert>
+#include <cmath>
 
 #include "minecrap.h"
 #include "World.h"

@@ -35,6 +35,19 @@ Chunk::~Chunk() {
     transparent = NULL;
 }
 
+bool Chunk::findSpawnLocation(Vec3 &location)
+{
+    for (int x=0; x < CHUNKX; x++) {
+        for (int y=0; y < CHUNKZ; y++) {
+            int ground = groundLevel(x, y);
+            if (ground > 0) {
+                location = inWorld(x, ground+1, y);
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 bool Chunk::isGround(int x, int y, int z)
 {

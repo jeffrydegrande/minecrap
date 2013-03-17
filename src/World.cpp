@@ -21,6 +21,16 @@
 
 #define INITIAL_WORLD_SIZE 16
 
+#define OUTSIDE_WORLD(x, y, z) \
+    ((y < 0 || y > CHUNKY-1) || (x < 0 || x > (int)chunks->numRows() << 4) || (z < 0 || z > (int)chunks->numRows() << 4))
+
+#define CHUNK_FROM_WORLD_COORDINATES(x, y) \
+    chunks->get((x) / CHUNKX, (y) / CHUNKZ)
+
+#define CHUNK_COORDINATES(x, y) \
+    Vec2((x) % CHUNKX, (y) % CHUNKZ)
+
+
 World::World(): chunks(NULL) {
 	init((unsigned int)time(NULL));
 }
@@ -75,49 +85,22 @@ Vec2 World::getSize() {
 Player * World::spawnPlayer() {
 	Vec3 playerSpawnLocation;
 
-    int x=0, y=0;
-    int ground=0;
-    int retries = 0;
-
     Chunk *chunk = NULL;
 
 	// pick a random spot in real world coordinates
 	Vec2 size = this->getSize();
+    Vec2 center((int)size.x / 2, (int)size.y / 2);
 
-    // If we get to the water level and we haven't encountered
-    // terrain yet, we can't use this to spawn.
-    while (ground <= WATER_LEVEL && retries < 5) {
-        x = rand() % (int)size.x;
-        y = rand() % (int)size.y;
+    // get the center chunk
+    chunk = CHUNK_FROM_WORLD_COORDINATES(center.x, center.y);
 
-        // find the block for this coordinate
-        chunk = chunks->get( x / CHUNKX, y / CHUNKZ);
-
-        // and translate the real world coordinates into chunk coordinates
-        // y in 2d => z in 3d
-        int chunkX = x % CHUNKX;
-        int chunkY = y % CHUNKZ;
-
-        // find the ground level
-        ground = chunk->groundLevel(chunkX, chunkY);
-        retries++;
+    if (chunk->findSpawnLocation(playerSpawnLocation)) {
+	    return new Player(this, playerSpawnLocation);
     }
 
-	playerSpawnLocation.x = (float)x;
-	playerSpawnLocation.y = (float)ground + 2;
-	playerSpawnLocation.z = (float)y;
-
-#ifdef SUPPORT_GLCONSOLE
-    ConsoleLog("Spawn location: %0.2f, %0.2f, %0.2f\n",
-            playerSpawnLocation.x, playerSpawnLocation.y, playerSpawnLocation.z);
-#endif
-
-	return new Player(this, playerSpawnLocation);
+    printf ("Can not find suitable player spawn location\n");
+    exit(1);
 }
-
-
-#define OUTSIDE_WORLD(x, y, z) \
-    ((y < 0 || y > CHUNKY-1) || (x < 0 || x > (int)chunks->numRows() << 4) || (z < 0 || z > (int)chunks->numRows() << 4))
 
 bool World::isGround(int x, int y, int z) {
     if (OUTSIDE_WORLD(x,y,z))

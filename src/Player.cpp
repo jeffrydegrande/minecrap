@@ -87,8 +87,11 @@ void Player::update(float elapsed)
         osd->write("On Ground: no");
 }
 
-
 void Player::look(int x, int y) {
+    // avoid mouse pointer warp throwing off the camera
+    if (abs(x) > 200 || abs(y) > 200)
+        return;
+
     bool flying = CVarUtils::GetCVar<bool>("flying");
     float mouse_sense = 0.5f;
 

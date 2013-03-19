@@ -19,6 +19,14 @@ class MatrixStack {
         void apply(const Matrix4 &matrix);
         void set(const Matrix4 &matrix);
 
+        void translate(const Vec3 &offset);
+        void scale(const Vec3 &v);
+        void scale(float v);
+
+        void rotateX(float degs);
+        void rotateY(float degs);
+        void rotateZ(float degs);
+
     private:
 
         std::stack<Matrix4, std::vector<Matrix4> > stack;

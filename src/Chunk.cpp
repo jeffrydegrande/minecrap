@@ -12,6 +12,7 @@
 #include "Vec.h"
 #include "Mesh.h"
 #include "Terrain.h"
+#include "Block.h"
 
 #include "simplex.h"
 #include <cmath>
@@ -55,7 +56,8 @@ bool Chunk::isGround(int x, int y, int z)
     assert(y >= 0 && y < CHUNKY);
     assert(z >= 0 && z < CHUNKZ);
 
-    return (B(x, y, z) != AIR);
+    Block block = B(x,y,z);
+    return (block != AIR);
 }
 
 int Chunk::groundLevel(int x, int z) {
@@ -124,6 +126,12 @@ void Chunk::countNumberOfVertices(int *transparent, int *opaque)
 	}
 }
 
+inline bool Chunk::neighbourIsTransparent(int x, int y, int z)
+{
+    Block block = B(x,y,z);
+    return (block == AIR || block == WATER);
+}
+
 void Chunk::buildMesh() {
     int numberOfTransparentVertices=0;
     int numberOfOpaqueVertices=0;
@@ -149,40 +157,41 @@ void Chunk::buildMesh() {
 				faces = 0;
 
                 // front face
-				if(z == CHUNKZ-1 || (z < CHUNKZ-1 && B(x  ,y  ,z+1) == AIR)) { // front
+                if (z == CHUNKZ-1 || (z < CHUNKZ-1 && neighbourIsTransparent(x,y, z+1))) {
                     faces |= (1<<0);
                 }
 
                 // right face
-                if(x == CHUNKX-1 || (x < CHUNKX-1 && B(x+1,y  ,z  ) == AIR)) { // right
+                if(x == CHUNKX-1 || (x < CHUNKX-1 && neighbourIsTransparent(x+1,y,z))) {
                     faces |= (1<<1);
                 }
 
                 // back
-                if(z == 0 || (z > 0 && B(x  ,y  ,z-1) == AIR)) { // back
+                if(z == 0 || (z > 0 && neighbourIsTransparent(x,y,z-1))) {
                     faces |= (1<<2);
                 }
-				
+
                 // left
-                if(x == 0 || (x > 0 && B(x-1,y  ,z  ) == AIR)) { // left
+                if(x == 0 || (x > 0 && neighbourIsTransparent(x-1,y,z))) {
                     faces |= (1<<3); // left
                 }
 
-				// top
-                if(y == CHUNKY-1 || (y < CHUNKY-1 && B(x  ,y+1,z  ) == AIR)) { // top
+                // top
+                if(y == CHUNKY-1 || (y < CHUNKY-1 && neighbourIsTransparent(x,y+1,z))) { // top
                     faces |= (1<<4); // top
                 }
-				
+
                 // bottom
-                if(y == 0 || (y > 0 && B(x  ,y-1,z  ) == AIR)) { // bottom
+                if(y == 0 || (y > 0 && neighbourIsTransparent(x,y-1,z))) { // bottom
                     faces |= (1<<5);
                 }
 
                 if (faces>0) {
-                    if (block == WATER)
-					    transparent->addCube(inWorld(x,y,z), block, faces);
-                    else
+                    if (block == WATER) {
+                        transparent->addCube(inWorld(x,y,z), block, 1<<4);
+                    } else {
                         opaque->addCube(inWorld(x,y,z), block, faces);
+                    }
                 }
 			}
 		}
@@ -196,6 +205,7 @@ int Chunk::render() {
     if (opaque != NULL) {
         opaque->render(false);
     }
+
     if (transparent != NULL) {
         transparent->render(true);
     }

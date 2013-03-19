@@ -64,6 +64,8 @@ private:
 
     void countNumberOfVertices(int *transparent, int *opaque);
 
+    bool neighbourIsTransparent(int x, int y, int z);
+
 };
 
 inline int Chunk::getSeed() const

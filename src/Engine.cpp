@@ -9,6 +9,7 @@
 #include "Shader.h"
 #include "MatrixStack.h"
 #include "Image.h"
+#include "Model.h"
 
 #include <sstream>
 
@@ -110,6 +111,7 @@ void Engine::init() {
     compileShaders();
     loadTextures();
 
+
     resizeWindow(width, height);
 
     SDL_WM_SetCaption("Minecrap","");
@@ -128,6 +130,8 @@ void Engine::init() {
     world = new World(CVarUtils::GetCVar<int>("seed"));
     player = world->spawnPlayer();
     crosshair = new Crosshair(viewWidth(), viewHeight());
+
+    dragon = new Model("./models/dragon.blend");
 }
 
 void Engine::resizeWindow(int width, int height) {
@@ -329,9 +333,6 @@ void Engine::collectInput() {
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            /* printf("Mouse button %d pressed at (%d,%d)\n", */
-            /*     event.button.button, event.button.x, event.button.y); */
-            printf( "Mouse button down\n");
 			switch(event.button.button) {
 				case 1:
 					world->addBlock(player);
@@ -404,6 +405,7 @@ void Engine::loadTextures()
     images.push_back(new Image("./bricks/bedrock.jpg"));
     images.push_back(new Image("./bricks/redstone_ore.jpg"));
     images.push_back(new Image("./bricks/lava.jpg"));
+    images.push_back(new Image("./bricks/diamond_ore.jpg"));
 
     glGenTextures(1, &blockTextureArray);
     glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
@@ -433,7 +435,6 @@ void Engine::loadTextures()
     }
 }
 
-
 void Engine::render3D() {
     ASSERT_NO_GL_ERROR;
 
@@ -450,37 +451,59 @@ void Engine::render3D() {
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
 
-	UseShader use(*shader);
+    UseShader use(*shader);
+     // set clip matrix
+     Matrix4 cameraToClipMatrix = projection.top();
 
-	Matrix4 cameraToClipMatrix = projection.top();
     MatrixStack model;
-    Matrix4 camera = player->getCameraMatrix();
-    model.apply(camera);
+    model.set(player->getCameraMatrix());
 
-    Vec4 cameraDirectionToLight = camera * directionToLight;
-    Matrix3 normal(camera);
+    Vec4 cameraDirectionToLight = model.top() * directionToLight;
 
-    shader->setUniformMatrix4(basicShader.cameraToClipMatrix, cameraToClipMatrix);
-    shader->setUniformMatrix3(basicShader.normalModelToCameraMatrix, normal);
+    Matrix4 m(model.top());
+    Matrix3 normal(model.top());
+
     shader->setDirectionToLight(cameraDirectionToLight);
-    shader->setUniformMatrix4(basicShader.modelToCameraMatrix, camera);
     shader->setUniformVec4(basicShader.lightIntensity, lightIntensity);
     shader->setUniformVec4(basicShader.ambientLightIntensity, ambientLightIntensity);
+    shader->setUniformMatrix4(basicShader.cameraToClipMatrix, cameraToClipMatrix);
+    shader->setUniformMatrix3(basicShader.normalModelToCameraMatrix, normal);
     shader->setUniform1i(basicShader.materials, 0);
+    shader->setUniformMatrix4(basicShader.modelToCameraMatrix, m);
 
-    world->render();
+    // world->render();
 
-    if (optionDrawRayToLightSource) {
-        Vec4 point = Vec4(0.0f, 0.0f, 0.0f, 0.f) + (directionToLight * 10000);
-        glLineWidth(3.0f);
-        glColor3f(1.0, 0.0, 0.0);
-        glBegin(GL_LINES);
-        glVertex3f(0.0, 0.0, 0.0);
-        glVertex3f(point.x, point.y, point.z);
-        glEnd();
-        glColor3f(1.0, 1.0, 1.0);
+    {
+        // last thought: this is setting up a model matrix, while we
+        // kind of want translations to happen in the world matrix
+
+        PushStack push(model);
+        // model.set(dragon->getWorldMatrix());
+        model.translate(Vec3(110.0f, 85.0f, 110.0f));
+        // model.scale(0.2f);
+
+        Matrix4 m(model.top());
+        Matrix3 normal = m;
+        Vec4 cameraDirectionToLight = model.top() * directionToLight;
+
+        shader->setDirectionToLight(cameraDirectionToLight);
+        shader->setUniformMatrix4(basicShader.modelToCameraMatrix, m);
+        shader->setUniformMatrix3(basicShader.normalModelToCameraMatrix, normal);
+
+        dragon->render();
     }
 
+
+        if (optionDrawRayToLightSource) {
+            Vec4 point = Vec4(0.0f, 0.0f, 0.0f, 0.f) + (directionToLight * 10000);
+            glLineWidth(3.0f);
+            glColor3f(1.0, 0.0, 0.0);
+            glBegin(GL_LINES);
+            glVertex3f(0.0, 0.0, 0.0);
+            glVertex3f(point.x, point.y, point.z);
+            glEnd();
+            glColor3f(1.0, 1.0, 1.0);
+        }
     // ASSERT_NO_GL_ERROR;
 }
 
@@ -509,7 +532,7 @@ void Engine::render2D() {
 
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
-    // ASSERT_NO_GL_ERROR;
+    ASSERT_NO_GL_ERROR;
 }
 
 int Engine::viewWidth() const {

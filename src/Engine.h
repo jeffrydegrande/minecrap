@@ -11,6 +11,7 @@ class World;
 class Crosshair;
 class Player;
 class Shader;
+class Model;
 class Engine
 {
 	int center_x;
@@ -46,6 +47,8 @@ class Engine
 
     // Textures
     GLuint blockTextureArray;
+
+    Model *dragon;
 
 public:
 	Engine();

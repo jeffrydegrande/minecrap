@@ -6,6 +6,7 @@
 
 class Plane;
 class Matrix4 {
+
     // friend Vec3 operator*(const Vec3 &lhs, const Matrix4 &rhs);
 
     float m[16];
@@ -22,7 +23,9 @@ class Matrix4 {
         static Matrix4 Multiply(const Matrix4 &am, const Matrix4 &bm);
 	    Matrix4 operator *(const Matrix4 &m);
         Matrix4 operator *=(const Matrix4 &m);
+
         Vec4 operator *(const Vec4 &m);
+        Vec4 operator *(Vec4 &m) const;
 
         const float &operator[](size_t i) const;
         float &operator[](size_t i);
@@ -34,6 +37,9 @@ class Matrix4 {
         void transformVector(Vec3 &to);
         void translate(float x, float y, float z);
         void translate(const Vec3 &v);
+
+        void scale(const Vec3 &v);
+        void scale(float v);
 
         void rotate(const Vec3 &axis, float angle);
         void rotateX(float degs);
@@ -53,6 +59,7 @@ class Matrix3 {
         Matrix3();
         Matrix3(float v[9]);
         Matrix3(Matrix4 &m);
+        Matrix3(const Matrix4 &m);
 
         void identity();
 

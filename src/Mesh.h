@@ -13,7 +13,6 @@ struct vertex_t {
           s, t, p;   // textures
 };
 
-
 class Vec3;
 class Mesh {
     int index;

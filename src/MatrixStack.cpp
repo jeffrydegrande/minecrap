@@ -45,6 +45,31 @@ const Matrix4 &MatrixStack::top() const
     return currentMatrix;
 }
 
+
+void MatrixStack::translate(const Vec3 &offset) {
+    currentMatrix.translate(offset);
+}
+
+void MatrixStack::scale(const Vec3 &v) {
+    currentMatrix.scale(v);
+}
+
+void MatrixStack::scale(float v) {
+    currentMatrix.scale(v);
+}
+
+void MatrixStack::rotateX(float degs) {
+    currentMatrix.rotateX(degs);
+}
+
+void MatrixStack::rotateY(float degs) {
+    currentMatrix.rotateY(degs);
+}
+
+void MatrixStack::rotateZ(float degs) {
+    currentMatrix.rotateZ(degs);
+}
+
 PushStack::PushStack(MatrixStack &stack):
     stack(stack)
 {

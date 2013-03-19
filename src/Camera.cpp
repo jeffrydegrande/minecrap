@@ -89,7 +89,8 @@ void Camera::rotateFlight(float headingDegrees, float pitchDegrees, float rollDe
 void Camera::rotateFirstPerson(float headingDegrees, float pitchDegrees)
 {
     accumPitchDegrees += pitchDegrees;
-   
+
+    /*
     if (accumPitchDegrees > 90.0f) {
         pitchDegrees = 90.0f - (accumPitchDegrees - pitchDegrees);
         accumPitchDegrees = 90.0f;
@@ -98,6 +99,7 @@ void Camera::rotateFirstPerson(float headingDegrees, float pitchDegrees)
         pitchDegrees = -90.0f - (accumPitchDegrees - pitchDegrees);
         accumPitchDegrees = -90.0f;
     }
+    */
 
     Matrix4 rotation;
 

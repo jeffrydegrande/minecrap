@@ -27,25 +27,15 @@ const Vec3 cubeVerts[] =
 
 const Vec3 verts[] = //36 vertices total
 {
-  cubeVerts[0], cubeVerts[4], cubeVerts[6],  //front
-  /*cubeVerts[0], cubeVerts[6],*/ cubeVerts[2],
-
-  cubeVerts[1], cubeVerts[0], cubeVerts[2],  //right
-  /*cubeVerts[1], cubeVerts[2],*/ cubeVerts[3],
-
-  cubeVerts[5], cubeVerts[1], cubeVerts[3],  //back
-  /*cubeVerts[5], cubeVerts[3],*/ cubeVerts[7],
-
-  cubeVerts[4], cubeVerts[5], cubeVerts[7],  //left
-  /*cubeVerts[4], cubeVerts[7],*/ cubeVerts[6],
-
-  cubeVerts[4], cubeVerts[0], cubeVerts[1],  //top
-  /*cubeVerts[4], cubeVerts[1],*/ cubeVerts[5],
-
-  cubeVerts[6], cubeVerts[7], cubeVerts[3],  //bottom
-  /*cubeVerts[6], cubeVerts[3],*/ cubeVerts[2],
+  cubeVerts[0], cubeVerts[4], cubeVerts[6], cubeVerts[2],  //front
+  cubeVerts[1], cubeVerts[0], cubeVerts[2], cubeVerts[3], //right
+  cubeVerts[5], cubeVerts[1], cubeVerts[3], cubeVerts[7], //back
+  cubeVerts[4], cubeVerts[5], cubeVerts[7], cubeVerts[6], //left
+  cubeVerts[4], cubeVerts[0], cubeVerts[1], cubeVerts[5], //top
+  cubeVerts[6], cubeVerts[7], cubeVerts[3], cubeVerts[2] //bottom
 };
 
+// normals
 const Vec3 right(1.0f, 0.0f, 0.0f);
 const Vec3 left(-1.0f, 0.0f, 0.0f);
 const Vec3 top(0.0f, 1.0f, 0.0f);
@@ -106,6 +96,12 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
                 break;
         }
 
+        // normals
+        vertices[index].nx = normsArray[i].x;
+        vertices[index].ny = normsArray[i].y;
+        vertices[index].nz = normsArray[i].z;
+
+        // set texture index
         vertices[index].p = 0.0f;
 
         // color
@@ -135,13 +131,20 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
             else
                 vertices[index].p = 0.0f;
             break;
+
         case WATER:
             vertices[index].r  = 0.0f;
             vertices[index].g  = 0.0f;
-            vertices[index].b  = 0.5f;
-            vertices[index].a  = 0.4f;
-            vertices[index].p = 2.0f;
+            vertices[index].b  = 1.5f;
+            vertices[index].a  = 0.8f;
+
+            vertices[index].p  = 2.0f;
+
+            vertices[index].nx = 0.0f;
+            vertices[index].ny = -1.0f;
+            vertices[index].nz = 0.0f;
             break;
+
         case SAND:
             vertices[index].r  = 0.5f;
             vertices[index].g  = 0.5f;
@@ -161,12 +164,10 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
         case LAVA:
             vertices[index].p = 7.0f;
             break;
+        case GEMS:
+            vertices[index].p = 8.0f;
+            break;
         }
-
-        // normals
-        vertices[index].nx = normsArray[i].x;
-        vertices[index].ny = normsArray[i].y;
-        vertices[index].nz = normsArray[i].z;
         index++;
     }
 }
@@ -212,11 +213,10 @@ void Mesh::render(bool transparency) {
     glBindVertexArray(vao);
 
     if (transparency) {
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
-        glDisable(GL_CULL_FACE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
     }
-
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     glEnableVertexAttribArray(0); // vertices
@@ -242,7 +242,7 @@ void Mesh::render(bool transparency) {
 
     if (transparency) {
         glDisable(GL_BLEND);
-        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
     }
 
     assert(GL_NO_ERROR == glGetError());

@@ -31,6 +31,21 @@ Matrix3::Matrix3(Matrix4 &matrix)
     m[8] = p[10];
 }
 
+Matrix3::Matrix3(const Matrix4 &matrix)
+{
+    m[0] = matrix[0];
+    m[1] = matrix[1];
+    m[2] = matrix[2];
+
+    m[3] = matrix[4];
+    m[4] = matrix[5];
+    m[5] = matrix[6];
+
+    m[6] = matrix[8];
+    m[7] = matrix[9];
+    m[8] = matrix[10];
+}
+
 void Matrix3::identity() {
     memset(&m, 0, sizeof(float) * 9);
     m[0] = m[4] = m[8] = 1.0f;
@@ -219,6 +234,16 @@ Vec4 Matrix4::operator *(const Vec4 &v)
     return result;
 }
 
+Vec4 Matrix4::operator *(Vec4 &v) const
+{
+    Vec4 result;
+    result.x = m[0] * v.x + m[4] + v.y * m[8]  + v.z * m[12] + v.w;
+    result.y = m[1] * v.x + m[5] + v.y * m[9]  + v.z * m[13] + v.w;
+    result.z = m[2] * v.x + m[6] + v.y * m[10] + v.z * m[14] + v.w;
+    result.w = m[3] * v.x + m[7] + v.y * m[10] + v.z * m[15] + v.w;
+    return result;
+}
+
 float *Matrix4::value_ptr()
 {
     return m;
@@ -379,4 +404,23 @@ Matrix4 Matrix4::Perspective(float fovy, float aspect, float zNear, float zFar) 
     M.m[11] = -1.0f;
 
     return M;
+}
+
+void Matrix4::scale(const Vec3 &v)
+{
+    Matrix4 M;
+    M[0] = v.x;
+    M[5] = v.y;
+    M[10] = v.z;
+    multiply(M);
+}
+
+void Matrix4::scale(float v)
+{
+    Matrix4 M;
+    M[0] = v;
+    M[5] = v;
+    M[10] = v;
+
+    multiply(M);
 }

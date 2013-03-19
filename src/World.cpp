@@ -109,10 +109,9 @@ bool World::isGround(int x, int y, int z) {
         return false;
 
     // get the chunk from the grid
-    Chunk *chunk = chunks->get(x / CHUNKX, z / CHUNKZ);
-    int chunkX = x % CHUNKX;
-    int chunkZ = z % CHUNKZ;
-    return chunk->isGround(chunkX, y, chunkZ);
+    Chunk *chunk = CHUNK_FROM_WORLD_COORDINATES(x, y);
+    Vec2 c = CHUNK_COORDINATES(x, y);
+    return chunk->isGround(c.x, y, c.y);
 }
 
 bool World::isGround(const Vec3 &v) {
@@ -194,10 +193,12 @@ void World::addBlock(Player *player)
 		}
 	}
 
-    pos.y += 1.0f;
-	if (blockAt(pos) == AIR) {
-	    changeBlock(pos, player->getInventory().getCurrentBlock());
-	}
+	if (block == AIR || block == WATER) {
+	    changeBlock(pos, player->getInventory()->getCurrentBlock());
+	} else {
+        pos.y += 1.0f;
+	    changeBlock(pos, player->getInventory()->getCurrentBlock());
+    }
 }
 
 void World::removeBlock(Player *player)
@@ -218,7 +219,7 @@ void World::removeBlock(Player *player)
 
 		Vec3 pos(floor(ray.x+0.5f), floor(ray.y+0.5f), floor(ray.z+0.5f));
 		GLubyte block = blockAt(pos);
-		if (block != AIR && block != RED) {
+		if (block != AIR && block != RED && block != WATER) {
 			changeBlock(pos, AIR);
 			return;
 		}

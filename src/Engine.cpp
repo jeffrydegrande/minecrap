@@ -27,20 +27,6 @@
 #define FPS_INTERVAL     1.0f
 #define ASSERT_NO_GL_ERROR assert(GL_NO_ERROR == glGetError())
 
-// static float elapsed_seconds = 0.0f;
-
-struct ProgramData {
-    GLuint cameraToClipMatrix;
-    GLuint directionToLight;
-    GLuint modelToCameraMatrix;
-    GLuint normalModelToCameraMatrix;
-    GLuint lightIntensity;
-    GLuint ambientLightIntensity;
-    GLuint materials;
-};
-
-ProgramData basicShader;
-
 Vec4 directionToLight(0.866f, 1.0f, 0.0f, 0.0f);
 
 static void displayOpenGLInfo() {
@@ -171,19 +157,12 @@ void Engine::setupProjectionMatrix()
 
 void Engine::compileShaders()
 {
-    printf("Compiling shaders\n");
-    if (shader == NULL) {
-        shader = new Shader();
-#ifdef _WIN32
-        shader->addVertexShader("..\\shaders\\hello_world.vert");
-        shader->addFragmentShader("..\\shaders\\hello_world.frag");
-#else
-        shader->addVertexShader("shaders/hello_world.vert");
-        shader->addFragmentShader("shaders/hello_world.frag");
-#endif
-        shader->done();
+    assert(shader == NULL);
 
-        // set program data
+    shader = new Shader();
+    shader->addVertexShader("hello_world");
+    shader->addFragmentShader("hello_world");
+    shader->done();
 
         basicShader.cameraToClipMatrix        = shader->getUniformLocation("cameraToClipMatrix");
         basicShader.directionToLight          = shader->getUniformLocation("directionToLight");
@@ -451,27 +430,28 @@ void Engine::render3D() {
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
 
-    UseShader use(*shader);
-     // set clip matrix
-     Matrix4 cameraToClipMatrix = projection.top();
+	Matrix4 cameraToClipMatrix = projection.top();
+	MatrixStack model(player->getCameraMatrix());
 
-    MatrixStack model;
-    model.set(player->getCameraMatrix());
+	{
+		UseShader use(*shader);
+        PushStack push(model);
 
-    Vec4 cameraDirectionToLight = model.top() * directionToLight;
+		// set clip matrix
+		Vec4 cameraDirectionToLight = model.top() * directionToLight;
 
-    Matrix4 m(model.top());
-    Matrix3 normal(model.top());
+		Matrix4 m(model.top());
+		Matrix3 normal(model.top());
 
-    shader->setDirectionToLight(cameraDirectionToLight);
-    shader->setUniformVec4(basicShader.lightIntensity, lightIntensity);
-    shader->setUniformVec4(basicShader.ambientLightIntensity, ambientLightIntensity);
-    shader->setUniformMatrix4(basicShader.cameraToClipMatrix, cameraToClipMatrix);
-    shader->setUniformMatrix3(basicShader.normalModelToCameraMatrix, normal);
-    shader->setUniform1i(basicShader.materials, 0);
-    shader->setUniformMatrix4(basicShader.modelToCameraMatrix, m);
-
-    // world->render();
+		shader->setDirectionToLight(cameraDirectionToLight);
+		shader->setUniform("lightIntensity", lightIntensity);
+		shader->setUniform("ambientLightIntensity", ambientLightIntensity);
+		shader->setUniform("cameraToClipMatrix", cameraToClipMatrix);
+		shader->setUniform("normalModelToCameraMatrix", normal);
+		shader->setUniform("materials", 0);
+		shader->setUniform("modelToCameraMatrix", model.top());
+		world->render();
+	}
 
     {
         // last thought: this is setting up a model matrix, while we

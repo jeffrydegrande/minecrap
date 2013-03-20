@@ -5,6 +5,15 @@
 
 #define ASSERT_NO_GL_ERROR  assert(GL_NO_ERROR == glGetError())
 
+
+
+
+#ifdef _WIN32
+    const std::string ShadersDirectory("..\\shaders\\");
+#else
+    const std::string ShadersDirectory("./shaders/");
+#endif
+
 Shader::Shader(): program(0) { }
 
 Shader::~Shader() {
@@ -13,40 +22,56 @@ Shader::~Shader() {
     }
 }
 
-GLint Shader::getUniformLocation(const char *name) const {
-    assert(program != 0);
-    return glGetUniformLocation(program, name);
+GLint Shader::getUniformLocation(const char *name) {
+    std::map<std::string, GLint>::iterator it = uniforms.find(name);
+
+    GLint u = 0;
+
+    if (it == uniforms.end()) {
+        u = glGetUniformLocation(program, name);
+        uniforms[name] = u;
+    } else {
+       u = it->second;
+    }
+//    assert(u > 0);
+    return u;
 }
 
-void Shader::setUniformMatrix3(GLint u, Matrix3 &m)
+void Shader::setUniform(const char *name, Matrix4 &m) 
 {
+    GLint u = getUniformLocation(name);
+    glUniformMatrix4fv(u, 1, GL_FALSE, m.value_ptr());
+}
+
+void Shader::setUniform(const char *name, const Matrix4 &m)
+{
+    GLint u = getUniformLocation(name);
+    glUniformMatrix4fv(u, 1, GL_FALSE, m.value_ptr());
+}
+
+void Shader::setUniform(const char *name, Matrix3 &m)
+{
+    GLint u = getUniformLocation(name);
     glUniformMatrix3fv(u, 1, GL_FALSE, m.value_ptr());
 }
 
-void Shader::setUniformMatrix4(GLint u, Matrix4 &m)
+void Shader::setUniform(const char *name, Vec3 &v)
 {
-    glUniformMatrix4fv(u, 1, GL_FALSE, m.value_ptr());
-}
-
-void Shader::setUniformMatrix4(GLint u, const Matrix4 &m)
-{
-    glUniformMatrix4fv(u, 1, GL_FALSE, m.value_ptr());
-}
-
-void Shader::setUniformVec3(GLint u, Vec3 &v)
-{
+    GLint u = getUniformLocation(name);
     glUniform3fv(u, 1, (GLfloat *)v.value_ptr());
 
 }
 
-void Shader::setUniformVec4(GLint u, Vec4 &v)
+void Shader::setUniform(const char *name, Vec4 &v)
 {
+    GLint u = getUniformLocation(name);
     glUniform4fv(u, 1, (GLfloat *)v.value_ptr());
 }
 
 
-void Shader::setUniform1i(GLint u, int i)
+void Shader::setUniform(const char *name, int i)
 {
+    GLint u = getUniformLocation(name);
     glUniform1i(u, i);
 }
 

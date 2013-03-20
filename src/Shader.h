@@ -6,10 +6,14 @@
 #include "Matrix.h"
 #include "Vec.h"
 
+#include <map>
+#include <string>
+
 class Shader {
     GLuint program;
 
     std::vector<GLuint> shaders;
+    std::map<std::string, GLint> uniforms;
 
     public:
         Shader();
@@ -19,14 +23,12 @@ class Shader {
         void addFragmentShader(const char *path);
         void done();
 
-        GLint getUniformLocation(const char *name) const;
-
-        void setUniformMatrix3(GLint uniformLocation, Matrix3 &m);
-        void setUniformMatrix4(GLint uniformLocation, Matrix4 &m);
-        void setUniformMatrix4(GLint uniformLocation, const Matrix4 &m);
-        void setUniformVec3   (GLint uniformLocation, Vec3 &v);
-        void setUniformVec4   (GLint uniformLocation, Vec4 &v);
-        void setUniform1i(GLint uniformLocation, int i);
+        void setUniform(const char *name, Matrix4 &m);
+        void setUniform(const char *name, const Matrix4 &m);
+        void setUniform(const char *name, Matrix3 &m);
+        void setUniform(const char *name, Vec3 &v);
+        void setUniform(const char *name, Vec4 &v);
+        void setUniform(const char *name, int i);
 
         void setDirectionToLight(Vec4 &v);
 
@@ -34,6 +36,7 @@ class Shader {
         void dontUse();
 
     private:
+        GLint getUniformLocation(const char *name);
         GLuint addShader(GLenum type, const char *path);
         void checkCompileStatus(GLuint shader);
 

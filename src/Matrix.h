@@ -35,6 +35,9 @@ class Matrix4 {
         void translate(float x, float y, float z);
         void translate(const Vec3 &v);
 
+        void scale(const Vec3 &v);
+        void scale(float v);
+
         void rotate(const Vec3 &axis, float angle);
         void rotateX(float degs);
         void rotateY(float degs);
@@ -42,8 +45,10 @@ class Matrix4 {
         void inverse(const Matrix4 &m);
 
         float *value_ptr();
+        const float *value_ptr() const;
 
         void print();
+        void print() const;
 };
 
 class Matrix3 {

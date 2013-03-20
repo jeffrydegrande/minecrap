@@ -224,6 +224,11 @@ float *Matrix4::value_ptr()
     return m;
 }
 
+const float *Matrix4::value_ptr() const
+{
+    return m;
+}
+
 float & Matrix4::operator()(int row, int column) {
     return m[row * 4 + column];
 }
@@ -363,6 +368,15 @@ void Matrix4::print() {
     printf("\n");
 }
 
+void Matrix4::print() const {
+    printf("%0.2f %0.2f %0.2f %0.2f\n", m[0], m[4], m[8], m[12]);
+    printf("%0.2f %0.2f %0.2f %0.2f\n", m[1], m[5], m[9], m[13]);
+    printf("%0.2f %0.2f %0.2f %0.2f\n", m[2], m[6], m[10], m[14]);
+    printf("%0.2f %0.2f %0.2f %0.2f\n", m[3], m[7], m[11], m[15]);
+    printf("\n");
+}
+
+
 Matrix4 Matrix4::Perspective(float fovy, float aspect, float zNear, float zFar) {
     if (aspect > 1.0f)
         fovy /= aspect;
@@ -379,4 +393,23 @@ Matrix4 Matrix4::Perspective(float fovy, float aspect, float zNear, float zFar) 
     M.m[11] = -1.0f;
 
     return M;
+}
+
+void Matrix4::scale(const Vec3 &v)
+{
+    Matrix4 M;
+    M[0]  = v.x;
+    M[5]  = v.y;
+    M[10] = v.z;
+
+    multiply(M);
+}
+
+void Matrix4::scale(float v)
+{
+    Matrix4 M;
+    M[0]  = v;
+    M[5]  = v;
+    M[10] = v;
+    multiply(M);
 }

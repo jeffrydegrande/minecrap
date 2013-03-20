@@ -23,6 +23,7 @@ class Shader {
 
         void setUniformMatrix3(GLint uniformLocation, Matrix3 &m);
         void setUniformMatrix4(GLint uniformLocation, Matrix4 &m);
+        void setUniformMatrix4(GLint uniformLocation, const Matrix4 &m);
         void setUniformVec3   (GLint uniformLocation, Vec3 &v);
         void setUniformVec4   (GLint uniformLocation, Vec4 &v);
         void setUniform1i(GLint uniformLocation, int i);

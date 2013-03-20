@@ -25,9 +25,13 @@ void Shader::setUniformMatrix3(GLint u, Matrix3 &m)
 
 void Shader::setUniformMatrix4(GLint u, Matrix4 &m)
 {
-    glUniformMatrix4fv(u, 1, GL_FALSE, m.value_ptr());  
+    glUniformMatrix4fv(u, 1, GL_FALSE, m.value_ptr());
 }
 
+void Shader::setUniformMatrix4(GLint u, const Matrix4 &m)
+{
+    glUniformMatrix4fv(u, 1, GL_FALSE, m.value_ptr());
+}
 
 void Shader::setUniformVec3(GLint u, Vec3 &v)
 {

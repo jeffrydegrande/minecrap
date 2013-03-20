@@ -27,6 +27,9 @@ class MatrixStack {
         void rotateY(float degs);
         void rotateZ(float degs);
 
+
+        void identity();
+
     private:
 
         std::stack<Matrix4, std::vector<Matrix4> > stack;

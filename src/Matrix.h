@@ -48,8 +48,10 @@ class Matrix4 {
         void inverse(const Matrix4 &m);
 
         float *value_ptr();
+        const float *value_ptr() const;
 
         void print();
+        void print() const;
 };
 
 class Matrix3 {

@@ -70,6 +70,11 @@ void MatrixStack::rotateZ(float degs) {
     currentMatrix.rotateZ(degs);
 }
 
+void MatrixStack::identity()
+{
+    currentMatrix.identity();
+}
+
 PushStack::PushStack(MatrixStack &stack):
     stack(stack)
 {

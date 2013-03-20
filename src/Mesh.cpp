@@ -244,6 +244,7 @@ void Mesh::render(bool transparency) {
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
     }
+    // glBindVertexArray(0);
 
     assert(GL_NO_ERROR == glGetError());
 }

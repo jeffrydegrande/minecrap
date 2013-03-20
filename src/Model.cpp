@@ -14,10 +14,7 @@
 Model::Model(const char *filename)
 {
     Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(filename, aiProcess_CalcTangentSpace       |
-                                                       aiProcess_Triangulate            |
-                                                       aiProcess_JoinIdenticalVertices  |
-                                                       aiProcess_SortByPType ); 
+    const aiScene *scene = importer.ReadFile(filename, aiProcessPreset_TargetRealtime_MaxQuality);
     if (scene != NULL)
         buildMeshes(scene);
 }
@@ -28,30 +25,35 @@ Model::~Model()
 
 void Model::render()
 {
-    glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, numFaces * 3, GL_UNSIGNED_INT, 0);
+    for (size_t i=0; i<meshes.size(); i++) {
+        glBindVertexArray(meshes[i].vao);
+        glDrawElements(GL_TRIANGLES, meshes[i].numFaces * 3, GL_UNSIGNED_INT, 0);
+    }
 }
 
 void Model::buildMeshes(const aiScene *scene)
 {
     assert(scene != NULL);
     GLuint buffer;
+
     const struct aiNode *node = scene->mRootNode;
-    aiMatrix4x4 matrix = node->mTransformation;
+    aiMatrix4x4 matrix = node->mChildren[0]->mTransformation; // node->mTransformation;
     Matrix4 m;
-	m[0]=matrix.a1; m[4]=matrix.a2; m[8]=matrix.a3 ; m[12]=matrix.a4;
-	m[1]=matrix.b1; m[5]=matrix.b2; m[9]=matrix.b3 ; m[13]=matrix.b4;
-	m[2]=matrix.c1; m[6]=matrix.c2; m[10]=matrix.c3; m[14]=matrix.c4;
-	m[3]=matrix.d1; m[7]=matrix.d2; m[11]=matrix.d3; m[15]=matrix.d4;
-#if 0
-    worldMatrix=m;
-#endif
+
+    m[0]=matrix.a1; m[4]=matrix.a2; m[8] =matrix.a3; m[12]=matrix.a4;
+    m[1]=matrix.b1; m[5]=matrix.b2; m[9] =matrix.b3; m[13]=matrix.b4;
+    m[2]=matrix.c1; m[6]=matrix.c2; m[10]=matrix.c3; m[14]=matrix.c4;
+    m[3]=matrix.d1; m[7]=matrix.d2; m[11]=matrix.d3; m[15]=matrix.d4;
+
+    worldMatrix = m;
+    worldMatrix.print();
 
     printf( "%d meshes\n",scene->mNumMeshes);
 
     // For each mesh
     for (unsigned int n = 0; n < scene->mNumMeshes; ++n) {
         const struct aiMesh* mesh = scene->mMeshes[n];
+        // set the mesh
 
         // create array with faces
         // have to convert from Assimp format to array
@@ -67,11 +69,12 @@ void Model::buildMeshes(const aiScene *scene)
             faceIndex += 3;
         }
 
-        numFaces = scene->mMeshes[n]->mNumFaces;
+        struct mesh_t im;
+        im.numFaces = scene->mMeshes[n]->mNumFaces;
 
         // generate Vertex Array for mesh
-        glGenVertexArrays(1,&vao);
-        glBindVertexArray(vao);
+        glGenVertexArrays(1,&im.vao);
+        glBindVertexArray(im.vao);
 
         // buffer for faces
         glGenBuffers(1, &buffer);
@@ -104,5 +107,6 @@ void Model::buildMeshes(const aiScene *scene)
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER,0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+        meshes.push_back(im);
     }
 }

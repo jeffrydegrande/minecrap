@@ -45,6 +45,7 @@ Engine::Engine():
     player(NULL),
     crosshair(NULL),
     shader(NULL),
+	dragonShader(NULL),
     lightIntensity(0.8f, 0.8f, 0.8f, 0.8f),
     ambientLightIntensity(0.5f, 0.5f, 0.5f, 0.5f),
     night(false),
@@ -164,14 +165,12 @@ void Engine::compileShaders()
     shader->addFragmentShader("hello_world");
     shader->done();
 
-        basicShader.cameraToClipMatrix        = shader->getUniformLocation("cameraToClipMatrix");
-        basicShader.directionToLight          = shader->getUniformLocation("directionToLight");
-        basicShader.modelToCameraMatrix       = shader->getUniformLocation("modelToCameraMatrix");
-        basicShader.normalModelToCameraMatrix = shader->getUniformLocation("normalModelToCameraMatrix");
-        basicShader.lightIntensity            = shader->getUniformLocation("lightIntensity");
-        basicShader.ambientLightIntensity     = shader->getUniformLocation("ambientLightIntensity");
-        basicShader.materials                 = shader->getUniformLocation("materials");
-    }
+
+    assert(dragonShader == NULL);
+    dragonShader = new Shader();
+    dragonShader->addVertexShader("dragon");
+    dragonShader->addFragmentShader("dragon");
+    dragonShader->done();
 }
 
 
@@ -363,7 +362,7 @@ void Engine::render() {
 
 	while (GL_NO_ERROR != (error=glGetError())) {
 		std::string s = reinterpret_cast<const char *>(gluErrorString(error));
-		fprintf(stderr, "Error: %s\n", s.c_str());
+		fprintf(stderr, "OpenGL Error: %s\n", s.c_str());
         exit(1);
 	}
 }
@@ -454,36 +453,37 @@ void Engine::render3D() {
 	}
 
     {
-        // last thought: this is setting up a model matrix, while we
-        // kind of want translations to happen in the world matrix
-
+		UseShader use(*dragonShader);
         PushStack push(model);
-        // model.set(dragon->getWorldMatrix());
-        model.translate(Vec3(110.0f, 85.0f, 110.0f));
-        // model.scale(0.2f);
+        model.identity();
+        model.rotateY(90.0f);
+        model.translate(Vec3(10.0f, 3.0f, 5.0f));
+        model.scale(0.5);
 
-        Matrix4 m(model.top());
-        Matrix3 normal = m;
-        Vec4 cameraDirectionToLight = model.top() * directionToLight;
+        model.apply(player->getCameraMatrix());
 
-        shader->setDirectionToLight(cameraDirectionToLight);
-        shader->setUniformMatrix4(basicShader.modelToCameraMatrix, m);
-        shader->setUniformMatrix3(basicShader.normalModelToCameraMatrix, normal);
+		dragonShader->setUniform("cameraToClipMatrix", cameraToClipMatrix);
+		dragonShader->setUniform("modelToCameraMatrix", model.top());
 
+		glDisable(GL_CULL_FACE);
+		glDisable(GL_DEPTH_TEST);
         dragon->render();
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
     }
 
-
-        if (optionDrawRayToLightSource) {
-            Vec4 point = Vec4(0.0f, 0.0f, 0.0f, 0.f) + (directionToLight * 10000);
-            glLineWidth(3.0f);
-            glColor3f(1.0, 0.0, 0.0);
-            glBegin(GL_LINES);
-            glVertex3f(0.0, 0.0, 0.0);
-            glVertex3f(point.x, point.y, point.z);
-            glEnd();
-            glColor3f(1.0, 1.0, 1.0);
-        }
+#if 0
+    if (optionDrawRayToLightSource) {
+        Vec4 point = Vec4(0.0f, 0.0f, 0.0f, 0.f) + (directionToLight * 10000);
+        glLineWidth(3.0f);
+        glColor3f(1.0, 0.0, 0.0);
+        glBegin(GL_LINES);
+        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(point.x, point.y, point.z);
+        glEnd();
+        glColor3f(1.0, 1.0, 1.0);
+    }
+#endif
     // ASSERT_NO_GL_ERROR;
 }
 

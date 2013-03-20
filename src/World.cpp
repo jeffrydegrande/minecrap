@@ -88,6 +88,7 @@ Player * World::spawnPlayer() {
 	Vec3 playerSpawnLocation;
 
     Chunk *chunk = NULL;
+    (void)chunk;
 
 	// pick a random spot in real world coordinates
 	Vec2 size = this->getSize();
@@ -96,9 +97,12 @@ Player * World::spawnPlayer() {
     // get the center chunk
     chunk = CHUNK_FROM_WORLD_COORDINATES(center.x, center.y);
 
+#if 0
     if (chunk->findSpawnLocation(playerSpawnLocation)) {
 	    return new Player(this, playerSpawnLocation);
     }
+#endif
+	return new Player(this, Vec3(10.0f, 5.0f, 10.0f));
 
     printf ("Can not find suitable player spawn location\n");
     exit(1);

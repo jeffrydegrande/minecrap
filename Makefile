@@ -17,7 +17,7 @@ LIB_CVARS=./vendor/lib/osx/libcvars.a
 LDFLAGS =-L/usr/local/lib -lSDLmain -lSDL -Wl,-framework,Cocoa -framework OpenGL
 else
 LIB_CVARS?=./vendor/lib/linux/libcvars.a
-LDFLAGS=-lSDL -lGL -lGLU -lIL -lILU
+LDFLAGS=-lSDL -lGL -lGLU -lIL -lILU -lassimp
 endif
 
 all: mc tests
@@ -49,8 +49,10 @@ LIB_MINECRAP_SOURCES= src/AABox.cpp \
 		      src/World.cpp \
 		      src/simplex.cpp \
 		      src/Image.cpp \
-			  src/Terrain.cpp \
-			  src/Inventory.cpp
+		      src/Terrain.cpp \
+		      src/Inventory.cpp \
+	              src/IndexedMesh.cpp \
+		      src/Model.cpp
 
 LIB_MINECRAP_OBJS?=$(addprefix , $(LIB_MINECRAP_SOURCES:.cpp=.o))
 

@@ -32,6 +32,7 @@ class Engine
 	Crosshair *crosshair;
 
     Shader *shader;
+    Shader *dragonShader;
 
     Vec3 cameraPosition;
     Vec3 cameraDirection;

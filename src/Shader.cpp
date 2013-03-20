@@ -115,21 +115,33 @@ void Shader::done() {
 
 void Shader::addVertexShader(const char *path)
 {
-    GLuint shader = addShader(GL_VERTEX_SHADER, path);
+    std::string fullPath(ShadersDirectory);
+    fullPath += path;
+    fullPath += ".vert";
+
+    printf("Loading vertex shader: %s\n", fullPath.c_str());
+    GLuint shader = addShader(GL_VERTEX_SHADER, fullPath.c_str());
     shaders.push_back(shader);
     ASSERT_NO_GL_ERROR;
 }
 
 void Shader::addFragmentShader(const char *path)
 {
-    GLuint shader = addShader(GL_FRAGMENT_SHADER, path);
+    std::string fullPath(ShadersDirectory);
+    fullPath += path;
+    fullPath += ".frag";
+
+    printf("Loading fragment shader: %s\n", fullPath.c_str());
+    GLuint shader = addShader(GL_FRAGMENT_SHADER, fullPath.c_str());
     shaders.push_back(shader);
     ASSERT_NO_GL_ERROR;
 }
 
 GLuint Shader::addShader(GLenum type, const char *path)
 {
+
     std::string src = File::readText(path);
+
     int srcLength = src.size();
     const char *srcBuffer = src.c_str();
 

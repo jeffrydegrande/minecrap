@@ -92,8 +92,9 @@ void Player::look(int x, int y) {
     if (abs(x) > 200 || abs(y) > 200)
         return;
 
-    bool flying = CVarUtils::GetCVar<bool>("flying");
     float mouse_sense = 0.5f;
+    /*
+    bool flying = CVarUtils::GetCVar<bool>("flying");
 
 	if (flying) {
 		float heading = -direction.x * 100.0f * 0.05f;
@@ -106,6 +107,10 @@ void Player::look(int x, int y) {
 		float pitch   = -y * mouse_sense;
 		camera.rotate(heading, pitch, 0.0f);
 	}
+    */
+    float heading = -x * mouse_sense;
+    float pitch   = -y * mouse_sense;
+    camera.rotate(heading, pitch, 0.0f);
 }
 
 void Player::calculateMovementDirection(float elapsed)

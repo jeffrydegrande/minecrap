@@ -169,7 +169,7 @@ void Matrix4::rotateX(float degs) {
     float rads = degs * DEGREES_TO_RADIANS;
     rot.m[5] = cos(rads);
     rot.m[6] = sin(rads);
-    rot.m[7] = -rot.m[6]; // -sin
+    rot.m[9] = -rot.m[6]; // -sin
     rot.m[10] = rot.m[5];  // cos
     multiply(rot);
 }

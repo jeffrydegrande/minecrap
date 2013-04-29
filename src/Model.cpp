@@ -53,7 +53,7 @@ void Model::extractMeshesFromNode(const aiScene *scene, const aiNode *node)
         for (unsigned int i=0; i < node->mNumMeshes; i++) {
 
             const aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-            initMesh(currentMeshIndex, mesh);
+            initMesh(currentMeshIndex, mesh, node);
             currentMeshIndex++;
         }
     }

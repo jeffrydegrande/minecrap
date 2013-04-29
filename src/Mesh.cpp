@@ -72,7 +72,7 @@ Mesh::Mesh(int count): index(0), vertexCount(count) {
 }
 
 Mesh::~Mesh() {
-    glDeleteVertexArrays(1, &vao);
+    glDeleteVertexArraysAPPLE(1, &vao);
     glDeleteBuffers(1, &vbo);
 }
 

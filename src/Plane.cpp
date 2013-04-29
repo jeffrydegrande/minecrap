@@ -12,6 +12,11 @@ Plane::~Plane() {
 }
 
 void Plane::setPoints(Vec3 &p1, Vec3 &p2, Vec3 &p3) {
+    (void)p1;
+    (void)p2;
+    (void)p3;
+
+    /*
     Vec3 aux1, aux2;
 
     aux1 = p1 - p2;
@@ -21,6 +26,7 @@ void Plane::setPoints(Vec3 &p1, Vec3 &p2, Vec3 &p3) {
     normal.normalize();
     point.copy(p2);
     d = -(normal.dotProduct(point));
+    */
 }
 
 float Plane::distance(const Vec3 &p) {

@@ -63,6 +63,12 @@
 #define sleep(N)   usleep(N * 1000)
 #endif
 
+#ifdef HAVE_APPLE_OPENGL_FRAMEWORK
+#define glBindVertexArray glBindVertexArrayAPPLE
+#define glGenVertexArrays glGenVertexArraysAPPLE
+#define  glDeleteVertexArrays glDeleteVertexArraysAPPLE
+#endif
+
 
 #define DEGREES_TO_RADIANS        .017453292F
 #define RADIANS_TO_DEGREES        57.29577951F

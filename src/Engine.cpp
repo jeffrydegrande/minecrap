@@ -171,11 +171,16 @@ void Engine::compileShaders()
     if (shader == NULL) {
         shader = new Shader();
 #ifdef _WIN32
-        shader->addVertexShader("..\\shaders\\hello_world.vert");
-        shader->addFragmentShader("..\\shaders\\hello_world.frag");
+        shader->addVertexShader("..\\shaders\\GLSL33\\hello_world.vert");
+        shader->addFragmentShader("..\\shaders\\GLSL33\\hello_world.frag");
+#endif
+
+#ifdef HAVE_APPLE_OPENGL_FRAMEWORK
+        shader->addVertexShader("shaders/GLSL21/hello_world.vert");
+        shader->addFragmentShader("shaders/GLSL21/hello_world.frag");
 #else
-        shader->addVertexShader("shaders/hello_world.vert");
-        shader->addFragmentShader("shaders/hello_world.frag");
+        shader->addVertexShader("shaders/GLSL33/hello_world.vert");
+        shader->addFragmentShader("shaders/GLSL33/hello_world.frag");
 #endif
         shader->done();
 
@@ -468,6 +473,8 @@ void Engine::render3D() {
     shader->setUniformVec4(basicShader.ambientLightIntensity, ambientLightIntensity);
     shader->setUniform1i(basicShader.materials, 0);
 
+    ASSERT_NO_GL_ERROR;
+
     world->render();
 
     if (optionDrawRayToLightSource) {
@@ -481,7 +488,7 @@ void Engine::render3D() {
         glColor3f(1.0, 1.0, 1.0);
     }
 
-    // ASSERT_NO_GL_ERROR;
+    ASSERT_NO_GL_ERROR;
 }
 
 void Engine::render2D() {

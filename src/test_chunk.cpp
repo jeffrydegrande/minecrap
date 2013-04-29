@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-int main() {
+int main(int, char **) {
     struct timeval start, end;
     long mtime, seconds, useconds;    
 

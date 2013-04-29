@@ -13,36 +13,44 @@ Shader::~Shader() {
     }
 }
 
-GLint Shader::getUniformLocation(const char *name) const {
-    assert(program != 0);
-    return glGetUniformLocation(program, name);
-}
-
-void Shader::setUniformMatrix3(GLint u, Matrix3 &m)
+void Shader::setUniformMatrix3(const char *name, Matrix3 &m)
 {
+    assert(program != 0);
+    GLint u = glGetUniformLocation(program, name);
+    assert(u != -1);
     glUniformMatrix3fv(u, 1, GL_FALSE, m.value_ptr());
 }
 
 void Shader::setUniformMatrix4(GLint u, Matrix4 &m)
 {
+    assert(program != 0);
+    GLint u = glGetUniformLocation(program, name);
+    assert(u != -1);
     glUniformMatrix4fv(u, 1, GL_FALSE, m.value_ptr());  
 }
 
 
 void Shader::setUniformVec3(GLint u, Vec3 &v)
 {
+    assert(program != 0);
+    GLint u = glGetUniformLocation(program, name);
+    assert(u != -1);
     glUniform3fv(u, 1, (GLfloat *)v.value_ptr());
 
 }
 
 void Shader::setUniformVec4(GLint u, Vec4 &v)
 {
+    assert(program != 0);
+    GLint u = glGetUniformLocation(program, name);   
+    assert(u != -1);
     glUniform4fv(u, 1, (GLfloat *)v.value_ptr());
 }
 
 
 void Shader::setUniform1i(GLint u, int i)
 {
+    assert(program != 0);
     glUniform1i(u, i);
 }
 

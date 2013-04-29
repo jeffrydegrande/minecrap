@@ -1,9 +1,12 @@
+#include "minecrap.h"
 #include "Model.h"
 #include "Matrix.h"
-
-#include "minecrap.h"
-
 #include "IndexedMesh.h"
+#include "Texture.h"
+#include "Image.h"
+
+#include <string>
+#include <map>
 
 #include <cassert>
 
@@ -11,102 +14,145 @@
 #include <assimp/aiScene.h>
 #include <assimp/aiPostProcess.h>
 
+
 Model::Model(const char *filename)
+    : currentMeshIndex(0)
 {
     Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(filename, aiProcessPreset_TargetRealtime_MaxQuality);
-    if (scene != NULL)
-        buildMeshes(scene);
+    const aiScene *scene = importer.ReadFile(filename,
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_CalcTangentSpace |
+        aiProcess_FlipUVs |
+        aiProcess_Triangulate);
+
+    if (scene != NULL) {
+        initFromScene(scene);
+    }
 }
 
 Model::~Model()
 {
 }
 
-void Model::render()
+void Model::initFromScene(const aiScene *scene)
 {
-    for (size_t i=0; i<meshes.size(); i++) {
-        glBindVertexArray(meshes[i].vao);
-        glDrawElements(GL_TRIANGLES, meshes[i].numFaces * 3, GL_UNSIGNED_INT, 0);
+    assert(scene != NULL);
+    meshes.resize(scene->mNumMeshes);
+    textures.resize(scene->mNumTextures);
+
+    extractMeshesFromNode(scene, scene->mRootNode);
+    initMaterials(scene);
+}
+
+void Model::extractMeshesFromNode(const aiScene *scene, const aiNode *node)
+{
+    printf( "Node %s: %d\n", node->mName.data, node->mNumMeshes);
+
+    if (node->mNumMeshes != 0) {
+
+        for (unsigned int i=0; i < node->mNumMeshes; i++) {
+
+            const aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+            initMesh(currentMeshIndex, mesh);
+            currentMeshIndex++;
+        }
+    }
+    if (node->mNumChildren > 0) {
+        for (unsigned int i=0; i < node->mNumChildren; i++) {
+            const aiNode *child = node->mChildren[i];
+            extractMeshesFromNode(scene, child);
+        }
     }
 }
 
-void Model::buildMeshes(const aiScene *scene)
+void Model::initMesh(unsigned int index, const aiMesh *mesh, const aiNode *node)
 {
-    assert(scene != NULL);
-    GLuint buffer;
+    printf( "Initializing mesh %d\n", index);
+    meshes[index].materialIndex = mesh->mMaterialIndex;
 
-    const struct aiNode *node = scene->mRootNode;
-    aiMatrix4x4 matrix = node->mChildren[0]->mTransformation; // node->mTransformation;
+    std::vector<vertex2_t> vertices;
+    std::vector<unsigned int> indices;
+
+    // set the transformation matrix;
+
+    aiMatrix4x4 transform = node->mTransformation;
+    transform.Transpose();
+
     Matrix4 m;
+    for(int x=0; x<16; x++) {
+        m[x] = *transform[x];
+    }
 
-    m[0]=matrix.a1; m[4]=matrix.a2; m[8] =matrix.a3; m[12]=matrix.a4;
-    m[1]=matrix.b1; m[5]=matrix.b2; m[9] =matrix.b3; m[13]=matrix.b4;
-    m[2]=matrix.c1; m[6]=matrix.c2; m[10]=matrix.c3; m[14]=matrix.c4;
-    m[3]=matrix.d1; m[7]=matrix.d2; m[11]=matrix.d3; m[15]=matrix.d4;
+    const aiVector3D Zero(0.0f, 0.0f, 0.0f);
 
-    worldMatrix = m;
-    worldMatrix.print();
+    for (unsigned int i=0; i<mesh->mNumVertices; i++) {
+        const aiVector3D* pos      = &(mesh->mVertices[i]);
+        const aiVector3D* normal   = &(mesh->mNormals[i]);
+        const aiVector3D* texCoord = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero;
 
-    printf( "%d meshes\n",scene->mNumMeshes);
+        vertex2_t v;
+        v.x  = pos->x;      v.y  = pos->y;      v.z = pos->z;
+        v.nx = normal->x;   v.ny = normal->y;   v.nz = normal->z;
+        v.s  = texCoord->x; v.t  = texCoord->y;
+        vertices.push_back(v);
+    }
 
-    // For each mesh
-    for (unsigned int n = 0; n < scene->mNumMeshes; ++n) {
-        const struct aiMesh* mesh = scene->mMeshes[n];
-        // set the mesh
+    for (unsigned int i=0; i<mesh->mNumFaces; i++) {
+        const aiFace &face = mesh->mFaces[i];
+        assert(face.mNumIndices == 3);
+        indices.push_back(face.mIndices[0]);
+        indices.push_back(face.mIndices[1]);
+        indices.push_back(face.mIndices[2]);
+    }
+    meshes[index].init(vertices, indices);
+}
 
-        // create array with faces
-        // have to convert from Assimp format to array
-        unsigned int *faceArray;
-        faceArray = (unsigned int *)malloc(sizeof(unsigned int) * mesh->mNumFaces * 3);
-        unsigned int faceIndex = 0;
+void Model::initMaterials(const aiScene *scene)
+{
+    if (textures.size() > 0) {
+        for (unsigned int m=0; m < scene->mNumMaterials; m++) {
+            int texIndex = 0;
+            aiString path;  // filename
+            aiMaterial *material = scene->mMaterials[m];
+            aiReturn texFound = material->GetTexture(aiTextureType_DIFFUSE, texIndex, &path);
 
-        for (unsigned int t = 0; t < mesh->mNumFaces; ++t)
-        {
-            const struct aiFace* face = &mesh->mFaces[t];
+            if (texFound == AI_SUCCESS) {
+                int i = atoi(path.data + 1);
+                printf ("material %d uses texture %d\n", m, i);
 
-            memcpy(&faceArray[faceIndex], face->mIndices,3 * sizeof(float));
-            faceIndex += 3;
+                textures[m] = NULL;
+                aiTexture *texture = scene->mTextures[i];
+                Image *image = new Image();
+                image->load(texture->pcData, texture->mWidth);
+                Texture *t = new Texture();
+                t->load(GL_TEXTURE_2D, image);
+                textures[m] = t;
+            }
         }
+    }
+}
 
-        struct mesh_t im;
-        im.numFaces = scene->mMeshes[n]->mNumFaces;
+void Model::render()
+{
+    for (size_t i=0; i<meshes.size(); i++) {
 
-        // generate Vertex Array for mesh
-        glGenVertexArrays(1,&im.vao);
-        glBindVertexArray(im.vao);
+        glBindVertexArray(meshes[i].VAO);
+        glEnableVertexAttribArray(0); // vertices
+        glEnableVertexAttribArray(1); // normals
+        glEnableVertexAttribArray(2); // textures
 
-        // buffer for faces
-        glGenBuffers(1, &buffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh->mNumFaces * 3, faceArray, GL_STATIC_DRAW);
+        // activate texture
+        const unsigned int materialIndex = meshes[i].materialIndex;
 
-        free((void*)faceArray);
+        if (materialIndex < textures.size() && textures[materialIndex]) {
+            textures[materialIndex]->bind(GL_TEXTURE0);
+		}
+        glDisable(GL_CULL_FACE);
+        glDrawElements(GL_TRIANGLES, meshes[i].numIndices, GL_UNSIGNED_INT, 0);
+        glEnable(GL_CULL_FACE);
 
-        // buffer for vertex positions
-        if(mesh->HasPositions())
-        {
-            glGenBuffers(1, &buffer);
-            glBindBuffer(GL_ARRAY_BUFFER, buffer);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(float)*3*mesh->mNumVertices, mesh->mVertices, GL_STATIC_DRAW);
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 3, GL_FLOAT, 0, 0, 0);
-        }
-
-        // buffer for vertex normals
-        if (mesh->HasNormals())
-        {
-            glGenBuffers(1, &buffer);
-            glBindBuffer(GL_ARRAY_BUFFER, buffer);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(float)*3*mesh->mNumVertices, mesh->mNormals, GL_STATIC_DRAW);
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 3, GL_FLOAT, 0, 0, 0);
-        }
-
-        // unbind buffers
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER,0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-        meshes.push_back(im);
+        glDisableVertexAttribArray(0); // vertices
+        glDisableVertexAttribArray(1); // normals
+        glDisableVertexAttribArray(2); // textures
     }
 }

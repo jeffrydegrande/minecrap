@@ -98,7 +98,6 @@ void Engine::init() {
     compileShaders();
     loadTextures();
 
-
     resizeWindow(width, height);
 
     SDL_WM_SetCaption("Minecrap","");
@@ -118,7 +117,9 @@ void Engine::init() {
     player = world->spawnPlayer();
     crosshair = new Crosshair(viewWidth(), viewHeight());
 
-    dragon = new Model("./models/dragon.blend");
+    // dragon = new Model("./models/Dragon-low-rig.blend");
+    dragon = new Model("./models/gothic.blend");
+    // dragon = new Model("./models/dragon.blend");
 }
 
 void Engine::resizeWindow(int width, int height) {
@@ -199,6 +200,7 @@ void Engine::run() {
         render();
         last_update = tick() - now;
         fps_frames++;
+
         if (fps_lasttime < tick() - FPS_INTERVAL*1000)
         {
             fps_lasttime = tick();
@@ -370,7 +372,6 @@ void Engine::render() {
 void Engine::loadTextures()
 {
     printf("Loading textures\n");
-
     Image_Init();
 
     std::vector<Image *> images;
@@ -393,7 +394,6 @@ void Engine::loadTextures()
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT /*GL_CLAMP_TO_EDGE*/);
 
     // create 
-
     glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, 128, 128, images.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     ASSERT_NO_GL_ERROR;
 
@@ -427,7 +427,6 @@ void Engine::render3D() {
     glDepthRange(0.0f, 1.0f);
     glEnable(GL_DEPTH_CLAMP);
 
-    glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
 
 	Matrix4 cameraToClipMatrix = projection.top();
 	MatrixStack model(player->getCameraMatrix());
@@ -436,10 +435,10 @@ void Engine::render3D() {
 		UseShader use(*shader);
         PushStack push(model);
 
+        glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
+
 		// set clip matrix
 		Vec4 cameraDirectionToLight = model.top() * directionToLight;
-
-		Matrix4 m(model.top());
 		Matrix3 normal(model.top());
 
 		shader->setDirectionToLight(cameraDirectionToLight);
@@ -449,27 +448,30 @@ void Engine::render3D() {
 		shader->setUniform("normalModelToCameraMatrix", normal);
 		shader->setUniform("materials", 0);
 		shader->setUniform("modelToCameraMatrix", model.top());
-		world->render();
+		// world->render();
 	}
 
     {
 		UseShader use(*dragonShader);
         PushStack push(model);
-        model.identity();
-        model.rotateY(90.0f);
-        model.translate(Vec3(10.0f, 3.0f, 5.0f));
-        model.scale(0.5);
 
+        model.identity();
+        // model.scale(0.10f);
+        model.rotateX(-90.0f);
+        model.translate(Vec3(100.0f, 90.0f, 100.0f));
         model.apply(player->getCameraMatrix());
 
-		dragonShader->setUniform("cameraToClipMatrix", cameraToClipMatrix);
-		dragonShader->setUniform("modelToCameraMatrix", model.top());
+		Vec4 cameraDirectionToLight = model.top() * directionToLight;
+        Matrix3 normal(model.top());
 
-		glDisable(GL_CULL_FACE);
-		glDisable(GL_DEPTH_TEST);
+		dragonShader->setDirectionToLight(cameraDirectionToLight);
+		dragonShader->setUniform("lightIntensity", lightIntensity);
+		dragonShader->setUniform("ambientLightIntensity", ambientLightIntensity);
+		dragonShader->setUniform("cameraToClipMatrix", cameraToClipMatrix);
+		dragonShader->setUniform("normalModelToCameraMatrix", normal);
+		dragonShader->setUniform("materials", 0);
+		dragonShader->setUniform("modelToCameraMatrix", model.top());
         dragon->render();
-		glEnable(GL_CULL_FACE);
-		glEnable(GL_DEPTH_TEST);
     }
 
 #if 0
@@ -558,4 +560,3 @@ void Engine::toggleDayNight()
 {
     night = !night;
 }
-

@@ -3,38 +3,33 @@
 
 #include <vector>
 #include "Matrix.h"
+#include "IndexedMesh.h"
 
 class aiScene;
-class IndexedMesh;
+class aiMesh;
+class aiNode;
+class Texture;
 class Model {
-    struct mesh_t {
-        unsigned int vao;
-        unsigned int numFaces;
-    };
 
-    std::vector<struct mesh_t> meshes;
-
-    unsigned int vao;
-    unsigned int numFaces;
-
-    Matrix4 worldMatrix;
+    int currentMeshIndex;
 
     public:
 
         Model(const char *filename);
         ~Model();
 
-        const Matrix4 &getWorldMatrix();
-
         void render();
 
     private:
 
-        void buildMeshes(const aiScene *scene);
 
+        void initFromScene(const aiScene *scene);
+        void extractMeshesFromNode(const aiScene *scene, const aiNode *node);
+        void initMesh(unsigned int index, const aiMesh *mesh, const aiNode *node);
+        void initMaterials(const aiScene *scene);
+
+        std::vector<IndexedMesh> meshes;
+        std::vector<Texture *> textures;
 };
-
-inline const Matrix4 &Model::getWorldMatrix() 
-{ return worldMatrix; }
 
 #endif

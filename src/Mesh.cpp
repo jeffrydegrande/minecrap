@@ -75,7 +75,7 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
         vertices[index].y  = pos.y + verts[i].y;
         vertices[index].z  = pos.z + verts[i].z;
 
-        vertices[index].a  = 1.0f;
+        // vertices[index].a  = 1.0f;
 
         switch (i % 4) {
             case 0:
@@ -106,59 +106,34 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
 
         // color
         switch (kind) {
-
         case GRASS:
-            vertices[index].r  = 0.1f;
-            vertices[index].g  = 0.6f;
-            vertices[index].b  = 0.0f;
             if (start == 16)
                 vertices[index].p = 0.0f;
             else
                 vertices[index].p = 1.0f;
             break;
         case ROCK:
-            vertices[index].r  = 0.25f;
-            vertices[index].g  = 0.25f;
-            vertices[index].b  = 0.25f;
             vertices[index].p  = 4.0f;
             break;
         case DIRT:
-            vertices[index].r = 233.0f/510;
-            vertices[index].g = 107.0f/510;
-            vertices[index].b = 0.0f;
             if (start == 16)
                 vertices[index].p = 1.0f;
             else
                 vertices[index].p = 0.0f;
             break;
-
         case WATER:
-            vertices[index].r  = 0.0f;
-            vertices[index].g  = 0.0f;
-            vertices[index].b  = 1.5f;
-            vertices[index].a  = 0.8f;
-
             vertices[index].p  = 2.0f;
-
             vertices[index].nx = 0.0f;
             vertices[index].ny = -1.0f;
             vertices[index].nz = 0.0f;
             break;
-
         case SAND:
-            vertices[index].r  = 0.5f;
-            vertices[index].g  = 0.5f;
-            vertices[index].b  = 0.0f;
             vertices[index].p = 3.0f;
             break;
         case BEDROCK:
             vertices[index].p = 5.0f;
             break;
-
         case RED:
-            vertices[index].r  = 1.0f;
-            vertices[index].g  = 0.0f;
-            vertices[index].b  = 0.0f;
             vertices[index].p = 6.0f;
             break;
         case LAVA:
@@ -220,25 +195,16 @@ void Mesh::render(bool transparency) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     glEnableVertexAttribArray(0); // vertices
-    glEnableVertexAttribArray(1); // colors
-    glEnableVertexAttribArray(2); // normals
-    glEnableVertexAttribArray(3); // textures
+    glEnableVertexAttribArray(1); // normals
+    glEnableVertexAttribArray(2); // textures
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
-            (GLvoid*)offsetof(struct vertex_t, x));
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
-            (GLvoid*)offsetof(struct vertex_t, r));
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
-            (GLvoid*)offsetof(struct vertex_t, nx));
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
-            (GLvoid*)offsetof(struct vertex_t, s));
-
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), (GLvoid*)offsetof(struct vertex_t, x));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), (GLvoid*)offsetof(struct vertex_t, nx));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t), (GLvoid*)offsetof(struct vertex_t, s));
     glDrawArrays(GL_QUADS, 0, index);
-
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
-    glDisableVertexAttribArray(3);
 
     if (transparency) {
         glDisable(GL_BLEND);

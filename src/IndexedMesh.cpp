@@ -2,70 +2,53 @@
 #include "Matrix.h"
 #include <cassert>
 
-IndexedMesh::IndexedMesh(unsigned int vao, int facesCount) :vao(vao),
-                                                            facesCount(facesCount) {
+IndexedMesh::IndexedMesh()
+{
+    VAO = INVALID_OPENGL_VALUE;
+    VBO = INVALID_OPENGL_VALUE;
+    IBO = INVALID_OPENGL_VALUE;
+    numIndices = 0;
+    materialIndex = INVALID_MATERIAL;
 }
 
 IndexedMesh::~IndexedMesh()
 {
+    if (VAO != INVALID_OPENGL_VALUE)
+        glDeleteBuffers(1, &VAO);
+
+    if (VBO != INVALID_OPENGL_VALUE)
+        glDeleteBuffers(1, &VBO);
+
+    if (IBO != INVALID_OPENGL_VALUE)
+        glDeleteBuffers(1, &IBO);
+
 }
 
-void IndexedMesh::addFaceIndexes(unsigned int *faces, size_t count)
+void IndexedMesh::init(const std::vector<struct vertex2_t>& vertices,
+                       const std::vector<unsigned int>& indices)
 {
-    (void) faces;
-    (void) count;
-}
+    numIndices  = indices.size();
 
-void IndexedMesh::addVertices(float *vertices, size_t count)
-{
-    (void) vertices;
-    (void) count;
-}
+    glGenVertexArrays(1,&VAO);
+    glBindVertexArray(VAO);
 
-void addNormals(float *normals, size_t count)
-{
-    (void) normals;
-    (void) count;
-}
+    glGenBuffers(1, &IBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * numIndices, &indices[0], GL_STATIC_DRAW);
 
-#if 0
-            // buffer for vertex texture coordinates
-            float *texCoords = (float *)malloc(sizeof(float)*2*mesh->mNumVertices);
-            for (unsigned int k = 0; k < mesh->mNumVertices; ++k) {
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex2_t) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
 
-                texCoords[k*2]   = mesh->mTextureCoords[0][k].x;
-                texCoords[k*2+1] = mesh->mTextureCoords[0][k].y; 
-
-            }
-            glGenBuffers(1, &buffer);
-            glBindBuffer(GL_ARRAY_BUFFER, buffer);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(float)*2*mesh->mNumVertices, texCoords, GL_STATIC_DRAW);
-            glEnableVertexAttribArray(texCoordLoc);
-            glVertexAttribPointer(texCoordLoc, 2, GL_FLOAT, 0, 0, 0);
-#endif
-
-void IndexedMesh::render()
-{
-    glBindVertexArray(vao);
     glEnableVertexAttribArray(0); // vertices
-    glEnableVertexAttribArray(1); // colors
-    glDrawElements(GL_TRIANGLES, facesCount * 3, GL_UNSIGNED_INT, 0);
+    glEnableVertexAttribArray(1); // normals
+    glEnableVertexAttribArray(2); // textures
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex2_t), (GLvoid*)offsetof(struct vertex2_t, x));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex2_t), (GLvoid*)offsetof(struct vertex2_t, nx));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(struct vertex2_t), (GLvoid*)offsetof(struct vertex2_t, s));
+
     glDisableVertexAttribArray(0); // vertices
-    glDisableVertexAttribArray(1); // colors
-
-    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    // glEnableVertexAttribArray(2); // normals
-    // glEnableVertexAttribArray(3); // textures
-
-/*
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
-            (GLvoid*)offsetof(struct vertex_t, x));
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
-            (GLvoid*)offsetof(struct vertex_t, r));
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
-            (GLvoid*)offsetof(struct vertex_t, nx));
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
-            (GLvoid*)offsetof(struct vertex_t, s));
-*/
-    assert(GL_NO_ERROR == glGetError());
+    glDisableVertexAttribArray(1); // normals
+    glDisableVertexAttribArray(2); // textures
 }

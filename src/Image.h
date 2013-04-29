@@ -12,8 +12,12 @@ class Image {
     ILuint image;
 
     public:
+        Image();
         Image(const char *filename);
         ~Image();
+
+        void load(void *buffer, unsigned int size);
+        void save(const char *filename);
 
         const char *data_ptr() const;
 

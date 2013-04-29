@@ -4,31 +4,20 @@
 #include "Mesh.h"
 #include "Matrix.h"
 
-class IndexedMesh
+struct IndexedMesh
 {
-    GLuint vao;
+    GLuint VAO;
+    GLuint VBO;
+    GLuint IBO;
 
-    vertex_t* vertices;
-    int facesCount;
+    unsigned int materialIndex;
+    unsigned int numIndices;
 
-    Matrix4 worldMatrix;
+    IndexedMesh();
+    ~IndexedMesh();
 
-    friend class Model;
-
-    protected:
-        void addFaceIndexes(unsigned int *faces, size_t count);
-        void addVertices(float *vertices, size_t count);
-        void addNormals(float *normals, size_t count);
-
-    public:
-        IndexedMesh(unsigned int, int facesCount);
-        virtual ~IndexedMesh();
-        const Matrix4 &getWorldMatrix();
-
-        void render();
+    void init(const std::vector<struct vertex2_t>& vertices,
+              const std::vector<unsigned int>& indices);
 };
-
-inline const Matrix4 &IndexedMesh::getWorldMatrix() 
-{ return worldMatrix; }
 
 #endif

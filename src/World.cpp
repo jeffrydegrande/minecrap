@@ -97,12 +97,13 @@ Player * World::spawnPlayer() {
     // get the center chunk
     chunk = CHUNK_FROM_WORLD_COORDINATES(center.x, center.y);
 
-#if 0
+#if 1
     if (chunk->findSpawnLocation(playerSpawnLocation)) {
 	    return new Player(this, playerSpawnLocation);
     }
-#endif
+#else
 	return new Player(this, Vec3(10.0f, 5.0f, 10.0f));
+#endif
 
     printf ("Can not find suitable player spawn location\n");
     exit(1);

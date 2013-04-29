@@ -8,9 +8,14 @@
 
 struct vertex_t {
     float x, y, z,     // position
-          r, g, b, a,  // color
           nx, ny, nz,  // normal
           s, t, p;   // textures
+};
+
+struct vertex2_t {
+    float x, y, z,     // position
+          nx, ny, nz,  // normal
+          s, t;   // textures
 };
 
 class Vec3;

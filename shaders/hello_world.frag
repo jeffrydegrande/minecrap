@@ -1,8 +1,6 @@
 #version 330
 
-smooth in vec4 interpColor;
 smooth in vec3 textureCoordinates;
-
 in float cosAngIncidence;
 in float depth;
 
@@ -11,7 +9,6 @@ uniform vec4 lightIntensity;
 uniform vec4 ambientLightIntensity;
 
 out vec4 outputColor;
-
 
 vec4 fog(vec4 color, vec4 fcolor, float depth, float density){
     const float e = 2.71828182845904523536028747135266249;
@@ -22,7 +19,6 @@ vec4 fog(vec4 color, vec4 fcolor, float depth, float density){
 void main()
 {
     vec4 color = texture(material, textureCoordinates.rgb);
-
     vec4 lightColor = (lightIntensity * color * cosAngIncidence) +
                             (color * ambientLightIntensity);
 

@@ -131,9 +131,8 @@ void Engine::init() {
     compileShaders();
     loadTextures();
 
-    // SDL_EnableUNICODE(1);
-    // SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-    SDL_ShowCursor (false);
+    SDL_ShowCursor (0);
+	SDL_WarpMouseInWindow(window, width / 2, height / 2);
 
     /*
     for (int i = 0; i < SDL_NumJoysticks(); i++) {
@@ -336,8 +335,7 @@ void Engine::collectInput() {
                 if (ConsoleIsOpen())
                     break;
 #endif
-                // TODO: find SDL2 equivalent
-                // SDL_WarpMouse(w / 2, h / 2);
+                SDL_WarpMouseInWindow(window, w / 2, h / 2);
               } else {
                 player->look(event.motion.xrel, event.motion.yrel);
               }

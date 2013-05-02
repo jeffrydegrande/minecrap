@@ -16,6 +16,7 @@
 #include "Color.h"
 #include "Sun.h"
 #include "Console.h"
+#include "Inventory.h"
 #include "Player.h"
 #include "Block.h"
 
@@ -196,7 +197,7 @@ void World::addBlock(Player *player)
 
     pos.y += 1.0f;
 	if (blockAt(pos) == AIR) {
-	    changeBlock(pos, player->getInventory().getCurrentBlock());
+	    changeBlock(pos, player->getInventory()->getCurrentBlock());
 	}
 }
 

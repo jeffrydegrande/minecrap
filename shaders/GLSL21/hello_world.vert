@@ -1,8 +1,9 @@
-# version 120
+# version 150
 
-attribute vec3 position;
-attribute vec4 color;
-attribute vec3 normal;
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec4 diffuseColor;
+layout(location = 2) in vec3 normal;
+layout(location = 3) in vec3 texture;
 
 varying vec4 interpColor;
 

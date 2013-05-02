@@ -14,7 +14,7 @@ OS=$(shell uname -s)
 ifeq ($(OS),Darwin)
 CFLAGS+=-DHAVE_APPLE_OPENGL_FRAMEWORK
 LIB_CVARS=./vendor/lib/osx/libcvars.a
-LDFLAGS =-L/usr/local/lib -lSDLmain -lSDL -Wl,-framework,Cocoa -framework OpenGL
+LDFLAGS =-L/usr/local/lib -lSDLmain -lSDL2 -Wl,-framework,Cocoa -framework OpenGL
 else
 LIB_CVARS?=./vendor/lib/linux/libcvars.a
 LDFLAGS=-lSDL -lGL -lGLU -lIL -lILU

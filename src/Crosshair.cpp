@@ -8,6 +8,7 @@
 //
 
 
+#include "minecrap.h"
 #include "Crosshair.h"
 #include "Color.h"
 
@@ -18,6 +19,7 @@ Crosshair::Crosshair(int screenWidth, int screenHeight) {
 	this->centerY = (float)screenHeight / 2;
 
 	this->crosshair = glGenLists(1);
+    CHECK_OPENGL_ERRORS(__LINE__);
     assert(this->crosshair != 0);
     glNewList(this->crosshair, GL_COMPILE);
 	this->draw();

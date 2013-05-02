@@ -19,6 +19,7 @@
 
 #ifdef HAVE_APPLE_OPENGL_FRAMEWORK
 #    include <OpenGL/gl.h>
+#    include <OpenGL/glext.h>
 #    include <OpenGL/glu.h>
 #else
 #    ifdef _WIN32
@@ -39,15 +40,9 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #else
-#include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
 #endif
-
-/* #ifdef __APPLE__ */
-/* #include <GLUT/glut.h> */
-/* #else */
-/* #include <GL/GLUT.h> */
-/* #endif */
 
 #include <CVars/CVar.h>
 #include "Console.h"
@@ -69,7 +64,6 @@
 #define  glDeleteVertexArrays glDeleteVertexArraysAPPLE
 #endif
 
-
 #define DEGREES_TO_RADIANS        .017453292F
 #define RADIANS_TO_DEGREES        57.29577951F
 #define PI                        (3.1415926535f)
@@ -78,11 +72,6 @@
 #define STRAFE_DISTANCE 1.0f
 
 #define WATER_LEVEL 64
-
-typedef struct Point3D_ {
-    GLfloat x, y, z;
-} Point3D;
-
 
 #define foreach_xyz \
     for (int x=0; x<CHUNKX; x++) { \
@@ -99,14 +88,12 @@ typedef struct Point3D_ {
 #include <algorithm>
 #define clamp(value, upper, lower)		(std::max)((std::min)(value, (lower)), (upper))
 
-
-#define CHECK_OPENGL_ERRORS \
+#define CHECK_OPENGL_ERRORS(lineno) \
     { \
         GLenum error; \
         while (GL_NO_ERROR != (error=glGetError())) { \
             std::string s = reinterpret_cast<const char *>(gluErrorString(error)); \
-            fprintf(stderr, "Error: %s\n", s.c_str()); \
-            exit(1); \
+            fprintf(stderr, "Error (%s:%d): %s\n", __FILE__, lineno, s.c_str()); \
         } \
     }
 

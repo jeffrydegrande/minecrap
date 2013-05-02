@@ -72,7 +72,7 @@ Mesh::Mesh(int count): index(0), vertexCount(count) {
 }
 
 Mesh::~Mesh() {
-    glDeleteVertexArraysAPPLE(1, &vao);
+    glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
 }
 
@@ -190,18 +190,24 @@ void Mesh::finish() {
     assert(index <= vertexCount);
 
     glGenVertexArrays(1, &vao );
+    CHECK_OPENGL_ERRORS(__LINE__);
+
     glBindVertexArray(vao);
+    CHECK_OPENGL_ERRORS(__LINE__);
 
     glGenBuffers( 1, &vbo );
+    CHECK_OPENGL_ERRORS(__LINE__);
     /* printf("Allocating %ld kb, ?? cubes, %d vertices, expected %d\n", */
     /*     (index * sizeof(struct vertex_t)) / 1024, index, vertexCount); */
 
     // upload data into VBO
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    CHECK_OPENGL_ERRORS(__LINE__);
     glBufferData(GL_ARRAY_BUFFER, index * sizeof(struct vertex_t), vertices, GL_STATIC_DRAW);
+    CHECK_OPENGL_ERRORS(__LINE__);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    assert(GL_NO_ERROR == glGetError());
+    CHECK_OPENGL_ERRORS(__LINE__);
 
     // and get rid of the data on our side
     delete [] vertices;
@@ -244,6 +250,5 @@ void Mesh::render(bool transparency) {
         glDisable(GL_BLEND);
         glEnable(GL_CULL_FACE);
     }
-
-    assert(GL_NO_ERROR == glGetError());
+    CHECK_OPENGL_ERRORS(__LINE__);
 }

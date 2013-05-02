@@ -1,5 +1,6 @@
 #include "Terrain.h"
 #include "simplex.h"
+#include "Block.h"
 #include <cmath>
 
 ///////////////////////////////////////////////////////////

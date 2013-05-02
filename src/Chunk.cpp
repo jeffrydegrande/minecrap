@@ -7,6 +7,7 @@
 //
 
 #include "minecrap.h"
+#include "Block.h"
 #include "Color.h"
 #include "Chunk.h"
 #include "Vec.h"

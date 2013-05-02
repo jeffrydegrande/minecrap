@@ -24,9 +24,11 @@
 #define FULLSCREEN false
 
 #define FPS_INTERVAL     1.0f
-#define ASSERT_NO_GL_ERROR assert(GL_NO_ERROR == glGetError())
 
 // static float elapsed_seconds = 0.0f;
+
+static SDL_Window *window = 0;
+static SDL_GLContext context;
 
 struct ProgramData {
     GLuint cameraToClipMatrix;
@@ -69,31 +71,51 @@ Engine::Engine():
 }
 
 Engine::~Engine() {
+
     delete this->world;
     delete this->player;
-    delete this->crosshair;
+    // delete this->crosshair;
+
+    SDL_GL_DeleteContext(context);
+    SDL_DestroyWindow(window);
 
     SDL_Quit();
 }
 
 void Engine::init() {
-    int flags;
-
-    if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_JOYSTICK) != 0) {
-        return;
-    }
-
     this->width  = WINDOW_WIDTH;
     this->height = WINDOW_HEIGHT;
 
-    flags = SDL_OPENGL;
-    if (FULLSCREEN)
-        flags |= SDL_FULLSCREEN;
-    else
-        flags |= SDL_RESIZABLE;
+
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        SDL_Quit();
+        return;
+    }
+
+    // set the opengl context version
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_SetVideoMode(width, height, 32, flags);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
+
+    window = SDL_CreateWindow("Minecrap", SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED, width, height,
+            SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    if (!window) {
+        printf("Unable to create window");
+        exit(1);
+    }
+
+    context = SDL_GL_CreateContext(window);
+
+    printf("OpenGL Context created! \n ");
+
+    SDL_GL_SetSwapInterval(1);
+
+    CHECK_OPENGL_ERRORS(__LINE__);
 
 #ifdef _WIN32
     GLenum error = glewInit();
@@ -103,34 +125,32 @@ void Engine::init() {
     }
 #endif
 
-    OSD_Init();
 
     displayOpenGLInfo();
+    resizeWindow(width, height);
 
+    OSD_Init();
     compileShaders();
     loadTextures();
 
-    resizeWindow(width, height);
-
-    SDL_WM_SetCaption("Minecrap","");
-    SDL_Init(SDL_INIT_VIDEO);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_EnableUNICODE(1);
-    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+    // SDL_EnableUNICODE(1);
+    // SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
     SDL_ShowCursor (false);
 
+    /*
     for (int i = 0; i < SDL_NumJoysticks(); i++) {
         printf("Joystick found: %s\n", SDL_JoystickName(i));
         SDL_JoystickEventState(SDL_ENABLE);
         SDL_JoystickOpen(i);
     }
+    */
 
     world = new World(CVarUtils::GetCVar<int>("seed"));
     player = world->spawnPlayer();
-    crosshair = new Crosshair(viewWidth(), viewHeight());
 }
 
 void Engine::resizeWindow(int width, int height) {
+    printf("Setting window size: %d / %d\n", width, height);
     float aspect = (float)width / (float)height;
 
     this->width  = width;
@@ -141,18 +161,15 @@ void Engine::resizeWindow(int width, int height) {
 	// TODO: executing this here throws an error while it's
 	//		 really the optimal place to do this. Investigate
     // shader->setCameraToClipMatrix(perspective);
-	// ASSERT_NO_GL_ERROR;
 
     glViewport (0, 0, this->width, this->height);
+    /* if (crosshair != NULL) { */
+    /*     delete crosshair; */
+    /* } */
+    /* crosshair = new Crosshair(viewWidth(), viewHeight()); */
 
-    if (crosshair) {
-        delete crosshair;
-        crosshair = new Crosshair(viewWidth(), viewHeight());
-    }
-
-
-    osd->setWidth(width);
-    ASSERT_NO_GL_ERROR;
+    // osd->setWidth(width);
+    CHECK_OPENGL_ERRORS(__LINE__);
 }
 
 void printCurrentMatrix(GLenum matrix)
@@ -167,7 +184,9 @@ void Engine::setupProjectionMatrix()
 
 void Engine::compileShaders()
 {
+    CHECK_OPENGL_ERRORS(__LINE__);
     printf("Compiling shaders\n");
+
     if (shader == NULL) {
         shader = new Shader();
 #ifdef _WIN32
@@ -175,17 +194,12 @@ void Engine::compileShaders()
         shader->addFragmentShader("..\\shaders\\GLSL33\\hello_world.frag");
 #endif
 
-#ifdef HAVE_APPLE_OPENGL_FRAMEWORK
-        shader->addVertexShader("shaders/GLSL21/hello_world.vert");
-        shader->addFragmentShader("shaders/GLSL21/hello_world.frag");
-#else
         shader->addVertexShader("shaders/GLSL33/hello_world.vert");
         shader->addFragmentShader("shaders/GLSL33/hello_world.frag");
-#endif
+
         shader->done();
 
         // set program data
-
         basicShader.cameraToClipMatrix        = shader->getUniformLocation("cameraToClipMatrix");
         basicShader.directionToLight          = shader->getUniformLocation("directionToLight");
         basicShader.modelToCameraMatrix       = shader->getUniformLocation("modelToCameraMatrix");
@@ -326,7 +340,8 @@ void Engine::collectInput() {
                 if (ConsoleIsOpen())
                     break;
 #endif
-                SDL_WarpMouse(w / 2, h / 2);
+                // TODO: find SDL2 equivalent
+                // SDL_WarpMouse(w / 2, h / 2);
               } else {
                 player->look(event.motion.xrel, event.motion.yrel);
               }
@@ -352,9 +367,11 @@ void Engine::collectInput() {
                     break;
 			}
             break;
+            /*
         case SDL_VIDEORESIZE:
             resizeWindow(event.resize.w, event.resize.h);
             break;
+            */
         default:
             // noop
             break;
@@ -384,18 +401,14 @@ void Engine::render() {
     render2D();
     flush();
 
-	GLenum error;
-
-	while (GL_NO_ERROR != (error=glGetError())) {
-		std::string s = reinterpret_cast<const char *>(gluErrorString(error));
-		fprintf(stderr, "Error: %s\n", s.c_str());
-        exit(1);
-	}
+    CHECK_OPENGL_ERRORS(__LINE__);
 }
 
 void Engine::loadTextures()
 {
     printf("Loading textures\n");
+
+#ifndef HAVE_APPLE_OPENGL_FRAMEWORK
 
     Image_Init();
 
@@ -420,14 +433,14 @@ void Engine::loadTextures()
     // create 
 
     glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, 128, 128, images.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    ASSERT_NO_GL_ERROR;
+    CHECK_OPENGL_ERRORS(__LINE__);
 
     for (size_t i=0; i<images.size(); i++)
     {
         glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 128, 128, 1,
                 GL_RGBA, GL_UNSIGNED_BYTE, images[i]->data_ptr());
 
-        ASSERT_NO_GL_ERROR;
+        CHECK_OPENGL_ERRORS(__LINE__);
     }
 
     // glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
@@ -436,12 +449,12 @@ void Engine::loadTextures()
     for (size_t i=0; i<images.size(); i++) {
         delete images[i];
     }
+#endif
 }
 
 
 void Engine::render3D() {
-    ASSERT_NO_GL_ERROR;
-
+    CHECK_OPENGL_ERRORS(__LINE__);
     glPolygonMode( GL_FRONT_AND_BACK, optionRenderWireframe ? GL_LINE : GL_FILL );
 
     glEnable(GL_CULL_FACE);
@@ -453,7 +466,9 @@ void Engine::render3D() {
     glDepthRange(0.0f, 1.0f);
     glEnable(GL_DEPTH_CLAMP);
 
+#ifndef HAVE_APPLE_OPENGL_FRAMEWORK
     glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
+#endif
 
 	UseShader use(*shader);
 
@@ -473,7 +488,7 @@ void Engine::render3D() {
     shader->setUniformVec4(basicShader.ambientLightIntensity, ambientLightIntensity);
     shader->setUniform1i(basicShader.materials, 0);
 
-    ASSERT_NO_GL_ERROR;
+    CHECK_OPENGL_ERRORS(__LINE__);
 
     world->render();
 
@@ -488,11 +503,10 @@ void Engine::render3D() {
         glColor3f(1.0, 1.0, 1.0);
     }
 
-    ASSERT_NO_GL_ERROR;
+    CHECK_OPENGL_ERRORS(__LINE__);
 }
 
 void Engine::render2D() {
-    // ASSERT_NO_GL_ERROR;
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -504,7 +518,8 @@ void Engine::render2D() {
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
 
-    crosshair->render();
+    // crosshair->render();
+
     osd->render();
 
 #ifdef SUPPORT_GLCONSOLE
@@ -516,7 +531,6 @@ void Engine::render2D() {
 
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
-    // ASSERT_NO_GL_ERROR;
 }
 
 int Engine::viewWidth() const {
@@ -529,7 +543,7 @@ int Engine::viewHeight() const {
 
 
 void Engine::flush() {
-    SDL_GL_SwapBuffers();
+    SDL_GL_SwapWindow(window);
 }
 
 void Engine::updateFrustum() {

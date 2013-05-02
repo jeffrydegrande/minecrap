@@ -28,22 +28,22 @@ const Vec3 cubeVerts[] =
 const Vec3 verts[] = //36 vertices total
 {
   cubeVerts[0], cubeVerts[4], cubeVerts[6],  //front
-  /*cubeVerts[0], cubeVerts[6],*/ cubeVerts[2],
+  cubeVerts[0], cubeVerts[6], cubeVerts[2],
 
   cubeVerts[1], cubeVerts[0], cubeVerts[2],  //right
-  /*cubeVerts[1], cubeVerts[2],*/ cubeVerts[3],
+  cubeVerts[1], cubeVerts[2], cubeVerts[3],
 
   cubeVerts[5], cubeVerts[1], cubeVerts[3],  //back
-  /*cubeVerts[5], cubeVerts[3],*/ cubeVerts[7],
+  cubeVerts[5], cubeVerts[3], cubeVerts[7],
 
   cubeVerts[4], cubeVerts[5], cubeVerts[7],  //left
-  /*cubeVerts[4], cubeVerts[7],*/ cubeVerts[6],
+  cubeVerts[4], cubeVerts[7], cubeVerts[6],
 
   cubeVerts[4], cubeVerts[0], cubeVerts[1],  //top
-  /*cubeVerts[4], cubeVerts[1],*/ cubeVerts[5],
+  cubeVerts[4], cubeVerts[1], cubeVerts[5],
 
   cubeVerts[6], cubeVerts[7], cubeVerts[3],  //bottom
-  /*cubeVerts[6], cubeVerts[3],*/ cubeVerts[2],
+  cubeVerts[6], cubeVerts[3], cubeVerts[2],
 };
 
 const Vec3 right(1.0f, 0.0f, 0.0f);
@@ -55,12 +55,12 @@ const Vec3 back(0.0f, 0.0f, -1.0f);
 
 const Vec3 normsArray[] =
 {
-  front, front, front, front, /*front, front,*/
-  right, right, right, right, /*right, right,*/
-  back, back, back, back, /*back, back,*/
-  left, left, left, left, /*left, left,*/
-  top, top, top, top, /*top, top,*/
-  bottom, bottom, bottom, bottom /*,bottom, bottom*/
+  front, front, front, front, front, front,
+  right, right, right, right, right, right,
+  back, back, back, back, back, back,
+  left, left, left, left, left, left,
+  top, top, top, top, top, top,
+  bottom, bottom, bottom, bottom, bottom, bottom
 };
 
 #include <iostream>
@@ -173,17 +173,17 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
 
 void Mesh::addCube(const Vec3 & pos, GLubyte kind, GLubyte faces) {
     if (faces & (1<<0))
-        addCubeFace(pos, kind, 0, 4);
+        addCubeFace(pos, kind, 0, 6);
     if (faces & (1<<1))
-        addCubeFace(pos, kind, 4, 8);
+        addCubeFace(pos, kind, 6, 12);
     if (faces & (1<<2))
-        addCubeFace(pos, kind, 8, 12);
+        addCubeFace(pos, kind, 12, 18);
     if (faces & (1<<3))
-        addCubeFace(pos, kind, 12, 16);
+        addCubeFace(pos, kind, 18, 24);
     if (faces & (1<<4))
-        addCubeFace(pos, kind, 16, 20);
+        addCubeFace(pos, kind, 24, 30);
     if (faces & (1<<5))
-        addCubeFace(pos, kind, 20, 24);
+        addCubeFace(pos, kind, 30, 36);
 }
 
 void Mesh::finish() {
@@ -239,7 +239,7 @@ void Mesh::render(bool transparency) {
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(struct vertex_t),
             (GLvoid*)offsetof(struct vertex_t, s));
 
-    glDrawArrays(GL_QUADS, 0, index);
+    glDrawArrays(GL_TRIANGLES, 0, index);
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);

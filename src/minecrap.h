@@ -18,9 +18,9 @@
 #define GL_GLEXT_PROTOTYPES
 
 #ifdef HAVE_APPLE_OPENGL_FRAMEWORK
-#    include <OpenGL/gl.h>
-#    include <OpenGL/glext.h>
-#    include <OpenGL/glu.h>
+#define GL3_PROTOTYPES 1
+#    include <OpenGL/gl3.h>
+#    include <OpenGL/gl3ext.h>
 #else
 #    ifdef _WIN32
 #      include <windows.h>
@@ -41,7 +41,6 @@
 #include <SDL_opengl.h>
 #else
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
 #endif
 
 #include <CVars/CVar.h>
@@ -56,12 +55,6 @@
 #else
 #include <unistd.h>
 #define sleep(N)   usleep(N * 1000)
-#endif
-
-#ifdef HAVE_APPLE_OPENGL_FRAMEWORK
-#define glBindVertexArray glBindVertexArrayAPPLE
-#define glGenVertexArrays glGenVertexArraysAPPLE
-#define  glDeleteVertexArrays glDeleteVertexArraysAPPLE
 #endif
 
 #define DEGREES_TO_RADIANS        .017453292F
@@ -92,8 +85,8 @@
     { \
         GLenum error; \
         while (GL_NO_ERROR != (error=glGetError())) { \
-            std::string s = reinterpret_cast<const char *>(gluErrorString(error)); \
-            fprintf(stderr, "Error (%s:%d): %s\n", __FILE__, lineno, s.c_str()); \
+            fprintf(stderr, "Error (%s:%d): %d\n", __FILE__, lineno, error); \
+            exit(1); \
         } \
     }
 

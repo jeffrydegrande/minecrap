@@ -4,7 +4,6 @@
 #include "Player.h"
 #include "Crosshair.h"
 #include "Console.h"
-#include "OSD.h"
 #include "Input.h"
 #include "Shader.h"
 #include "MatrixStack.h"
@@ -129,7 +128,6 @@ void Engine::init() {
     displayOpenGLInfo();
     resizeWindow(width, height);
 
-    OSD_Init();
     compileShaders();
     loadTextures();
 
@@ -168,7 +166,6 @@ void Engine::resizeWindow(int width, int height) {
     /* } */
     /* crosshair = new Crosshair(viewWidth(), viewHeight()); */
 
-    // osd->setWidth(width);
     CHECK_OPENGL_ERRORS(__LINE__);
 }
 
@@ -184,7 +181,6 @@ void Engine::setupProjectionMatrix()
 
 void Engine::compileShaders()
 {
-    CHECK_OPENGL_ERRORS(__LINE__);
     printf("Compiling shaders\n");
 
     if (shader == NULL) {
@@ -264,11 +260,11 @@ void Engine::update(float elapsed) {
     player->update(elapsedInSeconds);
     world->update();
 
-    osd->write("Current block: %s (%d)",
-            player->getInventory()->getCurrentBlockName(),
-            player->getInventory()->getCurrentBlock());
+    /* osd->write("Current block: %s (%d)", */
+    /*         player->getInventory()->getCurrentBlockName(), */
+    /*         player->getInventory()->getCurrentBlock()); */
 
-    osd->write("FPS: %d", fps_current);
+    /* osd->write("FPS: %d", fps_current); */
 }
 
 void Engine::collectInput() {
@@ -492,6 +488,7 @@ void Engine::render3D() {
 
     world->render();
 
+#if 0
     if (optionDrawRayToLightSource) {
         Vec4 point = Vec4(0.0f, 0.0f, 0.0f, 0.f) + (directionToLight * 10000);
         glLineWidth(3.0f);
@@ -502,11 +499,13 @@ void Engine::render3D() {
         glEnd();
         glColor3f(1.0, 1.0, 1.0);
     }
+#endif
 
     CHECK_OPENGL_ERRORS(__LINE__);
 }
 
 void Engine::render2D() {
+#if 0
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -519,8 +518,7 @@ void Engine::render2D() {
     glDisable(GL_DEPTH_TEST);
 
     // crosshair->render();
-
-    osd->render();
+    // osd->render();
 
 #ifdef SUPPORT_GLCONSOLE
     ConsoleRender();
@@ -531,6 +529,7 @@ void Engine::render2D() {
 
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
+#endif
 }
 
 int Engine::viewWidth() const {
@@ -546,31 +545,31 @@ void Engine::flush() {
     SDL_GL_SwapWindow(window);
 }
 
-void Engine::updateFrustum() {
-    return;
+/* void Engine::updateFrustum() { */
+/*     return; */
 
-    float p[16];
-    float m[16];
-    glGetFloatv(GL_PROJECTION_MATRIX, p);
-    glGetFloatv(GL_MODELVIEW_MATRIX, m);
+/*     float p[16]; */
+/*     float m[16]; */
+/*     glGetFloatv(GL_PROJECTION_MATRIX, p); */
+/*     glGetFloatv(GL_MODELVIEW_MATRIX, m); */
 
-    Matrix4 P = p;
-    Matrix4 M = m;
-    Matrix4 A = M * P;
-    frustum.setFrustum(A.value_ptr());
-}
+/*     Matrix4 P = p; */
+/*     Matrix4 M = m; */
+/*     Matrix4 A = M * P; */
+/*     frustum.setFrustum(A.value_ptr()); */
+/* } */
 
-bool Engine::withinFrustum(float x, float y, float z, float radius) {
-    Vec3 point(x, y, z);
+/* bool Engine::withinFrustum(float x, float y, float z, float radius) { */
+/*     Vec3 point(x, y, z); */
 
-    if ( point.y < cameraPosition.y - 4)
-        return false;
+/*     if ( point.y < cameraPosition.y - 4) */
+/*         return false; */
 
-    if (Frustum::OUTSIDE != frustum.sphereInFrustum(point, radius))
-        return true;
-    else
-        return false;
-}
+/*     if (Frustum::OUTSIDE != frustum.sphereInFrustum(point, radius)) */
+/*         return true; */
+/*     else */
+/*         return false; */
+/* } */
 
 void Engine::toggleDayNight()
 {

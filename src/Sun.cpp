@@ -26,9 +26,11 @@ int Sun::render() {
 }
 
 void Sun::draw() {
+    /*
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(0, 300, 0);
 	// Block::draw(8.0f);
     glPopMatrix();
+    */
 }

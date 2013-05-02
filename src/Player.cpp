@@ -4,7 +4,6 @@
 #include "Engine.h"
 #include "World.h"
 #include "Text.h"
-#include "OSD.h"
 
 #include "Vec.h"
 #include <math.h>
@@ -64,8 +63,8 @@ bool Player::checkCollision(const Vec3 &pos) {
     GLubyte hb = world->blockAt(head);
     GLubyte hf = world->blockAt(feet);
 
-    osd->write("head: %d\n", hb);
-    osd->write("feet: %d\n", hf);
+    // osd->write("head: %d\n", hb);
+    // osd->write("feet: %d\n", hf);
 
     return (hb == AIR && hf == AIR);
 }
@@ -76,15 +75,15 @@ void Player::update(float elapsed)
     move(direction, elapsed);
 
 
-    osd->write("LOC: %0.2f, %0.2f, %0.2f", currentPosition.x, currentPosition.y, currentPosition.z);
-    osd->write("Facing %s (%0.2f)", getDirectionAsString(), getDirectionInDegrees());
-    osd->write("Distance Traveled: %0.2fm (%0.2f km/h)\n", 
-            getDistanceTraveled(), getSpeed() / 1000);
+    /* osd->write("LOC: %0.2f, %0.2f, %0.2f", currentPosition.x, currentPosition.y, currentPosition.z); */
+    /* osd->write("Facing %s (%0.2f)", getDirectionAsString(), getDirectionInDegrees()); */
+    /* osd->write("Distance Traveled: %0.2fm (%0.2f km/h)\n", */ 
+    /*         getDistanceTraveled(), getSpeed() / 1000); */
 
-    if (onGround)
-        osd->write("On Ground: yes");
-    else
-        osd->write("On Ground: no");
+    /* if (onGround) */
+    /*     osd->write("On Ground: yes"); */
+    /* else */
+    /*     osd->write("On Ground: no"); */
 }
 
 void Player::look(int x, int y) {

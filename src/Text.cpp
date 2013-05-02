@@ -106,17 +106,20 @@ void makeRasterFont(void)
     GLuint i;
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     fontOffset = glGenLists (128);
+    CHECK_OPENGL_ERRORS(__LINE__);
     for (i = 32; i < 127; i++) {
         glNewList(i+fontOffset, GL_COMPILE);
             glBitmap(8, 13, 0.0, 2.0, 10.0, 0.0, rasters[i-32]);
         glEndList();
     }
+    CHECK_OPENGL_ERRORS(__LINE__);
 }
 
 void TextInit(void)
 {
-    glShadeModel (GL_FLAT);
+    // glShadeModel (GL_FLAT);
     makeRasterFont();
+    CHECK_OPENGL_ERRORS(__LINE__);
 }
 
 void renderText(const char *s)

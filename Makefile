@@ -31,20 +31,16 @@ LIB_MINECRAP_SOURCES= src/AABox.cpp \
 		      src/Chunk.cpp \
 		      src/Color.cpp \
 		      src/Console.cpp \
-		      src/Crosshair.cpp \
 		      src/Engine.cpp \
 		      src/File.cpp \
-		      src/Frustum.cpp \
 		      src/Input.cpp \
 		      src/Matrix.cpp \
 		      src/MatrixStack.cpp \
 		      src/Mesh.cpp \
-		      src/OSD.cpp \
 		      src/Plane.cpp \
 		      src/Player.cpp \
 		      src/Shader.cpp \
 		      src/Sun.cpp \
-		      src/Text.cpp \
 		      src/Vec.cpp \
 		      src/World.cpp \
 		      src/simplex.cpp \

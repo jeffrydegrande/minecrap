@@ -23,6 +23,7 @@ class OSD {
 
 void OSD_Init();
 void OSD_Destroy();
+
 extern OSD *osd;
 
 #endif

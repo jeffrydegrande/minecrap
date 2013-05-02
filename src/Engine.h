@@ -4,7 +4,6 @@
 #include "minecrap.h"
 #include "Matrix.h"
 #include "Vec.h"
-#include "Frustum.h"
 #include "MatrixStack.h"
 
 class World;
@@ -20,8 +19,6 @@ class Engine
 	unsigned int fps_current; //the current FPS.
 	int width;
 	int height;
-
-    Frustum frustum;
 
 	bool quit;
     bool paused;

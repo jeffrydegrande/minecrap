@@ -1,8 +1,8 @@
+* convert OSD to shaders
 * implement sun with meshes
 * use uniform blocks to pass in matrices into shaders
 * AABB collision with world
 * load/unload in additional parts of the world as we travel.
-* convert OSD to shaders
 * convert GLconsole to shaders
 * make a matrix version of glOrtho
 * switching between multiple shaders must be simple
@@ -17,6 +17,3 @@ GOALS:
 stuff that broke:
 * showing direction no longer works, rads vs degs problem
 * figure out why setCameraToClipMatrix doesn't work in Engine::resizeWindow
-
-dumb stuff:
-* figure out what's the deal with std::min, std::max

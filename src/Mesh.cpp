@@ -79,28 +79,33 @@ Mesh::~Mesh() {
 void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
 {
     assert( index <= vertexCount );
+
     for (int i=start; i<stop; i++) {
         // position
         vertices[index].x  = pos.x + verts[i].x;
         vertices[index].y  = pos.y + verts[i].y;
         vertices[index].z  = pos.z + verts[i].z;
 
-        vertices[index].a  = 1.0f;
-
-        switch (i % 4) {
+        // vertices[index].a  = 1.0f;
+        switch (i % 6) {
             case 0:
+            case 3:
                 vertices[index].s = 0.0f;
                 vertices[index].t = 0.0f;
                 break;
+
             case 1:
                 vertices[index].s = 1.0f;
                 vertices[index].t = 0.0f;
                 break;
+
             case 2:
+            case 4:
                 vertices[index].s = 1.0f;
                 vertices[index].t = 1.0f;
                 break;
-            case 3:
+
+            case 5:
                 vertices[index].s = 0.0f;
                 vertices[index].t = 1.0f;
                 break;
@@ -110,42 +115,18 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
 
         // color
         switch (kind) {
-
-        case GRASS:
-            vertices[index].r  = 0.1f;
-            vertices[index].g  = 0.6f;
-            vertices[index].b  = 0.0f;
-            if (start == 16)
-                vertices[index].p = 0.0f;
-            else
-                vertices[index].p = 1.0f;
-            break;
         case ROCK:
-            vertices[index].r  = 0.25f;
-            vertices[index].g  = 0.25f;
-            vertices[index].b  = 0.25f;
             vertices[index].p  = 4.0f;
             break;
+        case GRASS:
         case DIRT:
-            vertices[index].r = 233.0f/510;
-            vertices[index].g = 107.0f/510;
-            vertices[index].b = 0.0f;
-            if (start == 16)
-                vertices[index].p = 1.0f;
-            else
-                vertices[index].p = 0.0f;
+            vertices[index].p = (start == 24) ? 1.0f : 0.0f;
             break;
         case WATER:
-            vertices[index].r  = 0.0f;
-            vertices[index].g  = 0.0f;
-            vertices[index].b  = 0.5f;
             vertices[index].a  = 0.4f;
             vertices[index].p = 2.0f;
             break;
         case SAND:
-            vertices[index].r  = 0.5f;
-            vertices[index].g  = 0.5f;
-            vertices[index].b  = 0.0f;
             vertices[index].p = 3.0f;
             break;
         case BEDROCK:
@@ -153,9 +134,6 @@ void Mesh::addCubeFace(const Vec3 &pos, GLubyte kind, int start, int stop)
             break;
 
         case RED:
-            vertices[index].r  = 1.0f;
-            vertices[index].g  = 0.0f;
-            vertices[index].b  = 0.0f;
             vertices[index].p = 6.0f;
             break;
         case LAVA:

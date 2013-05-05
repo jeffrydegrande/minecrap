@@ -187,10 +187,10 @@ void Engine::compileShaders()
 #ifdef _WIN32
         shader->addVertexShader("..\\shaders\\GLSL33\\hello_world.vert");
         shader->addFragmentShader("..\\shaders\\GLSL33\\hello_world.frag");
-#endif
-
+#else
         shader->addVertexShader("shaders/GLSL33/hello_world.vert");
         shader->addFragmentShader("shaders/GLSL33/hello_world.frag");
+#endif
 
         shader->done();
 
@@ -402,20 +402,18 @@ void Engine::loadTextures()
 {
     printf("Loading textures\n");
 
-#ifndef HAVE_APPLE_OPENGL_FRAMEWORK
-
     Image_Init();
 
     std::vector<Image *> images;
 
-    images.push_back(new Image("./bricks/grass_side.jpg"));
-    images.push_back(new Image("./bricks/grass_top.jpg"));
-    images.push_back(new Image("./bricks/water.jpg"));
-    images.push_back(new Image("./bricks/sand.jpg"));
-    images.push_back(new Image("./bricks/stone.jpg"));
-    images.push_back(new Image("./bricks/bedrock.jpg"));
-    images.push_back(new Image("./bricks/redstone_ore.jpg"));
-    images.push_back(new Image("./bricks/lava.jpg"));
+    images.push_back(new Image("./bricks/grass_side.jpg"));   // 0
+    images.push_back(new Image("./bricks/grass_top.jpg"));    // 1
+    images.push_back(new Image("./bricks/water.jpg"));        // 2
+    images.push_back(new Image("./bricks/sand.jpg"));         // 3
+    images.push_back(new Image("./bricks/stone.jpg"));        // 4
+    images.push_back(new Image("./bricks/bedrock.jpg"));      // 5
+    images.push_back(new Image("./bricks/redstone_ore.jpg")); // 6
+    images.push_back(new Image("./bricks/lava.jpg"));         // 7
 
     glGenTextures(1, &blockTextureArray);
     glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
@@ -438,12 +436,11 @@ void Engine::loadTextures()
     }
 
     // glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-	CHECK_OPENGL_ERRORS
+	CHECK_OPENGL_ERRORS(__LINE__);
 
     for (size_t i=0; i<images.size(); i++) {
         delete images[i];
     }
-#endif
 }
 
 
@@ -459,10 +456,7 @@ void Engine::render3D() {
     glDepthMask(GL_TRUE);
     glDepthRange(0.0f, 1.0f);
     glEnable(GL_DEPTH_CLAMP);
-
-#ifndef HAVE_APPLE_OPENGL_FRAMEWORK
     glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
-#endif
 
 	UseShader use(*shader);
 

@@ -5,4 +5,4 @@ Lots of inspiration is drawn (and some code borrowed) from Shamus Young's [Front
 project](http://www.shamusyoung.com/twentysidedtale/?p=11874) and Michael
 Goodfellow's [SeaOfMemes](http://www.sea-of-memes.com). 
 
-Currently it runs on Linux and Windows only.
+Currently it runs on Linux, OSX & Windows.

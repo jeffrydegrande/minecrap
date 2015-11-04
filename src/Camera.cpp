@@ -27,12 +27,16 @@ Vec3 Camera::move(float dx, float dy, float dz) const
     Vec3 eye = this->eye;
     Vec3 forward;
 
+    /*
     if(CVarUtils::GetCVar<bool>("flying")) {
         forward = viewDirection;
     } else {
+        */
         forward = Vec3::crossProduct(WORLD_YAXIS, xAxis);
         forward.normalize();
+        /*
     }
+    */
 
     eye += xAxis * dx;
     eye += WORLD_YAXIS * dy;
@@ -53,11 +57,11 @@ void Camera::setPosition(const Vec3 &position)
 
 void Camera::rotate(float headingDegrees, float pitchDegrees, float rollDegrees)
 {
-    if(CVarUtils::GetCVar<bool>("flying")) {
-        rotateFlight(headingDegrees, pitchDegrees, rollDegrees);
-    } else {
+    // if(CVarUtils::GetCVar<bool>("flying")) {
+        // rotateFlight(headingDegrees, pitchDegrees, rollDegrees);
+    // } else {
         rotateFirstPerson(headingDegrees, pitchDegrees);
-    }
+    // }
     updateViewMatrix(true);
 }
 

@@ -7,7 +7,7 @@
 
 #include "Vec.h"
 #include <math.h>
-#include <CVars/CVar.h>
+// #include <CVars/CVar.h>
 
 #define GRAVITY         9.2f
 #define JUMP_SPEED      6.0f
@@ -54,8 +54,10 @@ void Player::setPosition(const Vec3 &position) {
 
 bool Player::checkCollision(const Vec3 &pos) {
 
+    /*
     if (CVarUtils::GetCVar<bool>("noclip"))
         return true;
+    */
 
     Vec3 head(pos.x, (int)pos.y+1, pos.z);
     Vec3 feet(pos.x, (int)pos.y, pos.z);
@@ -91,7 +93,7 @@ void Player::look(int x, int y) {
     if (abs(x) > 200 || abs(y) > 200)
         return;
 
-    bool flying = CVarUtils::GetCVar<bool>("flying");
+    bool flying = false; // CVarUtils::GetCVar<bool>("flying");
     float mouse_sense = 0.5f;
 
 	if (flying) {
@@ -160,7 +162,7 @@ void Player::calculateMovementDirection(float elapsed)
 		movingLeft = false;
 	}
 
-    if (CVarUtils::GetCVar<bool>("flying")) {
+    if (false /*CVarUtils::GetCVar<bool>("flying")*/) {
         if (Input::isAscending()) {
             if (!movingUp) {
                 movingUp = true;
@@ -263,7 +265,7 @@ void Player::updateVelocity(const Vec3 &direction, float elapsed)
         }
     }
 
-    if (CVarUtils::GetCVar<bool>("flying")) {
+    if (false/*CVarUtils::GetCVar<bool>("flying")*/) {
         if (direction.y != 0.0f) {
             // Camera is moving along the y axis.
             // Linearly accelerate up to the camera's max speed.

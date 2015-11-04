@@ -43,7 +43,7 @@
 #include <SDL2/SDL.h>
 #endif
 
-#include <CVars/CVar.h>
+// #include <CVars/CVar.h>
 #include "Console.h"
 
 #include <cstdio>

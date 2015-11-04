@@ -142,7 +142,7 @@ void Engine::init() {
     }
     */
 
-    world = new World(CVarUtils::GetCVar<int>("seed"));
+    world = new World(300); // CVarUtils::GetCVar<int>("seed"));
     player = world->spawnPlayer();
 }
 

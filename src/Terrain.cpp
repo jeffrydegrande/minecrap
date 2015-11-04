@@ -1,6 +1,7 @@
 #include "Terrain.h"
-#include "simplex.h"
+#include "simplex.h" 
 #include "Block.h"
+#include "Chunk.h"
 #include <cmath>
 
 ///////////////////////////////////////////////////////////
@@ -89,7 +90,7 @@ void SimpleTerrain::generate(Chunk &chunk)
             0.5f,
             0.5f) * 32 + WATER_LEVEL;
 
-        assert(maxHeight <= CHUNKY && maxHeight >= 0);
+        // assert(maxHeight <= CHUNKY && maxHeight >= 0);
 
 		chunk.setBlock(x, (int)maxHeight, z, ROCK);
 		chunk.setBlock(x, (int)maxHeight - 1, z,  ROCK);
